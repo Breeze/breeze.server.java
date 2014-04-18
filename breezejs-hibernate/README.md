@@ -13,7 +13,7 @@ be used as a library in a web application.
 - Serializes query results to [JSON](http://www.json.org/java/), using [$id/$ref syntax for handling references](https://blogs.oracle.com/sundararajan/entry/a_convention_for_circular_reference)
 - Handles saving Breeze payloads in Hibernate
 
-To see these features in action, please see the [NorthBreeze sample](../../breezejs.samples/java/NorthBreeze).
+To see these features in action, please see the [NorthBreeze sample](https://github.com/Breeze/breeze.js.samples/tree/master/java/NorthBreeze).
 
 ## Using the API
 
@@ -216,6 +216,44 @@ it needs support for for handing references (circular and otherwise) that are co
 We would like to use a better-supported JSON library, but we haven't found one for Java that supports references in the same manner (and without annotating all of our model 
 classes).  Let us know if you find one.
   
+
+## Caveats and Limitations
+#### Foreign Keys Must Be Mapped
+
+Unlike Hibernate itself, Breeze requires foreign keys that are mapped to object properties so Breeze can maintain the relationships on the client side. Here's an example, mapping a relationship from Order to Customer:
+
+	<many-to-one name="Customer" column="`CustomerID`" class="Customer" />
+	<property name="CustomerID" type="System.Guid" insert="false" update="false" />
+
+The "Customer" property is mapped normally, while the "CustomerID" property is mapped with `insert="false"` and `update="false"`. This way, the CustomerID is exposed to Breeze, but Hibernate will perform inserts and updates using the ID of the Customer object itself.
+
+##### Possible Fix?
+Foreign keys are required on the client for Breeze to work. They are also required to 
+re-connect the entities on the server during the SaveChanges processing.  However, we
+should be able to generate the keys automatically, without having to map them in the 
+model.  Our plan is to:
+
+1. Create necessary foreign key properties in the metadata where they don't exist in the real model. These would be marked as "synthetic" somehow ('$' prefix, special property, etc).
+2. During the JSON serialization process, populate the synthetic foreign keys from the related entities or Hibernate proxies.
+3. During the JSON deserialization process (when saving), carry the synthetic foreign key information along with the entity, so it can be used to re-establish relationships or create Hibernate proxies.
+
+Note that this is closely tied to the JSON serialization process.
+
+#### OData Grammar
+
+Currently, only a subset of the [OData protocol specification](http://www.odata.org/documentation/odata-version-3-0/odata-version-3-0-core-protocol/) is handled.
+
+- **$orderby**: supported
+- **$top**: supported
+- **$skip**: supported
+- **$inlinecount**: supported
+- **$filter**: supports comparisons (eq, ne, gt, ge, lt, le) but not logicals (and, or, not), arithmetic (add, sub, mul, div, mod), grouping, or functions (substring, endswith, etc.)
+- **$select**: not supported
+- **$format**: not supported, always returns JSON
+- **$links**: not supported
+- **$count**: not supported
+
+
 
 ## Building the Library
 
