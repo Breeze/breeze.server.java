@@ -45,6 +45,7 @@ public class OdataCriteria {
 	 */
 	public static Criteria applyParameters(Criteria crit, OdataParameters op)
 	{
+		if (op == null) return crit;
     	if (op.top > 0) crit.setMaxResults(op.top);
     	if (op.skip > 0) crit.setFirstResult(op.skip);
     	if (op.orderby != null) {
