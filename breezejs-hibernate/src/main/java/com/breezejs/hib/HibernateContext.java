@@ -17,6 +17,7 @@ import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.ComponentType;
 import org.hibernate.type.Type;
 
+import com.breezejs.Metadata;
 import com.breezejs.save.*;
 
 public class HibernateContext extends ContextProvider {

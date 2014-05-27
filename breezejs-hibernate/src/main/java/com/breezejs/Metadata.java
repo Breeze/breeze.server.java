@@ -1,4 +1,4 @@
-package com.breezejs.hib;
+package com.breezejs;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,5 +12,5 @@ public class Metadata extends LinkedHashMap<String, Object> {
 	 * if the Order entity has a Customer navigation property, the map would contain
 	 * "Models.NorthwindIB.NH.Order.Customer": "CustomerID"
 	 */
-	HashMap<String, String> foreignKeyMap;
+	public HashMap<String, String> foreignKeyMap;
 }
