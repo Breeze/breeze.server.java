@@ -60,7 +60,7 @@ public class HibernateExpander {
 	private static void initializeObjectPath(Object parent, String[] expandPath, int pathIndex)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
-		if (pathIndex >= expandPath.length)
+		if (parent == null || pathIndex >= expandPath.length)
 			return;
 		String propName = expandPath[pathIndex];
 		Class clazz = parent.getClass();

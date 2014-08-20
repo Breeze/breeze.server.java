@@ -29,6 +29,8 @@ import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.tuple.entity.EntityMetamodel;
 import org.hibernate.type.*;
 
+import com.breezejs.Metadata;
+
 /**
  * Builds a data structure containing the metadata required by Breeze.
  * @see http://www.breezejs.com/documentation/breeze-metadata-format
@@ -228,7 +230,7 @@ public class MetadataBuilder {
                     HashMap<String, Object> dmap = makeDataProperty(propName, propType, col, propNull[i], isKey, isVersion);
                     dataArrayList.add(dmap);
 
-                    String columnNameString = getPropertyColumnNames(persister, propName);
+                    String columnNameString = getPropertyColumnNames(persister, propName, propType);
                     relatedDataPropertyMap.put(columnNameString, dmap);
                 }
             }
@@ -245,7 +247,7 @@ public class MetadataBuilder {
             HashMap<String, Object> dmap = makeDataProperty(meta.getIdentifierPropertyName(), meta.getIdentifierType(), col, false, true, false);
             dataArrayList.add(0, dmap);
 
-            String columnNameString = getPropertyColumnNames(persister, meta.getIdentifierPropertyName());
+            String columnNameString = getPropertyColumnNames(persister, meta.getIdentifierPropertyName(), meta.getIdentifierType());
             relatedDataPropertyMap.put(columnNameString, dmap);
         }
         else if (meta.getIdentifierType() != null && meta.getIdentifierType().isComponentType())
@@ -272,7 +274,7 @@ public class MetadataBuilder {
 	                }
 	                else
 	                {
-	                    String propColumnNames = getPropertyColumnNames(persister, compName);
+	                    String propColumnNames = getPropertyColumnNames(persister, compName, propType);
 
 	                    HashMap<String, Object> assProp = makeAssociationProperty(type, (AssociationType)propType, compName, propColumnNames, relatedDataPropertyMap, true);
 	                    navArrayList.add(assProp);
@@ -291,7 +293,7 @@ public class MetadataBuilder {
             if (propType.isAssociationType())
             {
                 // navigation property
-                String propColumnNames = getPropertyColumnNames(persister, propName);
+                String propColumnNames = getPropertyColumnNames(persister, propName, propType);
                 HashMap<String, Object> assProp = makeAssociationProperty(type, (AssociationType)propType, propName, propColumnNames, relatedDataPropertyMap, false);
                 navArrayList.add(assProp);
             }
@@ -512,28 +514,41 @@ public class MetadataBuilder {
         nmap.put("isScalar", !propType.isCollectionType());
 
         // the associationName must be the same at both ends of the association.
-        nmap.put("associationName", getAssociationName(containingType.getSimpleName(), relatedEntityType.getSimpleName(), (propType instanceof OneToOneType)));
+        nmap.put("associationName", getAssociationName(containingType.getSimpleName(), relatedEntityType.getSimpleName(), columnNames));
 
-        // look up the related foreign key using the column name
-        String fkName = null;
-        Map<String, Object> relatedDataProperty = relatedDataPropertyMap.get(columnNames);
-        if (relatedDataProperty != null) {
-        	fkName = (String) relatedDataProperty.get("nameOnServer");
-        	if (propType.getForeignKeyDirection() == ForeignKeyDirection.FOREIGN_KEY_FROM_PARENT) {
-                nmap.put("foreignKeyNamesOnServer", new String[] { fkName });
-        	} else {
-                // inverse foreign key
-                // many-to-many relationships do not have a direct connection on the client or in metadata
-        		Joinable joinable = propType.getAssociatedJoinable((SessionFactoryImplementor) _sessionFactory);
-        		if (!(joinable instanceof AbstractCollectionPersister && ((AbstractCollectionPersister)joinable).isManyToMany())) {
-                    nmap.put("invForeignKeyNamesOnServer", new String[] { fkName });
-        		}
-        	}
-        }
-
-        // The foreign key columns usually applies for many-to-one and one-to-one associations
-        if (!propType.isCollectionType())
+        if (propType.isCollectionType())
         {
+            // inverse foreign key
+        	Joinable joinable = propType.getAssociatedJoinable((SessionFactoryImplementor)this._sessionFactory);
+            if (joinable instanceof AbstractCollectionPersister)
+            {
+                // many-to-many relationships do not have a direct connection on the client or in metadata
+            	AbstractEntityPersister elementPersister = (AbstractEntityPersister) ((AbstractCollectionPersister)joinable).getElementPersister();
+                if (elementPersister != null)
+                {
+                    String joinProp = getPropertyNameForColumn(elementPersister, columnNames);
+                    nmap.put("invForeignKeyNamesOnServer", new String[] { joinProp });
+                }
+            }
+        }
+        else
+        {
+            // Not a collection type - a many-to-one or one-to-one association
+            // Look up the related foreign key name using the column name
+            String fkName = null;
+            Map<String, Object> relatedDataProperty = relatedDataPropertyMap.get(columnNames);
+            if (relatedDataProperty != null) {
+            	if (propType.getForeignKeyDirection() == ForeignKeyDirection.FOREIGN_KEY_FROM_PARENT) 
+            	{
+                    nmap.put("foreignKeyNamesOnServer", new String[] { fkName });
+                }
+                else
+                {
+                    nmap.put("invForeignKeyNamesOnServer", new String[] { fkName });
+                }
+            }
+
+            // For many-to-one and one-to-one associations, save the relationship in _fkMap for re-establishing relationships during save
             String entityRelationship = containingType.getName() + '.' + propName;
             if (relatedDataProperty != null)
             {
@@ -554,6 +569,7 @@ public class MetadataBuilder {
                 throw new IllegalArgumentException("Could not find matching fk for property " + entityRelationship);
             }
         }
+        
         return nmap;
     }
 
@@ -570,17 +586,57 @@ public class MetadataBuilder {
 
     /**
      *  Get the column names for a given property as a comma-delimited String of unbracketed, lowercase names.
+     *  For a collection property, the column name is the inverse foreign key (i.e. the column on
+     *  the other table that points back to the persister's table)
      */
-    String getPropertyColumnNames(AbstractEntityPersister persister, String propertyName)
+    String getPropertyColumnNames(AbstractEntityPersister persister, String propertyName, Type propType)
     {
-        String propColumnNames[] = persister.getPropertyColumnNames(propertyName);
-        if (propColumnNames.length == 0)
+        String[] propColumnNames = null;
+        if (propType.isCollectionType())
+        {
+            propColumnNames = ((CollectionType)propType).getAssociatedJoinable((SessionFactoryImplementor)this._sessionFactory).getKeyColumnNames();
+        }
+        else
+        {
+            propColumnNames = persister.getPropertyColumnNames(propertyName);
+        }
+        if (propColumnNames == null || propColumnNames.length == 0)
         {
             // this happens when the property is part of the key
             propColumnNames = persister.getKeyColumnNames();
         }
+        return catColumnNames(propColumnNames);
+    }
+    
+    /**
+     * Gets the simple (non-Entity) property that has the given columns
+     * @param persister
+     * @param columnNames - Comma-delimited column name string
+     * @return
+     */
+    String getPropertyNameForColumn(AbstractEntityPersister persister, String columnNames)
+    {
+        String[] propNames = persister.getPropertyNames();
+        Type[] propTypes = persister.getPropertyTypes();
+        for (int i = 0; i < propNames.length; i++)
+        {
+            String propName = propNames[i];
+            Type propType = propTypes[i];
+            if (propType.isAssociationType()) continue;
+            String[] columnArray = persister.getPropertyColumnNames(i);
+            String columns = catColumnNames(columnArray);
+            if (columns == columnNames) return propName;
+        }
+        return persister.getIdentifierPropertyName();
+    }    
+    
+    /**
+     * Unbrackets the column names and concatenates them into a comma-delimited string
+     */
+    String catColumnNames(String[] columnNames)
+    {
         StringBuilder sb = new StringBuilder();
-        for (String s : propColumnNames)
+        for (String s : columnNames)
         {
             if (sb.length() > 0) sb.append(',');
             sb.append(unBracket(s));
@@ -640,17 +696,17 @@ public class MetadataBuilder {
      *  For consistency, puts the entity names in alphabetical order.
      * @param name1
      * @param name2
-     * @param isOneToOne - if true, adds the one-to-one suffix
+     * @param columnNames - name of the column(s) on the child entity
      * @return
      */
-    String getAssociationName(String name1, String name2, boolean isOneToOne)
+    String getAssociationName(String name1, String name2, String columnNames)
     {
+    	columnNames = columnNames.replace(',', '_');
         if (name1.compareTo(name2) < 0)
-            return ASSN + name1 + '_' + name2 + (isOneToOne ? ONE2ONE : "");
+            return ASSN + name1 + '_' + name2 + '_' + columnNames;
         else
-            return ASSN + name2 + '_' + name1 + (isOneToOne ? ONE2ONE : "");
+            return ASSN + name2 + '_' + name1 + '_' + columnNames;
     }
-    static final String ONE2ONE = "_1to1";
     static final String ASSN = "AN_";
 
     // Map of Hibernate datatype to Breeze datatype.
