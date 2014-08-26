@@ -9,9 +9,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
-import org.odata4j.expression.BoolCommonExpression;
-import org.odata4j.expression.PrintExpressionVisitor;
-import org.odata4j.producer.resources.OptionsQueryParser;
 
 import com.breezejs.OdataParameters;
 import com.google.common.primitives.Doubles;
@@ -107,35 +104,15 @@ public class OdataCriteria {
 		crit.setProjection( Projections.rowCount());
 		return crit;
 	}
-	
-	/**
-	 * Add simple filtering to the Criteria.  Handles OData filters of the form
-	 * $filter=country eq 'Brazil'
-	 * @param crit 
-	 * @param filterString OData $filter.  Only filters of the form [field] [op] [value] are supported..
-	 */
-	static void addFilter(Criteria crit, String filterString)
-	{
-		BoolCommonExpression bce = OptionsQueryParser.parseFilter(filterString);
-		
-		CriteriaGenerator cg = new CriteriaGenerator();
-		Criterion criterion = cg.toCriterion((BoolCommonExpression) bce);
-		crit.add(criterion);
-//		CriteriaExpressionVisitor visitor = new CriteriaExpressionVisitor(crit);
-//		visitor.visit(bce);
-//		crit.add((Criterion) visitor.visit(bce));
-//		PrintExpressionVisitor visitor = new PrintExpressionVisitor();
-//		bce.visit(visitor);
-		
-	}
 
 	/**
-	 * Add simple filtering to the Criteria.  Handles OData filters of the form
+	 * Create a Criterion from a simple filter expression.  Handles OData filters of the form
 	 * $filter=country eq 'Brazil'
 	 * @param crit 
 	 * @param filterString OData $filter.  Only filters of the form [field] [op] [value] are supported..
+	 * @return an OperatorExpression or PropertyExpression
 	 */
-	static void addFilterOLD(Criteria crit, String filterString)
+	public static Criterion makeFilterCriterion(String filterString)
 	{
 		String[] filter = filterString.split(WHITESPACE, 3);
 		if (filter.length != 3)
@@ -164,13 +141,23 @@ public class OdataCriteria {
 			}
 			if (value == null) {
 				// expression comparing two properties
-				crit.add(new PropertyExpression(field, stringValue, restrictionOp));
-				return;
+				return new PropertyExpression(field, stringValue, restrictionOp);
 			}
 		}
 		
-		crit.add(new OperatorExpression(field, value, restrictionOp));
-		
+		return new OperatorExpression(field, value, restrictionOp);
+	}
+	
+	/**
+	 * Add simple filtering to the Criteria.  Handles OData filters of the form
+	 * $filter=country eq 'Brazil'
+	 * @param crit 
+	 * @param filterString OData $filter.  Only filters of the form [field] [op] [value] are supported..
+	 */
+	static void addFilter(Criteria crit, String filterString)
+	{
+		Criterion criterion = makeFilterCriterion(filterString);
+		crit.add(criterion);
 	}
 	
 	/*

@@ -32,13 +32,6 @@
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/validation-api-1.1.0.Final.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/xml-apis-1.0.b2.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/junit-3.8.1.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/core4j-0.5.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/eclipselink-2.1.2.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/javax.persistence-2.0.0.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/joda-time-1.6.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jsr311-api-1.1.1.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/odata4j-core-0.7.0.jar" sourcepath="/odata4j-core/odata4j-core-0.7.0-sources.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/hsqldb-2.3.2.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/mysql-connector-java-5.1.30.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
