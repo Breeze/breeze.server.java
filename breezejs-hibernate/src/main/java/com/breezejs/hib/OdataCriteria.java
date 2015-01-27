@@ -49,7 +49,8 @@ public class OdataCriteria {
 		if (op == null) return crit;
     	if (op.top > 0) crit.setMaxResults(op.top);
     	if (op.skip > 0) crit.setFirstResult(op.skip);
-    	if (op.orderby != null) {
+    	// OLD Code
+    	/* if (op.orderby != null) {
     		for(String s: op.orderbys()) {
     			String[] seg = s.split(WHITESPACE, 2);
     			String field = seg[0].replace('/', '.');
@@ -59,13 +60,51 @@ public class OdataCriteria {
     				crit.addOrder(Order.asc(field));
     			}
     		}
-    	}
+    	}*/
+    	addOrderBy(crit, op);
     	if (op.filter != null) {
     		addFilter(crit, op.filter);
     	}
 		
 		
 		return crit;
+	}
+	
+	// Basically doing something like this for nested props
+	/* Criteria criteria = session.createCriteria(OrderDetail.class)
+			 .createAlias("product", "product_1")
+			 .createAlias("product_1.category", "category_2")
+			 .addOrder( Order.desc(category_2.name");
+    */
+	private static void addOrderBy(Criteria crit, OdataParameters op) {
+		if (op.orderby == null) return;
+
+		for(String s: op.orderbys()) {
+			String[] segs = s.split(WHITESPACE, 2);
+			String field = segs[0].replace('/', '.');
+			String[] fields = field.split("\\.");
+			
+			String nextField;
+			Criteria nextCrit = crit;
+			if (fields.length == 1) {
+				nextField = fields[0];
+			} else {
+				String nextAlias = "";
+				for (int i = 0; i < fields.length - 1; i = i + 1) {
+					nextField = nextAlias == "" ? fields[i] : nextAlias + "." + fields[i];
+					nextAlias = fields[i] + "_" + i;
+					nextCrit = nextCrit.createAlias(nextField, nextAlias);
+				}
+				nextField = nextAlias + "." + fields[fields.length - 1];
+			}
+			Boolean isDesc = (segs.length == 2 && "desc".equalsIgnoreCase(segs[1]));
+			if (isDesc) {
+				nextCrit.addOrder(Order.desc(nextField));
+			} else {
+				nextCrit.addOrder(Order.asc(nextField));
+			}
+		}
+
 	}
 	
 	/**

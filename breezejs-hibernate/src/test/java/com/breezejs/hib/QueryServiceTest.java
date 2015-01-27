@@ -40,6 +40,20 @@ public class QueryServiceTest extends TestCase {
     	assertTrue(json.indexOf("Brazil") > 0);
     	assertTrue(json.indexOf("France") < 0);
 	}
+	
+	public void testQueryOrderByNestedProp1() {
+    	String json = qs.queryToJson(Order.class, "?$filter=orderID lt 10258&$orderby=employee/lastName desc&$expand=employee");
+		// String json = qs.queryToJson(Product.class, "?$orderby=Category/CategoryName desc,ProductName");
+    	assertTrue(json.indexOf("Order") > 0);
+    	assertTrue(json.indexOf("lastName") > 0);
+	}
+	
+//	public void testQueryOrderByNestedProp2() {
+//    	String json = qs.queryToJson(OrderDetail.class, "?$filter=orderID lt 10258&$orderby=order/employee/lastName desc&$expand=order/employee");
+//		// String json = qs.queryToJson(Product.class, "?$orderby=Category/CategoryName desc,ProductName");
+//    	assertTrue(json.indexOf("OrderDetail") > 0);
+//    	assertTrue(json.indexOf("lastName") > 0);
+//	}
 
 //	public void testQueryFilterOrder() {
 //    	String json = qs.queryToJson(Order.class, "?$top=5&$filter=shipCountry eq 'Brazil'");
