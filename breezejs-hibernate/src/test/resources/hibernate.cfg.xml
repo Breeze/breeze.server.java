@@ -46,7 +46,7 @@
         -->
         <!-- MySql settings -->
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql://localhost:3306/NorthwindIB</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/northwindib</property>
         <property name="connection.username">myadmin</property>
         <property name="connection.password">mysql</property>
         <property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import com.breezejs.Metadata;
 import com.breezejs.testutil.Serializer;
 import com.breezejs.util.Json;
+import com.breezejs.util.JsonGson;
 
 import junit.framework.TestCase;
 
@@ -44,7 +45,8 @@ public class MetadataBuilderTest extends TestCase {
 	
 	public String toJson(Metadata metadata) {
 		try {
-			String json = Json.toJson(metadata, false, false);
+			// String json = Json.toJson(metadata, false, false);
+			String json = JsonGson.toJson(metadata, false);
 			// reformat for pretty-printing
 			String jsonPretty = new JSONObject(json).toString(4);
 			return jsonPretty;

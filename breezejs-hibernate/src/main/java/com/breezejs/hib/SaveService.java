@@ -10,6 +10,7 @@ import com.breezejs.Metadata;
 import com.breezejs.save.ContextProvider;
 import com.breezejs.save.SaveResult;
 import com.breezejs.util.Json;
+import com.breezejs.util.JsonGson;
 
 /**
  * Class to receive JSON save bundles and save them to Hibernate
@@ -41,7 +42,7 @@ public class SaveService {
 			ContextProvider context = new HibernateContext(session, metadata);
 			SaveResult sr = context.saveChanges(source);
 			
-			String json = Json.toJson(sr);
+			String json = JsonGson.toJson(sr);
 			log.debugv("saveChanges: SaveResult={0}", json);
 			if (sr.hasErrors()) {
 				response = Response.status(Response.Status.FORBIDDEN).entity(json).build(); 
@@ -51,7 +52,7 @@ public class SaveService {
 		}
     	catch (Exception e) {
     		log.errorv(e, "saveChanges: source={0}", source);
-    		String json = Json.toJson(e);
+    		String json = JsonGson.toJson(e);
 			response = Response.serverError().entity(json).build(); 
     	}
     	finally {

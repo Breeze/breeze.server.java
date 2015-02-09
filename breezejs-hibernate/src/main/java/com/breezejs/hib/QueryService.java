@@ -6,9 +6,11 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.jboss.logging.Logger;
+
 import com.breezejs.OdataParameters;
 import com.breezejs.QueryResult;
 import com.breezejs.util.Json;
+import com.breezejs.util.JsonGson;
 
 /**
  * Class to handle query strings and return JSON results
@@ -98,10 +100,10 @@ public class QueryService {
 			log.debugv("queryToJson: inline count={0}", countResult);
 			
 			QueryResult qr = new QueryResult(result, countResult);
-			json = Json.toJson(qr);
+			json = JsonGson.toJson(qr);
 			
 		} else {
-			json = Json.toJson(result);
+			json = JsonGson.toJson(result);
 		}
 		
 		log.debugv("queryToJson: result={0}", json);
@@ -120,7 +122,7 @@ public class QueryService {
 			session.beginTransaction();
 			List result = session.createQuery(hqlQuery).list();
 			session.getTransaction().commit();
-			return Json.toJson(result);
+			return JsonGson.toJson(result);
 		}
     	catch (RuntimeException e) {
     		session.getTransaction().rollback();

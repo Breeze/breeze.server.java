@@ -33,5 +33,6 @@
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/xml-apis-1.0.b2.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/mysql-connector-java-5.1.30.jar"/>
+ 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/gson-2.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
