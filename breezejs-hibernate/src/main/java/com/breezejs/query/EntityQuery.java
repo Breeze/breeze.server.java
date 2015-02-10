@@ -10,10 +10,10 @@ public class EntityQuery {
 		this.resourceName = (String) qmap.get("resourceName");
 		this.skipCount = (Integer) qmap.get("skip");
 		this.takeCount = (Integer) qmap.get("take");
-		this.wherePredicate = new WherePredicate((Map) qmap.get("where"));
-		this.orderByClause = new OrderByClause( (String) qmap.get("orderBy"));
-		this.selectClause = new SelectClause( (String) qmap.get("select"));
-		this.expandClause = new ExpandClause( (String) qmap.get("expand"));
+		this.wherePredicate = WherePredicate.fromMap((Map) qmap.get("where"));
+		this.orderByClause = OrderByClause.fromString( (String) qmap.get("orderBy"));
+		this.selectClause = SelectClause.fromString( (String) qmap.get("select"));
+		this.expandClause = ExpandClause.fromString( (String) qmap.get("expand"));
 		if (qmap.containsKey("inlineCountEnabled")) {
 			this.inlineCountEnabled = (boolean) qmap.get(inlineCountEnabled);
 		}
