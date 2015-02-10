@@ -10,7 +10,7 @@ import northwind.model.Product;
 import northwind.model.Supplier;
 
 import com.breezejs.OdataParameters;
-import com.breezejs.util.Json;
+import com.breezejs.util.JsonGson;
 
 import junit.framework.TestCase;
 
@@ -32,6 +32,10 @@ public class QueryServiceTest extends TestCase {
 
 	public void testQueryFilterCustomer() {
     	String json = qs.queryToJson(Customer.class, "?$top=5&$filter=country eq 'Brazil'");
+    	Map[] maps = JsonGson.fromJsonArray(json);
+    	assertTrue(maps.length == 5);
+    	assertTrue(maps[0].containsKey("companyName"));
+    	
     	assertTrue(json.indexOf("Customer") > 0);
     	assertTrue(json.indexOf("companyName") > 0);
     	assertTrue(json.indexOf("Comércio Mineiro") > 0);
@@ -110,8 +114,8 @@ public class QueryServiceTest extends TestCase {
     	String json = qs.queryToJson(Customer.class, "$top=3&$inlinecount=allpages");
     	assertTrue(json.indexOf("Customer") > 0);
     	assertTrue(hasValue(json, "companyName", "Island Trading"));
-    	assertTrue(hasValue(json, "InlineCount", "96"));
-    	assertTrue(hasValue(json, "Results", "\\["));
+    	assertTrue(hasValue(json, "inlineCount", "96"));
+    	assertTrue(hasValue(json, "results", "\\["));
 	}
 	
 	

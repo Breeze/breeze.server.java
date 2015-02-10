@@ -29,14 +29,13 @@ public class BreezeTypeAdapterFactory implements TypeAdapterFactory {
 	}
 
 	public final <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-		try {
-			String name = type.getRawType().getCanonicalName();
-		    if (!name.startsWith("northwind")) {
-		    	return null;
-		    }
-	    } catch(Exception e) {
+		
+		String name = type.getRawType().getCanonicalName();
+		// eliminate all simple types
+	    if ((name.indexOf('.') == -1) || name.startsWith("java.")) {
 	    	return null;
 	    }
+	    
 	    
 		final TypeAdapter<T> delegateAdapter = gson.getDelegateAdapter(this, type);
 		final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
@@ -45,7 +44,8 @@ public class BreezeTypeAdapterFactory implements TypeAdapterFactory {
 			public void write(JsonWriter out, T value) throws IOException {
 				
 				if (value == null) {
-					elementAdapter.write(out, delegateAdapter.toJsonTree(value));
+					// elementAdapter.write(out, delegateAdapter.toJsonTree(value));
+                    out.nullValue();
 					return;
 				}
 				JsonElement tree;
@@ -78,10 +78,6 @@ public class BreezeTypeAdapterFactory implements TypeAdapterFactory {
 		};
 	}
 
-	/**
-	* Override this to muck with source before it is written to
-	* the outgoing JSON stream.
-	*/
 	
 	/**
 	* Override this to muck with {@code deserialized} before it parsed into

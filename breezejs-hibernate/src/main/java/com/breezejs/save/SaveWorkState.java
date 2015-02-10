@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.breezejs.util.Json;
+import com.breezejs.util.JsonGson;
 import com.breezejs.util.Reflect;
 
 public class SaveWorkState {
@@ -73,7 +73,7 @@ public class SaveWorkState {
 
 		String entityTypeName = (String) aspect.get("entityTypeName");
 		Class type = Reflect.lookupEntityType(entityTypeName);
-		info.entity = Json.fromMap(type, map);
+		info.entity = JsonGson.fromMap(type, map);
 
 		info.entityState = EntityState.valueOf((String) aspect.get("entityState"));
 		info.originalValuesMap = (Map) aspect.get("originalValuesMap");

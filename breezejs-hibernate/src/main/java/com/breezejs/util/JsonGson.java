@@ -35,9 +35,10 @@ public class JsonGson {
 					.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 			if (isGraph) {
 				gsonBuilder
-					.registerTypeAdapterFactory(new BreezeTypeAdapterFactory())
+				    .registerTypeAdapterFactory(new BreezeTypeAdapterFactory())
 					.registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY)
 					.registerTypeAdapterFactory(HibernateCollectionTypeAdapter.FACTORY);
+					
 			}
 			Gson gson = gsonBuilder.create();
 			return gson.toJson(obj);
@@ -64,6 +65,20 @@ public class JsonGson {
 			throw new RuntimeException("Exception deserializing " + source, e);
 		}
 	}
+	
+	public static Map[] fromJsonArray(String source) {
+		try {
+			GsonBuilder gsonBuilder = new GsonBuilder()
+					.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			Gson gson = gsonBuilder.create();
+			LinkedTreeMap[] result = gson.fromJson(source, LinkedTreeMap[].class);
+			return result;
+
+		} catch (Exception e) {
+			throw new RuntimeException("Exception deserializing " + source, e);
+		}
+	}
+	
 
 	/**
 	 * Convert the Map into an instance of the given class

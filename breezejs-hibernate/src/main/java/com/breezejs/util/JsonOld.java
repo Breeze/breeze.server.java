@@ -5,7 +5,7 @@ import java.util.Map;
 import com.sun.json.JSONDeserializer;
 import com.sun.json.JSONSerializer;
 
-public class Json {
+public class JsonOld {
 
 	/**
 	 * Convert the object tree to JSON, including the $id and $type properties

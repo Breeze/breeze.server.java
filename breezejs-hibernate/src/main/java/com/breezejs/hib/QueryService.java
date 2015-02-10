@@ -9,7 +9,6 @@ import org.jboss.logging.Logger;
 
 import com.breezejs.OdataParameters;
 import com.breezejs.QueryResult;
-import com.breezejs.util.Json;
 import com.breezejs.util.JsonGson;
 
 /**

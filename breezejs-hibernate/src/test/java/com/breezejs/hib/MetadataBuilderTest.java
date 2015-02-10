@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import com.breezejs.Metadata;
 import com.breezejs.testutil.Serializer;
-import com.breezejs.util.Json;
 import com.breezejs.util.JsonGson;
 
 import junit.framework.TestCase;

@@ -3,7 +3,7 @@ package com.breezejs.save;
 import java.util.List;
 import java.util.Map;
 
-import com.breezejs.util.Json;
+import com.breezejs.util.JsonGson;;
 
 public class ContextProvider {
 
@@ -13,7 +13,7 @@ public class ContextProvider {
 	 * @param saveOptions
 	 */
 	public SaveResult saveChanges(String json) {
-		Map saveBundle = Json.fromJson(json);
+		Map saveBundle = JsonGson.fromJson(json);
 		SaveOptions saveOptions = new SaveOptions((Map) saveBundle.get("saveOptions"));
 		List entityMaps = (List<Map>) saveBundle.get("entities");
 		SaveWorkState sw = new SaveWorkState(this, entityMaps);

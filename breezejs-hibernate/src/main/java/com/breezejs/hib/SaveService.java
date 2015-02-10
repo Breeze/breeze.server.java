@@ -9,7 +9,6 @@ import org.jboss.logging.Logger;
 import com.breezejs.Metadata;
 import com.breezejs.save.ContextProvider;
 import com.breezejs.save.SaveResult;
-import com.breezejs.util.Json;
 import com.breezejs.util.JsonGson;
 
 /**
