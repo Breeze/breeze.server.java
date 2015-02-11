@@ -21,6 +21,18 @@ public class PredicateTest extends TestCase {
 		
 	}
 	
+	public void testBinaryPredNull() {
+		 String pJson = "{ region: null }";
+		 Map map = JsonGson.fromJson(pJson);
+		 Predicate pred = Predicate.predicateFromMap(map);
+		 assertTrue(pred != null);
+		 assertTrue(pred instanceof BinaryPredicate);
+		 BinaryPredicate bpred = (BinaryPredicate) pred;
+		 assertTrue(bpred.getOperator() == Operator.Equals);
+		 assertTrue(bpred.getExpr1Source().equals("region"));
+		 assertTrue(bpred.getExpr2Source() == null);
+	}
+	
 	public void testBinaryPredDouble() {
 		 String pJson = "{ freight: { '>' : 100}}";
 		 Map map = JsonGson.fromJson(pJson);
@@ -55,6 +67,18 @@ public class PredicateTest extends TestCase {
 		 assertTrue(bpred.getOperator() == Operator.Equals);
 		 assertTrue(bpred.getExpr1Source().equals("discontinued"));
 		 assertTrue(bpred.getExpr2Source().equals(true));
+	}
+	
+	public void testBinaryPredStringQuote() {
+		 String pJson = "{ 'companyName': { 'contains':  \"'\" } }";
+		 Map map = JsonGson.fromJson(pJson);
+		 Predicate pred = Predicate.predicateFromMap(map);
+		 assertTrue(pred != null);
+		 assertTrue(pred instanceof BinaryPredicate);
+		 BinaryPredicate bpred = (BinaryPredicate) pred;
+		 assertTrue(bpred.getOperator() == Operator.Contains);
+		 assertTrue(bpred.getExpr1Source().equals("companyName"));
+		 assertTrue(bpred.getExpr2Source().equals("'"));
 	}
 	
 	public void testBinaryExplicit() {
