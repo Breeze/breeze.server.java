@@ -15,7 +15,7 @@ public class SelectClause {
 	
 	public SelectClause(String source) {
 		_source = source;
-		_propertyPaths = StringFns.ToList(source, "\\,");
+		_propertyPaths = StringFns.ToList(source);
 	}
 	
 	public String getSource() {

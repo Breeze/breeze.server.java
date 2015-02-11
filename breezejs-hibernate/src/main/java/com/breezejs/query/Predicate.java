@@ -19,6 +19,7 @@ public abstract class Predicate {
 	}
 
 	public static Predicate predicateFromMap(Map sourceMap) {
+		if (sourceMap == null) return null;
 		List<Predicate> preds = predicatesFromMap(sourceMap);
 		return createCompoundPredicate(preds);
 	}
@@ -39,9 +40,9 @@ public abstract class Predicate {
 		}
 		
 		if (value == null || TypeFns.isPrimitiveOrString(value)) {
-			return new BinaryPredicate(BinaryOperator.Equals, Expression.from(key), Expression.from(value));
+			return new BinaryPredicate(BinaryOperator.Equals, key, value);
 		} else if (value instanceof Map && ((Map) value).containsKey("value")) {
-			return new BinaryPredicate(BinaryOperator.Equals, Expression.from(key), Expression.from(value));
+			return new BinaryPredicate(BinaryOperator.Equals, key, value);
 		}
 		
 		if (!(value instanceof Map)) {
@@ -50,7 +51,7 @@ public abstract class Predicate {
 		
 		List<Predicate> preds = new ArrayList<Predicate>();
 		Map map = (Map) value;
-		Expression expr = Expression.from(key);
+
 		
 	    for (Object oKey : map.keySet()) {
 			String subKey = (String) oKey;
@@ -60,16 +61,14 @@ public abstract class Predicate {
 			if (subOp != null) {
 				if (subOp.getType() == OperatorType.AnyAll) {
 					Predicate subPred = predicateFromObject(subVal);
-					pred = new AnyAllPredicate(subOp, expr, subPred);
+					pred = new AnyAllPredicate(subOp, key, subPred);
 				} else if (subOp.getType() == OperatorType.Binary) {
-					Expression subExpr = Expression.from(subVal);
-					pred = new BinaryPredicate(subOp, expr, subExpr);
+					pred = new BinaryPredicate(subOp, key, subVal);
 				} else {
 					throw new RuntimeException("Unable to resolve OperatorType for key: " + subKey);
 				}
-			} else if (subVal instanceof Map && ((Map) subVal).get("value")!= null) {
-				Expression subExpr = Expression.from(subVal);
-				pred = new BinaryPredicate(BinaryOperator.Equals, expr, subExpr );	
+			} else if (subVal instanceof Map && ((Map) subVal).get("value") != null) {
+				pred = new BinaryPredicate(BinaryOperator.Equals, key, subVal );	
 			} else {
 				throw new RuntimeException("Unable to resolve predicate after: " + key);
 			}

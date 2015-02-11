@@ -20,16 +20,21 @@ public class Operator {
 	public static BinaryOperator GreaterThan = new BinaryOperator("gt,>");
 	public static BinaryOperator GreaterThanOrEqual = new BinaryOperator("ge,>=");
 	
+	public static BinaryOperator StartsWith = new BinaryOperator("startswith");
+	public static BinaryOperator EndsWith = new BinaryOperator("endswith");
+	public static BinaryOperator Contains = new BinaryOperator("contains");
+	
 	public List<String> _aliases;
 	public String _name;
 	public OperatorType _type;
 	
 	public static Operator fromString(String op) {
-		 return _opMap.get(op);
+		 return _opMap.get(op.toLowerCase());
 	}
 	
 	public Operator(String aliases, OperatorType type) {
 		_aliases = StringFns.ToList(aliases);
+		
 		_name = _aliases.get(0);
 		_type = type;
 		AddOperator(this);
@@ -45,7 +50,7 @@ public class Operator {
 	
 	private static void AddOperator(Operator op) {
 		for (String opName: op._aliases) {
-			_opMap.put(opName, op);	
+			_opMap.put(opName.toLowerCase(), op);	
 		}
 	}
 }

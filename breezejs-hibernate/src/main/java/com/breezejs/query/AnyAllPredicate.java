@@ -4,11 +4,12 @@ import java.util.List;
 
 public class AnyAllPredicate extends Predicate {
 	private Operator _op;
-	private Expression _expr;
+	private Object _exprSource;
 	private Predicate _predicate;
 	
-	public AnyAllPredicate(Operator op, Expression expr, Predicate predicate) {
+	public AnyAllPredicate(Operator op, Object exprSource, Predicate predicate) {
 		_op = op;
+		_exprSource = exprSource;
 		_predicate = predicate;
 	}
 	
@@ -16,8 +17,8 @@ public class AnyAllPredicate extends Predicate {
 		return _op;
 	}
 	
-	public Expression getExpressionr() {
-		return _expr;
+	public Object getExprSource() {
+		return _exprSource;
 	}
 	
 	public Predicate getPredicate() {

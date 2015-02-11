@@ -7,7 +7,7 @@ public class TypeFns {
 	private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
 	
 	public static boolean isPrimitive(Object value) {
-		Class clazz = value.getClass();
+		Class<?> clazz = value.getClass();
 		if (isWrapperType(clazz)) {
 			return true;
 		} else {

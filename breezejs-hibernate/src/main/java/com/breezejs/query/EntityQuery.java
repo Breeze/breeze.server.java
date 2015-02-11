@@ -5,78 +5,64 @@ import java.util.Map;
 import com.breezejs.util.JsonGson;
 
 public class EntityQuery {
+	private String _resourceName;
+	private Predicate _wherePredicate;
+	private OrderByClause _orderByClause;
+	private ExpandClause _expandClause;
+	private SelectClause _selectClause;
+	private Integer _skipCount;
+	private Integer _takeCount;
+	private boolean _inlineCountEnabled;
+	
 	public EntityQuery(String json) {
 		Map qmap = JsonGson.fromJson(json);
-		this.resourceName = (String) qmap.get("resourceName");
-		this.skipCount = (Integer) qmap.get("skip");
-		this.takeCount = (Integer) qmap.get("take");
-		this.wherePredicate = WherePredicate.fromMap((Map) qmap.get("where"));
-		this.orderByClause = OrderByClause.fromString( (String) qmap.get("orderBy"));
-		this.selectClause = SelectClause.fromString( (String) qmap.get("select"));
-		this.expandClause = ExpandClause.fromString( (String) qmap.get("expand"));
+		this._resourceName = (String) qmap.get("resourceName");
+		this._skipCount = (Integer) qmap.get("skip");
+		this._takeCount = (Integer) qmap.get("take");
+		this._wherePredicate = Predicate.predicateFromMap((Map) qmap.get("where"));
+		this._orderByClause = OrderByClause.fromString( (String) qmap.get("orderBy"));
+		this._selectClause = SelectClause.fromString( (String) qmap.get("select"));
+		this._expandClause = ExpandClause.fromString( (String) qmap.get("expand"));
 		if (qmap.containsKey("inlineCountEnabled")) {
-			this.inlineCountEnabled = (boolean) qmap.get(inlineCountEnabled);
+			this._inlineCountEnabled = ((Boolean) qmap.get("inlineCountEnabled")).booleanValue();
 		}
 	}
 	
 	
 	public String getResourceName() {
-		return resourceName;
+		return _resourceName;
 	}
-	public void setResourceName(String resourceName) {
-		this.resourceName = resourceName;
-	}
-	public WherePredicate getWherePredicate() {
-		return wherePredicate;
-	}
-	public void setWherePredicate(WherePredicate wherePredicate) {
-		this.wherePredicate = wherePredicate;
-	}
-	public OrderByClause getOrderByClause() {
-		return orderByClause;
-	}
-	public void setOrderByClause(OrderByClause orderByClause) {
-		this.orderByClause = orderByClause;
-	}
-	public ExpandClause getExpandClause() {
-		return expandClause;
-	}
-	public void setExpandClause(ExpandClause expandClause) {
-		this.expandClause = expandClause;
-	}
-	public SelectClause getSelectClause() {
-		return selectClause;
-	}
-	public void setSelectClause(SelectClause selectClause) {
-		this.selectClause = selectClause;
-	}
-	public Integer getSkipCount() {
-		return skipCount;
-	}
-	public void setSkipCount(Integer skipCount) {
-		this.skipCount = skipCount;
-	}
-	public Integer getTakeCount() {
-		return takeCount;
-	}
-	public void setTakeCount(Integer takeCount) {
-		this.takeCount = takeCount;
-	}
-	public boolean isInlineCountEnabled() {
-		return inlineCountEnabled;
-	}
-	public void setInlineCountEnabled(boolean inlineCountEnabled) {
-		this.inlineCountEnabled = inlineCountEnabled;
+
+	public Predicate getWherePredicate() {
+		return _wherePredicate;
 	}
 	
-	private String resourceName;
-	private WherePredicate wherePredicate;
-	private OrderByClause orderByClause;
-	private ExpandClause expandClause;
-	private SelectClause selectClause;
-	private Integer skipCount;
-	private Integer takeCount;
-	private boolean inlineCountEnabled;
+	public OrderByClause getOrderByClause() {
+		return _orderByClause;
+	}
+	
+	public ExpandClause getExpandClause() {
+		return _expandClause;
+	}
+	
+	public SelectClause getSelectClause() {
+		return _selectClause;
+	}
+	
+	public Integer getSkipCount() {
+		return _skipCount;
+	}
+
+	public Integer getTakeCount() {
+		return _takeCount;
+	}
+
+	public boolean isInlineCountEnabled() {
+		return _inlineCountEnabled;
+	}
+	
+	
+
 	
 }
 
