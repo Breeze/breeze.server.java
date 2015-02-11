@@ -5,6 +5,7 @@ import java.util.Map;
 public class WherePredicate {
 	private Map _sourceMap;
 	
+
 	public static final WherePredicate fromMap(Map source) {
 		return (source == null) ? null : new WherePredicate(source);
 	}
@@ -15,5 +16,7 @@ public class WherePredicate {
 		
 	}
 	
-
+	public Map getSourceMap() {
+		return _sourceMap;
+	}
 }
