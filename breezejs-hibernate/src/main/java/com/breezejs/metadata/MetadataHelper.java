@@ -2,7 +2,6 @@ package com.breezejs.metadata;
 
 import java.util.List;
 
-import com.breezejs.query.ExpressionContext;
 import com.breezejs.util.StringFns;
 
 public class MetadataHelper {

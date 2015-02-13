@@ -38,7 +38,7 @@ public abstract class Expression {
 		if (source.indexOf("(") == -1) {
 			return new PropExpression(source, entityType);
 		} else {
-			return ExpressionToken.fromString(source).toExpression(entityType);	
+			return FnExpression.createFrom(source,  entityType);	
 		}
 		
 

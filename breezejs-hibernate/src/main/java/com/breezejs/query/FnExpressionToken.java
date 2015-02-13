@@ -5,40 +5,38 @@ import java.util.List;
 
 import com.breezejs.metadata.IEntityType;
 
-public class ExpressionToken {
+public class FnExpressionToken {
 	private StringBuilder _sb;
 	private int _nextIx; 
-	private List<ExpressionToken> _fnArgs; // only fns have args;
+	private List<FnExpressionToken> _fnArgs; 
 	
-	public ExpressionToken() {
+	public FnExpressionToken() {
 		_sb = new StringBuilder();
 	}
 
-	public static ExpressionToken fromString(String source) {
+	public static FnExpressionToken fromString(String source) {
 		return parseToken(source, 0);
 	}
 	
-	public Expression toExpression(IEntityType entityType) {
-		if (this._fnArgs == null) {
-			return new PropExpression(this._sb.toString(), entityType);
-		} else {
-			String fnName = this._sb.toString();
-			List<Expression> exprs = new ArrayList<Expression>();
-			for (ExpressionToken argToken: this._fnArgs) {
-				Expression expr = argToken.toExpression(entityType);
-				exprs.add(expr);
-			}
-			return new FnExpression(fnName, exprs);
+	public FnExpression toExpression(IEntityType entityType) {
+
+		String fnName = this._sb.toString();
+		List<Expression> exprs = new ArrayList<Expression>();
+		for (FnExpressionToken argToken: this._fnArgs) {
+			Expression expr = argToken.toExpression(entityType);
+			exprs.add(expr);
 		}
+		return new FnExpression(fnName, exprs);
+
 	}
 	
-	private static ExpressionToken parseToken(String source, int ix) {
+	private static FnExpressionToken parseToken(String source, int ix) {
 		ix = skipWhitespace(source, ix);
-		ExpressionToken token = collectQuotedToken(source, ix);
+		FnExpressionToken token = collectQuotedToken(source, ix);
 		if (token != null) {
 			return token;
 		}
-		token = new ExpressionToken();
+		token = new FnExpressionToken();
 		String badChars = ")'\"";
 		
 		while (ix < source.length()) {
@@ -56,7 +54,6 @@ public class ExpressionToken {
 				return token;
 			}
 			
-			
 			if (badChars.indexOf(c) >= 0) {
 				throw new RuntimeException("Unable to parse Fn name - encountered: " + c);
 			}
@@ -68,8 +65,8 @@ public class ExpressionToken {
 		
 	}
 	
-	private static void parseFnArgs(ExpressionToken token, String source, int ix) {
-		token._fnArgs = new ArrayList<ExpressionToken>();
+	private static void parseFnArgs(FnExpressionToken token, String source, int ix) {
+		token._fnArgs = new ArrayList<FnExpressionToken>();
 	
 		while (ix < source.length()) {
 			char c = source.charAt(ix);
@@ -79,7 +76,7 @@ public class ExpressionToken {
 				break;
 			}
 			
-			ExpressionToken argToken = parseToken(source, ix);
+			FnExpressionToken argToken = parseToken(source, ix);
 			token._fnArgs.add(argToken);
 			ix = argToken._nextIx;
 		}
@@ -100,10 +97,10 @@ public class ExpressionToken {
 		return ix;
 	}
 	
-	private static ExpressionToken collectQuotedToken(String source, int ix) {
+	private static FnExpressionToken collectQuotedToken(String source, int ix) {
 		char c = source.charAt(ix);
 		if (c != '\'' && c != '"') return null;
-		ExpressionToken token = new ExpressionToken();
+		FnExpressionToken token = new FnExpressionToken();
 		char quoteChar = c;
 		ix++;
 		while (ix < source.length()) {
