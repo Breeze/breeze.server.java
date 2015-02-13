@@ -29,6 +29,8 @@ import com.breezejs.util.JsonGson;
 
 import junit.framework.TestCase;
 
+// TODO: need nested property tests
+
 public class PredicateTest extends TestCase {
 	private IMetadata _metadataWrapper;
 	protected void setUp() throws Exception {

@@ -42,13 +42,13 @@ public class BinaryPredicate extends Predicate {
 			throw new RuntimeException("Unable to validate 1st expression: " + this._expr1Source);
 		}
 		
-		this._expr1 = Expression.createPropOrFnExpr(_expr1Source, entityType);
+		this._expr1 = Expression.createLHSExpression(_expr1Source, entityType);
 		
 		if (_op == Operator.In && !(_expr2Source instanceof List)) {
 			throw new RuntimeException("The 'in' operator requires that its right hand argument be an array");
 		}
 		
-		this._expr2 = Expression.createPropOrLitExpr(_expr2Source, entityType, this._expr1.getDataType());
+		this._expr2 = Expression.createRHSExpression(_expr2Source, entityType, this._expr1.getDataType());
 	}
 
 }

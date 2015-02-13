@@ -36,7 +36,7 @@ public class AnyAllPredicate extends Predicate {
 	}
 	
 	public void validate(IEntityType entityType) {
-		this._expr = Expression.createPropOrFnExpr(_exprSource, entityType);
+		this._expr = Expression.createLHSExpression(_exprSource, entityType);
 		if (!(this._expr instanceof PropExpression)) {
 			throw new RuntimeException("The first expression of this AnyAllPredicate must be a PropertyExpression");
 		}

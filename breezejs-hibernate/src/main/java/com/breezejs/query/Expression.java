@@ -11,8 +11,8 @@ import com.breezejs.util.TypeFns;
 
 public abstract class Expression {
 
-	// LHS expr
-	public static Expression createPropOrFnExpr(Object exprSource,
+	// will return either a PropExpression or a FnExpression
+	public static Expression createLHSExpression(Object exprSource,
 			IEntityType entityType) {
 		if (exprSource == null) {
 			throw new RuntimeException(
@@ -33,13 +33,19 @@ public abstract class Expression {
 			throw new RuntimeException(
 					"Only string expressions are permitted on this predicate");
 		}
-
-		return ExpressionToken.fromString((String) exprSource).toExpression(entityType);
+		
+		String source = (String) exprSource;
+		if (source.indexOf("(") == -1) {
+			return new PropExpression(source, entityType);
+		} else {
+			return ExpressionToken.fromString(source).toExpression(entityType);	
+		}
+		
 
 	}
 
-	// RHS expr
-	public static Expression createPropOrLitExpr(Object exprSource,
+	// will return either a PropExpression or a LitExpression
+	public static Expression createRHSExpression(Object exprSource,
 			IEntityType entityType, DataType otherExprDataType) {
 		
 		if (exprSource == null || TypeFns.isPrimitive(exprSource)) {
@@ -57,7 +63,6 @@ public abstract class Expression {
 					entityType);
 			if (prop == null) {
 				return new LitExpression(source, otherExprDataType);
-						
 			} else {
 				return new PropExpression(source, entityType);
 			}
