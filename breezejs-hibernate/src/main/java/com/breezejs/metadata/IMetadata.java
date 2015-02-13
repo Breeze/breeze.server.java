@@ -1,5 +1,6 @@
 package com.breezejs.metadata;
 
 public interface IMetadata {
-	public IEntityType getEntityType(String name);
+	public IEntityType getEntityTypeForResourceName(String resourceName);
+	public IEntityType getEntityTypeForEntityTypeName(String typeName);
 }

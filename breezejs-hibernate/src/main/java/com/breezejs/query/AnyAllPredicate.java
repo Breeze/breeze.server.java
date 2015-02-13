@@ -2,6 +2,7 @@ package com.breezejs.query;
 
 import java.util.List;
 
+import com.breezejs.metadata.IEntityType;
 import com.breezejs.metadata.INavigationProperty;
 import com.breezejs.metadata.IProperty;
 
@@ -30,8 +31,8 @@ public class AnyAllPredicate extends Predicate {
 		return _predicate;
 	}
 	
-	public void validate(ExpressionContext exprContext) {
-		this._expr = Expression.createPropOrFnExpr(_exprSource, exprContext);
+	public void validate(IEntityType entityType) {
+		this._expr = Expression.createPropOrFnExpr(_exprSource, entityType);
 		if (!(this._expr instanceof PropExpression)) {
 			throw new RuntimeException("The first expression of this AnyAllPredicate must be a PropertyExpression");
 		}
@@ -41,8 +42,7 @@ public class AnyAllPredicate extends Predicate {
 			throw new RuntimeException("The first expression of this AnyAllPredicate must be a Navigation PropertyExpression");
 		}
 		INavigationProperty nprop = (INavigationProperty) prop;
-		ExpressionContext nextExprContext = new ExpressionContext(nprop.getEntityType(), exprContext.usesNameOnServer);
-		this._predicate.validate(nextExprContext);
+		this._predicate.validate(nprop.getEntityType());
 		
 	}
 }

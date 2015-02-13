@@ -87,7 +87,7 @@ public class JsonGson {
 	 * @param map
 	 * @return
 	 */
-	public static Object fromMap(Class clazz, Map map) {
+	public static Object fromMap(Class<?> clazz, Map map) {
 		try {
 			return null;
 			// Object bean = JSONDeserializer.read(clazz, map);

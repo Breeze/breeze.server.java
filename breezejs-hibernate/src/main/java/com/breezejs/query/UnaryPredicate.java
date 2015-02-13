@@ -1,5 +1,7 @@
 package com.breezejs.query;
 
+import com.breezejs.metadata.IEntityType;
+
 public class UnaryPredicate extends Predicate {
 	private Operator _op;
 	private Predicate _predicate;
@@ -16,7 +18,7 @@ public class UnaryPredicate extends Predicate {
 		return _predicate;
 	}
 	
-	public void validate(ExpressionContext exprContext) {
-		_predicate.validate(exprContext);
+	public void validate(IEntityType entityType) {
+		_predicate.validate(entityType);
 	}
 }

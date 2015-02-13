@@ -3,11 +3,13 @@ package com.breezejs.query;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.breezejs.metadata.IEntityType;
+
 public class ExpressionToken {
-	public StringBuilder _sb;
-	// public char endsWith;
-	public int _nextIx; 
-	public List<ExpressionToken> _fnArgs; // only fns have args;
+	private StringBuilder _sb;
+	private int _nextIx; 
+	private List<ExpressionToken> _fnArgs; // only fns have args;
+	
 	public ExpressionToken() {
 		_sb = new StringBuilder();
 	}
@@ -16,22 +18,20 @@ public class ExpressionToken {
 		return parseToken(source, 0);
 	}
 	
-	public Expression toExpression(ExpressionContext exprContext) {
+	public Expression toExpression(IEntityType entityType) {
 		if (this._fnArgs == null) {
-			return new PropExpression(this._sb.toString(), exprContext);
+			return new PropExpression(this._sb.toString(), entityType);
 		} else {
 			String fnName = this._sb.toString();
 			List<Expression> exprs = new ArrayList<Expression>();
 			for (ExpressionToken argToken: this._fnArgs) {
-				Expression expr = argToken.toExpression(exprContext);
+				Expression expr = argToken.toExpression(entityType);
 				exprs.add(expr);
 			}
 			return new FnExpression(fnName, exprs);
 		}
 	}
 	
-
-
 	private static ExpressionToken parseToken(String source, int ix) {
 		ix = skipWhitespace(source, ix);
 		ExpressionToken token = collectQuotedToken(source, ix);

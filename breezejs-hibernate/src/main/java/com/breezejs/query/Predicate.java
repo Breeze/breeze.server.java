@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.breezejs.metadata.IEntityType;
 import com.breezejs.util.TypeFns;
 
 public abstract class Predicate {
@@ -24,7 +25,7 @@ public abstract class Predicate {
 		return createCompoundPredicate(preds);
 	}
 	
-	public abstract void validate(ExpressionContext exprContext);
+	public abstract void validate(IEntityType entityType);
 
 	private static Predicate predicateFromKeyValue(String key, Object value) {
 		Operator op = Operator.fromString(key);

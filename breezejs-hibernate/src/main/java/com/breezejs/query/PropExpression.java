@@ -11,11 +11,11 @@ public class PropExpression extends Expression {
 	private String _propertyPath;
 	private IProperty _property; 
 	
-	public PropExpression(String propertyPath, ExpressionContext exprContext) {
+	public PropExpression(String propertyPath, IEntityType entityType) {
 		_propertyPath = propertyPath;
-		_property = MetadataHelper.getPropertyFromPath(_propertyPath, exprContext);
+		_property = MetadataHelper.getPropertyFromPath(_propertyPath, entityType);
 		if (_property == null) {
-			throw new RuntimeException("Unable to validate propertyPath: " + _propertyPath + " on EntityType: " + exprContext.entityType.getName());
+			throw new RuntimeException("Unable to validate propertyPath: " + _propertyPath + " on EntityType: " + entityType.getName());
 		}
 	}
 	

@@ -18,7 +18,7 @@ public class FnExpression extends Expression {
 	public List<Expression> getExpressions() {
 		return _exprs;
 	}
-	// TODO: haven't yet propogated function return types to here.
+	// TODO: haven't yet propagated function return types to here.
 	public DataType getDataType() {
 		return _dataType;
 	}

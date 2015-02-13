@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
+
 
 import com.breezejs.Metadata;
 import com.breezejs.testutil.Serializer;
@@ -43,15 +42,9 @@ public class MetadataBuilderTest extends TestCase {
 	}
 	
 	public String toJson(Metadata metadata) {
-		try {
-			// String json = Json.toJson(metadata, false, false);
-			String json = JsonGson.toJson(metadata, false);
-			// reformat for pretty-printing
-			String jsonPretty = new JSONObject(json).toString(4);
-			return jsonPretty;
-		} catch (JSONException e) {
-			throw new RuntimeException(e);
-		}
+		String json = JsonGson.toJson(metadata, false);
+		return json;
+
 	}
 
 	/* only run this when you want to change the stored metadata

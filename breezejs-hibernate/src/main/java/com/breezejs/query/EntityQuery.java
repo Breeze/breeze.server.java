@@ -2,6 +2,7 @@ package com.breezejs.query;
 
 import java.util.Map;
 
+import com.breezejs.metadata.IEntityType;
 import com.breezejs.util.JsonGson;
 
 public class EntityQuery {
@@ -61,9 +62,9 @@ public class EntityQuery {
 		return _inlineCountEnabled;
 	}
 	
-	public void validate(ExpressionContext exprContext) {
+	public void validate(IEntityType entityType) {
 		if (_wherePredicate != null) {
-			_wherePredicate.validate(exprContext);
+			_wherePredicate.validate(entityType);
 		}
 	}
 

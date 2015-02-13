@@ -2,6 +2,8 @@ package com.breezejs.query;
 
 import java.util.List;
 
+import com.breezejs.metadata.IEntityType;
+
 public class AndOrPredicate extends Predicate {
 	private Operator _op;
 	private List<Predicate> _predicates;
@@ -18,9 +20,9 @@ public class AndOrPredicate extends Predicate {
 		return _predicates;
 	}
 	
-	public void validate(ExpressionContext exprContext) {
+	public void validate(IEntityType entityType) {
 		for (Predicate pred: _predicates ) {
-			pred.validate(exprContext);
+			pred.validate(entityType);
 		}
 	}
 }

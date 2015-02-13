@@ -2,35 +2,63 @@ package com.breezejs.testutil;
 
 
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.SessionFactory;
+
+import com.breezejs.Metadata;
+import com.breezejs.MetadataWrapper;
+import com.breezejs.hib.MetadataBuilder;
+import com.breezejs.hib.StaticConfigurator;
+import com.breezejs.metadata.DataType;
+import com.breezejs.metadata.IEntityType;
+import com.breezejs.metadata.IMetadata;
 import com.breezejs.query.AndOrPredicate;
 import com.breezejs.query.AnyAllPredicate;
 import com.breezejs.query.BinaryPredicate;
+import com.breezejs.query.Expression;
+import com.breezejs.query.LitExpression;
 import com.breezejs.query.Operator;
 import com.breezejs.query.Predicate;
+import com.breezejs.query.PropExpression;
 import com.breezejs.query.UnaryPredicate;
 import com.breezejs.util.JsonGson;
 
 import junit.framework.TestCase;
 
 public class PredicateTest extends TestCase {
+	private IMetadata _metadataWrapper;
 	protected void setUp() throws Exception {
 		super.setUp();
+		SessionFactory sf = StaticConfigurator.getSessionFactory();
 		
+		MetadataBuilder mb = new MetadataBuilder(sf);
+		
+		Metadata metadata = mb.buildMetadata();
+		_metadataWrapper = new MetadataWrapper(metadata);
 	}
 	
 	public void testBinaryPredNull() {
-		 String pJson = "{ region: null }";
+		 String pJson = "{ shipName: null }";
 		 Map map = JsonGson.fromJson(pJson);
 		 Predicate pred = Predicate.predicateFromMap(map);
 		 assertTrue(pred != null);
 		 assertTrue(pred instanceof BinaryPredicate);
 		 BinaryPredicate bpred = (BinaryPredicate) pred;
 		 assertTrue(bpred.getOperator() == Operator.Equals);
-		 assertTrue(bpred.getExpr1Source().equals("region"));
+		 assertTrue(bpred.getExpr1Source().equals("shipName"));
 		 assertTrue(bpred.getExpr2Source() == null);
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Orders");
+		 pred.validate(et);
+		 PropExpression expr1 = (PropExpression) bpred.getExpr1();
+		 assertTrue(expr1.getPropertyPath().equals("shipName"));
+		 LitExpression expr2 = (LitExpression) bpred.getExpr2();
+		 assertTrue(expr2.getDataType() == DataType.String);
+		 assertTrue(expr2.getValue() == null);
 	}
 	
 	public void testBinaryPredDouble() {
@@ -43,6 +71,15 @@ public class PredicateTest extends TestCase {
 		 assertTrue(bpred.getOperator() == Operator.GreaterThan);
 		 assertTrue(bpred.getExpr1Source().equals("freight"));
 		 assertTrue(bpred.getExpr2Source().equals(100.0));
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Orders");
+		 pred.validate(et);
+		 PropExpression expr1 = (PropExpression) bpred.getExpr1();
+		 assertTrue(expr1.getPropertyPath().equals("freight"));
+		 LitExpression expr2 = (LitExpression) bpred.getExpr2();
+		 assertTrue(expr2.getDataType() == DataType.Decimal);
+		 assertTrue(expr2.getValue().equals(BigDecimal.valueOf(100.0)));
+		 
 	}
 	
 	public void testBinaryPredString() {
@@ -55,9 +92,18 @@ public class PredicateTest extends TestCase {
 		 assertTrue(bpred.getOperator() == Operator.StartsWith);
 		 assertTrue(bpred.getExpr1Source().equals("lastName"));
 		 assertTrue(bpred.getExpr2Source().equals("S"));
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Employees");
+		 pred.validate(et);
+		 PropExpression expr1 = (PropExpression) bpred.getExpr1();
+		 assertTrue(expr1.getPropertyPath().equals("lastName"));
+		 LitExpression expr2 = (LitExpression) bpred.getExpr2();
+		 assertTrue(expr2.getDataType() == DataType.String);
+		 assertTrue(expr2.getValue().equals("S"));
 	}
 	
 	public void testBinaryPredBoolean() {
+    	// TODO: can't validate this because 'discontinued' property is no longer on order.
 		 String pJson = "{ discontinued: true }";
 		 Map map = JsonGson.fromJson(pJson);
 		 Predicate pred = Predicate.predicateFromMap(map);
@@ -79,9 +125,17 @@ public class PredicateTest extends TestCase {
 		 assertTrue(bpred.getOperator() == Operator.Contains);
 		 assertTrue(bpred.getExpr1Source().equals("companyName"));
 		 assertTrue(bpred.getExpr2Source().equals("'"));
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Customers");
+		 pred.validate(et);
+		 PropExpression expr1 = (PropExpression) bpred.getExpr1();
+		 assertTrue(expr1.getPropertyPath().equals("companyName"));
+		 LitExpression expr2 = (LitExpression) bpred.getExpr2();
+		 assertTrue(expr2.getDataType() == DataType.String);
+		 assertTrue(expr2.getValue().equals("'"));
 	}
 	
-	public void testBinaryExplicit() {
+	public void testBinaryExplicitDate() {
 		 String pJson = "{ shippedDate: { value: '2015-02-09T00:00:00', dataType: 'DateTime' }}";
 		 Map map = JsonGson.fromJson(pJson);
 		 Predicate pred = Predicate.predicateFromMap(map);
@@ -93,6 +147,14 @@ public class PredicateTest extends TestCase {
 		 assertTrue(bpred.getExpr2Source() instanceof Map);
 		 Map expr2Source = (Map) bpred.getExpr2Source();
 		 assertTrue(expr2Source.get("dataType").equals("DateTime"));
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Orders");
+		 pred.validate(et);
+		 PropExpression expr1 = (PropExpression) bpred.getExpr1();
+		 assertTrue(expr1.getPropertyPath().equals("shippedDate"));
+		 LitExpression expr2 = (LitExpression) bpred.getExpr2();
+		 assertTrue(expr2.getDataType() == DataType.DateTime);
+		 assertTrue(expr2.getValue().equals(new Date(115,1,9))); // wierd rules: yy - 1900, mm (0-11), dd (1-31)
 	}
 	
 	public void testBinaryExplicit2() {
@@ -107,6 +169,14 @@ public class PredicateTest extends TestCase {
 		 assertTrue(bpred.getExpr2Source() instanceof Map);
 		 Map expr2Source = (Map) bpred.getExpr2Source();
 		 assertTrue(expr2Source.get("value").equals("firstName"));
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Employees");
+		 pred.validate(et);
+		 PropExpression expr1 = (PropExpression) bpred.getExpr1();
+		 assertTrue(expr1.getPropertyPath().equals("lastName"));
+		 LitExpression expr2 = (LitExpression) bpred.getExpr2();
+		 assertTrue(expr2.getDataType() == DataType.String);
+		 assertTrue(expr2.getValue().equals("firstName"));
 	}
 	
 	

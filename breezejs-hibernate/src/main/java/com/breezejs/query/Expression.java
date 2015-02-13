@@ -4,14 +4,16 @@ import java.util.List;
 import java.util.Map;
 
 import com.breezejs.metadata.DataType;
+import com.breezejs.metadata.IEntityType;
 import com.breezejs.metadata.IProperty;
 import com.breezejs.metadata.MetadataHelper;
+import com.breezejs.util.TypeFns;
 
 public abstract class Expression {
 
 	// LHS expr
 	public static Expression createPropOrFnExpr(Object exprSource,
-			ExpressionContext exprContext) {
+			IEntityType entityType) {
 		if (exprSource == null) {
 			throw new RuntimeException(
 					"Null expressions are only permitted on the right hand side of a BinaryPredicate");
@@ -32,13 +34,34 @@ public abstract class Expression {
 					"Only string expressions are permitted on this predicate");
 		}
 
-		return ExpressionToken.fromString((String) exprSource).toExpression(exprContext);
+		return ExpressionToken.fromString((String) exprSource).toExpression(entityType);
 
 	}
 
 	// RHS expr
 	public static Expression createPropOrLitExpr(Object exprSource,
-			ExpressionContext exprContext, DataType otherExprDataType) {
+			IEntityType entityType, DataType otherExprDataType) {
+		
+		if (exprSource == null || TypeFns.isPrimitive(exprSource)) {
+			return new LitExpression(exprSource, otherExprDataType);
+		}
+		
+		if (exprSource instanceof String) {
+			String source = (String) exprSource;
+			if (entityType == null) {
+				// if entityType is unknown then assume that the rhs is a
+				// literal
+				return new LitExpression(source, otherExprDataType);
+			}
+			IProperty prop = MetadataHelper.getPropertyFromPath(source,
+					entityType);
+			if (prop == null) {
+				return new LitExpression(source, otherExprDataType);
+						
+			} else {
+				return new PropExpression(source, entityType);
+			}
+		}
 
 		if (exprSource instanceof Map) {
 			Map exprMap = (Map) exprSource;
@@ -52,34 +75,19 @@ public abstract class Expression {
 			Object value = exprMap.get("value");
 
 			if (exprMap.containsKey("isProperty")) {
-				return new PropExpression((String) value, exprContext);
+				return new PropExpression((String) value, entityType);
 			} else {
 				String dt = (String) exprMap.get("dataType");
 				DataType dataType = (dt != null) ? DataType.fromName(dt) : otherExprDataType;
-				return new LitExpression(value, dataType, true);
+				return new LitExpression(value, dataType );
 			}
 		}
 
-		if (exprSource instanceof String) {
-			String source = (String) exprSource;
-			if (exprContext.entityType == null) {
-				// if entityType is unknown then assume that the rhs is a
-				// literal
-				return new LitExpression(source, otherExprDataType, false);
-			}
-			IProperty prop = MetadataHelper.getPropertyFromPath(source,
-					exprContext);
-			if (prop == null) {
-				return new LitExpression(source, otherExprDataType, false);
-						
-			} else {
-				return new PropExpression(source, exprContext);
-			}
-		}
+	
 
 		if (exprSource instanceof List) {
 			// right now this pretty much implies the values on an 'in' clause
-			return new LitExpression(exprSource, otherExprDataType, false);
+			return new LitExpression(exprSource, otherExprDataType);
 		}
 
 		throw new RuntimeException(
