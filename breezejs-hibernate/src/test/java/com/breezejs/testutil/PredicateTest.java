@@ -20,6 +20,7 @@ import com.breezejs.query.AndOrPredicate;
 import com.breezejs.query.AnyAllPredicate;
 import com.breezejs.query.BinaryPredicate;
 import com.breezejs.query.Expression;
+import com.breezejs.query.FnExpression;
 import com.breezejs.query.LitExpression;
 import com.breezejs.query.Operator;
 import com.breezejs.query.Predicate;
@@ -374,7 +375,26 @@ public class PredicateTest extends TestCase {
 		 
 	}
 	
-		             
+	public void testBinaryPredFn() {
+		 String pJson = "{ 'toLower(\"shipName\")': 'abc' }";
+		 Map map = JsonGson.fromJson(pJson);
+		 Predicate pred = Predicate.predicateFromMap(map);
+		 assertTrue(pred != null);
+		 assertTrue(pred instanceof BinaryPredicate);
+		 BinaryPredicate bpred = (BinaryPredicate) pred;
+		 assertTrue(bpred.getOperator() == Operator.Equals);
+		 assertTrue(bpred.getExpr1Source().equals("toLower(\"shipName\")"));
+		 assertTrue(bpred.getExpr2Source().equals("abc"));
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Orders");
+		 pred.validate(et);
+		 FnExpression expr1 = (FnExpression) bpred.getExpr1();
+		 assertTrue(expr1.getFnName().equals("toLower"));
+		 List<Expression> argExprs = expr1.getExpressions();
+		 PropExpression argExpr1 = (PropExpression) argExprs.get(0);
+		 assertTrue(argExpr1.getDataType() == DataType.String);
+		 assertTrue(argExpr1.getPropertyPath().equals("shipName"));
+	}
 	             
 	
 }

@@ -7,11 +7,12 @@ import com.breezejs.util.StringFns;
 
 public class Operator {
 	public static final HashMap<String, Operator>_opMap = new HashMap<String, Operator>();
+	
 	public static Operator Any = new Operator("any,some", OperatorType.AnyAll);
 	public static Operator All = new Operator("all,every", OperatorType.AnyAll);
 	public static Operator And = new Operator("and,&&", OperatorType.AndOr);
 	public static Operator Or = new Operator("or,||", OperatorType.AndOr);
-	public static Operator Not = new Operator("not,!,~", OperatorType.Unary);
+	public static Operator Not = new Operator("not,!", OperatorType.Unary);
 	
 	public static BinaryOperator Equals = new BinaryOperator("eq,==");
 	public static BinaryOperator NotEquals = new BinaryOperator("ne,!=");
@@ -36,7 +37,6 @@ public class Operator {
 	
 	public Operator(String aliases, OperatorType type) {
 		_aliases = StringFns.ToList(aliases);
-		
 		_name = _aliases.get(0);
 		_type = type;
 		AddOperator(this);

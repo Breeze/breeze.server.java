@@ -22,7 +22,8 @@ public class MetadataHelper {
 
 	// returns the final property from a property path or null if not found.
 	public static IProperty getPropertyFromPath(String propertyPath, IEntityType entityType) {
-		List<String> paths = StringFns.ToList(propertyPath, "\\.");
+		// List<String> paths = StringFns.ToList(propertyPath, "\\.");
+		String[] paths = propertyPath.split("\\.");
 		IEntityType nextEntityType = entityType;
 		IProperty prop = null;
 		for (String propName: paths) {
@@ -35,11 +36,8 @@ public class MetadataHelper {
 			} else {
 				nextEntityType = null;
 			}
-			
 		}
-		return prop;
+		return prop;	
 	}
-	
-	
 	
 }

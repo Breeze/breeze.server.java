@@ -3,30 +3,55 @@ package com.breezejs.query;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.breezejs.metadata.DataType;
 import com.breezejs.metadata.IEntityType;
+import com.breezejs.metadata.IProperty;
+import com.breezejs.metadata.MetadataHelper;
 
-public class FnExpressionToken {
+// local to this package
+class FnExpressionToken {
 	private StringBuilder _sb;
 	private int _nextIx; 
+	private boolean _isQuoted;
 	private List<FnExpressionToken> _fnArgs; 
 	
-	public FnExpressionToken() {
+	private FnExpressionToken() {
 		_sb = new StringBuilder();
 	}
 
-	public static FnExpressionToken fromString(String source) {
-		return parseToken(source, 0);
+	public static FnExpression toExpression(String source, IEntityType entityType) {
+		FnExpressionToken token = parseToken(source, 0);
+		return (FnExpression) token.toExpression(entityType, null);
 	}
 	
-	public FnExpression toExpression(IEntityType entityType) {
-
-		String fnName = this._sb.toString();
-		List<Expression> exprs = new ArrayList<Expression>();
-		for (FnExpressionToken argToken: this._fnArgs) {
-			Expression expr = argToken.toExpression(entityType);
-			exprs.add(expr);
+	private Expression toExpression(IEntityType entityType, DataType returnDataType) {
+		String text = _sb.toString(); 
+		if (this._fnArgs == null) {
+			if (_isQuoted) {
+				// TODO: we could check that the returnDataType is a String
+				return new LitExpression(entityType, DataType.String);
+			} else {
+				IProperty prop = MetadataHelper.getPropertyFromPath(text,
+						entityType);
+				if (prop == null) {
+					return new LitExpression(text, returnDataType);
+				} else {
+					// TODO: we could check that the PropExpression dataType is compatible with the returnDataType
+					return new PropExpression(text, entityType);
+				}
+			}
+		} else {
+			String fnName = text;
+			DataType[] argTypes = FnExpression.getArgTypes(fnName);
+			List<Expression> exprs = new ArrayList<Expression>();
+			for (int fnIx = 0; fnIx < _fnArgs.size(); fnIx++) {
+				FnExpressionToken argToken = _fnArgs.get(fnIx);
+				Expression expr = argToken.toExpression(entityType, argTypes[fnIx] );
+				exprs.add(expr);
+			}
+			// TODO: we could check that the FnExpression dataType is compatible with the returnDataType
+			return new FnExpression(text, exprs);
 		}
-		return new FnExpression(fnName, exprs);
 
 	}
 	
@@ -107,6 +132,7 @@ public class FnExpressionToken {
 			c = source.charAt(ix);
 			ix++;
 			if (c == quoteChar ) {
+				token._nextIx = ix;
 				return token;
 			} else {
 				token._sb.append(c);
