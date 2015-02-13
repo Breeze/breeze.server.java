@@ -64,20 +64,24 @@ public class DataType {
 		if (value == null || value.getClass() == dataType.getJavaClass()) {
 			return value;
 		} else if (dataType == DataType.Int16) {
-			return Short.parseShort(value.toString());
+			Double dValue = (Double) coerceData(value, DataType.Double);
+			return dValue.shortValue();
 		} else if (dataType == DataType.Int32) {
-			return Integer.parseInt(value.toString());
+			Double dValue = (Double) coerceData(value, DataType.Double);
+			return dValue.intValue();
 		} else if (dataType == DataType.Int64) {
-			return Long.parseLong(value.toString());
+			Double dValue = (Double) coerceData(value, DataType.Double);
+			return dValue.longValue();
 		} else if (dataType == DataType.Decimal) {
-			Object dValue = coerceData(value, DataType.Double);
-			return BigDecimal.valueOf((Double)dValue);
+			Double dValue = (Double) coerceData(value, DataType.Double);
+			return BigDecimal.valueOf(dValue);
 		} else if (dataType == DataType.Double) {
 			return java.lang.Double.parseDouble(value.toString());
 		} else if (dataType == DataType.Single) {
 			return Float.parseFloat(value.toString());
 		} else if (dataType == DataType.Byte) {
-			return java.lang.Byte.parseByte(value.toString());
+			Double dValue = (Double) coerceData(value, DataType.Double);
+			return dValue.byteValue();
 		} else if (dataType == DataType.DateTime || dataType == DataType.DateTimeOffset) {
 			return javax.xml.bind.DatatypeConverter.parseDateTime(value.toString()).getTime(); 
 		}

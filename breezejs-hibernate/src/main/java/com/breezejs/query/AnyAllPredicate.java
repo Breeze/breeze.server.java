@@ -27,6 +27,10 @@ public class AnyAllPredicate extends Predicate {
 		return _exprSource;
 	}
 	
+	public Expression getExpr() {
+		return _expr;
+	}
+	
 	public Predicate getPredicate() {
 		return _predicate;
 	}

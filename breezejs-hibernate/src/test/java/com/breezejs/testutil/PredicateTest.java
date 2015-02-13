@@ -193,19 +193,34 @@ public class PredicateTest extends TestCase {
 		 
 		 Predicate pred1 = preds.get(0);
 		 assertTrue(pred1 instanceof BinaryPredicate);
-		 BinaryPredicate bpred = (BinaryPredicate) pred1;
-		 assertTrue(bpred.getOperator() == Operator.GreaterThan);
-		 assertTrue(bpred.getExpr1Source().equals("freight"));
-		 assertTrue(bpred.getExpr2Source().equals(100.0));
+		 BinaryPredicate bpred1 = (BinaryPredicate) pred1;
+		 assertTrue(bpred1.getOperator() == Operator.GreaterThan);
+		 assertTrue(bpred1.getExpr1Source().equals("freight"));
+		 assertTrue(bpred1.getExpr2Source().equals(100.0));
 		 
 		 Predicate pred2 = preds.get(1);
 		 assertTrue(pred2 instanceof BinaryPredicate);
-		 bpred = (BinaryPredicate) pred2;
-		 assertTrue(bpred.getOperator() == Operator.StartsWith);
-		 assertTrue(bpred.getExpr1Source().equals("shipCity"));
-		 assertTrue(bpred.getExpr2Source().equals("S"));
+		 BinaryPredicate bpred2 = (BinaryPredicate) pred2;
+		 assertTrue(bpred2.getOperator() == Operator.StartsWith);
+		 assertTrue(bpred2.getExpr1Source().equals("shipCity"));
+		 assertTrue(bpred2.getExpr2Source().equals("S"));
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Orders");
+		 pred.validate(et);
+		 
+		 PropExpression expr1 = (PropExpression) bpred1.getExpr1();
+		 assertTrue(expr1.getPropertyPath().equals("freight"));
+		 LitExpression expr2 = (LitExpression) bpred1.getExpr2();
+		 assertTrue(expr2.getDataType() == DataType.Decimal);
+		 assertTrue(expr2.getValue().equals(BigDecimal.valueOf(100.0)));
+		 
+		 PropExpression expr1b = (PropExpression) bpred2.getExpr1();
+		 assertTrue(expr1b.getPropertyPath().equals("shipCity"));
+		 LitExpression expr2b = (LitExpression) bpred2.getExpr2();
+		 assertTrue(expr2b.getDataType() == DataType.String);
+		 assertTrue(expr2b.getValue().equals("S"));
+
 	}
-	
 	
 	
 	
@@ -233,6 +248,10 @@ public class PredicateTest extends TestCase {
 		 assertTrue(bpred.getOperator() == Operator.LessThan);
 		 assertTrue(bpred.getExpr1Source().equals("freight"));
 		 assertTrue(bpred.getExpr2Source().equals(200.0));
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Orders");
+		 pred.validate(et);
+		 
 	}
 	
 	public void testImplicitAnd3Way() {
@@ -267,6 +286,9 @@ public class PredicateTest extends TestCase {
 		 assertTrue(bpred.getOperator() == Operator.Equals);
 		 assertTrue(bpred.getExpr1Source().equals("shippedDate"));
 		 assertTrue(bpred.getExpr2Source().equals("2015-02-09T00:00:00"));
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Orders");
+		 pred.validate(et);
 	}
 	
 	public void testNot() {
@@ -285,7 +307,8 @@ public class PredicateTest extends TestCase {
 		 assertTrue(bpred.getExpr1Source().equals("freight"));
 		 assertTrue(bpred.getExpr2Source().equals(100.0));
 		 
-		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Orders");
+		 pred.validate(et);
 	}
 	
 	public void testAny() {
@@ -305,6 +328,12 @@ public class PredicateTest extends TestCase {
 		 assertTrue(bpred.getOperator() == Operator.GreaterThan);
 		 assertTrue(bpred.getExpr1Source().equals("freight"));
 		 assertTrue(bpred.getExpr2Source().equals(950.0));
+		 
+		 IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Customers");
+		 pred.validate(et);
+		 PropExpression propExpr = (PropExpression) aapred.getExpr();
+		 assertTrue(propExpr.getPropertyPath().equals("orders"));
+		 assertTrue(propExpr.getProperty().getName().equals("orders"));
 		 
 	}
 	
