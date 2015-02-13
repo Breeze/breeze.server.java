@@ -17,4 +17,10 @@ public class AndOrPredicate extends Predicate {
 	public List<Predicate> getPredicates() {
 		return _predicates;
 	}
+	
+	public void validate(ExpressionContext exprContext) {
+		for (Predicate pred: _predicates ) {
+			pred.validate(exprContext);
+		}
+	}
 }

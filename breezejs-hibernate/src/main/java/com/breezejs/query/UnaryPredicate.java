@@ -16,4 +16,7 @@ public class UnaryPredicate extends Predicate {
 		return _predicate;
 	}
 	
+	public void validate(ExpressionContext exprContext) {
+		_predicate.validate(exprContext);
+	}
 }

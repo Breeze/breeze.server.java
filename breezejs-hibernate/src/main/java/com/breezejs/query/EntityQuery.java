@@ -61,7 +61,11 @@ public class EntityQuery {
 		return _inlineCountEnabled;
 	}
 	
-	
+	public void validate(ExpressionContext exprContext) {
+		if (_wherePredicate != null) {
+			_wherePredicate.validate(exprContext);
+		}
+	}
 
 	
 }

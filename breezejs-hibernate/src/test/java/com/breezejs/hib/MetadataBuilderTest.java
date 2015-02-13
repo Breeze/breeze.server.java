@@ -99,6 +99,7 @@ public class MetadataBuilderTest extends TestCase {
 		assertTrue(metadata.get("structuralTypes") instanceof List);
 		assertTrue(metadata.get("resourceEntityTypeMap") instanceof HashMap);
 		assertTrue(metadata.foreignKeyMap instanceof HashMap);
+		String jsonMetadata = JsonGson.toJson(metadata);
 		
 		// compare to known good metadata
 //		String json = toJson(metadata);

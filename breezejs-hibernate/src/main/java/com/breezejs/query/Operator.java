@@ -24,6 +24,8 @@ public class Operator {
 	public static BinaryOperator EndsWith = new BinaryOperator("endswith");
 	public static BinaryOperator Contains = new BinaryOperator("contains");
 	
+	public static BinaryOperator In = new BinaryOperator("in");
+	
 	public List<String> _aliases;
 	public String _name;
 	public OperatorType _type;

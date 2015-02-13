@@ -24,6 +24,7 @@ public abstract class Predicate {
 		return createCompoundPredicate(preds);
 	}
 	
+	public abstract void validate(ExpressionContext exprContext);
 
 	private static Predicate predicateFromKeyValue(String key, Object value) {
 		Operator op = Operator.fromString(key);
