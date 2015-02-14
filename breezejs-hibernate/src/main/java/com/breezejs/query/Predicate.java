@@ -25,6 +25,8 @@ public abstract class Predicate {
 		return createCompoundPredicate(preds);
 	}
 	
+	public abstract Operator getOperator();
+	
 	public abstract void validate(IEntityType entityType);
 
 	private static Predicate predicateFromKeyValue(String key, Object value) {

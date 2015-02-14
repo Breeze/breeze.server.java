@@ -22,7 +22,6 @@ public class EntityQueryTest extends TestCase {
 		String jsWhere = "'where': { 'freight': { '>': 100}, 'rowVersion': { 'lt': 10}, 'shippedDate': '2015-02-09T00:00:00' }";
 		String json = "{" + jsFrom + "," + jsWhere + "}".replace("'", "\""); 
 		
-				
 		EntityQuery eq = new EntityQuery(json);
 		assertTrue(eq != null);
 	}

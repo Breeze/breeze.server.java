@@ -3,6 +3,7 @@ package com.breezejs.query;
 import java.util.Map;
 
 import com.breezejs.metadata.IEntityType;
+import com.breezejs.metadata.IMetadata;
 import com.breezejs.util.JsonGson;
 
 public class EntityQuery {
@@ -14,6 +15,8 @@ public class EntityQuery {
 	private Integer _skipCount;
 	private Integer _takeCount;
 	private boolean _inlineCountEnabled;
+	
+	private IEntityType _entityType;
 	
 	public EntityQuery(String json) {
 		Map qmap = JsonGson.fromJson(json);
@@ -29,6 +32,18 @@ public class EntityQuery {
 		}
 	}
 	
+	public void  validate(IMetadata metadata) {
+		_entityType = metadata.getEntityTypeForResourceName(_resourceName); 
+		this._wherePredicate.validate(_entityType);
+	}
+		
+	public IEntityType getEntityType() {
+		return _entityType;
+	}
+	
+	public void setResourceName(String resourceName) {
+		_resourceName = resourceName;
+	}
 	
 	public String getResourceName() {
 		return _resourceName;

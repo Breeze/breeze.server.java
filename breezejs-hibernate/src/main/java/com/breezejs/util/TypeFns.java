@@ -6,6 +6,10 @@ import java.util.Set;
 public class TypeFns {
 	private static final Set<Class<?>> WRAPPER_TYPES = getWrapperTypes();
 	
+	public static <T> T as(Class<T> t, Object o) {
+		return t.isInstance(o) ? t.cast(o) : null;
+	}
+	
 	public static boolean isPrimitive(Object value) {
 		Class<?> clazz = value.getClass();
 		if (isWrapperType(clazz)) {

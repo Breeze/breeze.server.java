@@ -9,7 +9,7 @@ import com.breezejs.metadata.IProperty;
 public class AnyAllPredicate extends Predicate {
 	private Operator _op;
 	private Object _exprSource;
-	private Expression _expr; // calculated as a result of validate;
+	private PropExpression _expr; // calculated as a result of validate;
 	private Predicate _predicate;
 	
 	
@@ -27,7 +27,7 @@ public class AnyAllPredicate extends Predicate {
 		return _exprSource;
 	}
 	
-	public Expression getExpr() {
+	public PropExpression getExpr() {
 		return _expr;
 	}
 	
@@ -36,16 +36,17 @@ public class AnyAllPredicate extends Predicate {
 	}
 	
 	public void validate(IEntityType entityType) {
-		this._expr = Expression.createLHSExpression(_exprSource, entityType);
-		if (!(this._expr instanceof PropExpression)) {
+		Expression expr = Expression.createLHSExpression(_exprSource, entityType);
+		if (!(expr instanceof PropExpression)) {
 			throw new RuntimeException("The first expression of this AnyAllPredicate must be a PropertyExpression");
 		}
-		PropExpression pexpr = (PropExpression) this._expr;
+		PropExpression pexpr = (PropExpression) expr;
 		IProperty prop =  pexpr.getProperty();
 		if (!(prop instanceof INavigationProperty)) {
 			throw new RuntimeException("The first expression of this AnyAllPredicate must be a Navigation PropertyExpression");
 		}
 		INavigationProperty nprop = (INavigationProperty) prop;
+		this._expr = pexpr;
 		this._predicate.validate(nprop.getEntityType());
 		
 	}

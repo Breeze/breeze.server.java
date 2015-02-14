@@ -10,6 +10,11 @@ public class QueryResult {
 	private Collection results;
 	private Long inlineCount;
 	
+	public QueryResult(Collection results) {
+		this.results = results;
+		this.inlineCount = null;
+	}
+	
 	public QueryResult(Collection results, Long inlineCount) {
 		this.results = results;
 		this.inlineCount = inlineCount;
