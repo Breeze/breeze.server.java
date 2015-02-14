@@ -39,8 +39,7 @@ public class EntityQueryTest extends TestCase {
 		assertTrue(obItems.get(0).isDesc() == false);
 		assertTrue(obItems.get(1).getPropertyPath().equals("employee.firstName"));
 		assertTrue(obItems.get(1).isDesc() == true);
-		
-		
 	}
 
+	
 }

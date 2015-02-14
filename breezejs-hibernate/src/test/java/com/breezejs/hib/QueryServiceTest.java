@@ -89,26 +89,6 @@ public class QueryServiceTest extends TestCase {
     	assertTrue(json.indexOf("France") < 0);
 	}
 	
-	public void testQueryExpandProduct2() {
-    	String json = qs.queryToJson(Customer.class, "?$top=1&$filter=country eq 'Brazil'&$expand=orders/orderDetails/product");
-    	 
-    	// Map map = Json.fromJson(json);
-    	// assertTrue(map.size() > 0);
-    	
-    	/*
-    	assertTrue(hasValue(json, "companyName", "Comércio Mineiro"));
-    	assertTrue(hasValue(json, "orderID", "11042"));
-    	assertTrue(hasValue(json, "freight", "79.7"));
-    	assertTrue(hasValue(json, "productID", "61"));
-    	assertTrue(hasValue(json, "productName", "Gula Malacca"));
-    	assertTrue(hasValue(json, "unitPrice", "28.5"));
-    	assertTrue(json.indexOf("Customer") > 0);
-    	assertTrue(json.indexOf("OrderDetail") > 0);
-    	assertTrue(json.indexOf("Product") > 0);
-    	assertTrue(json.indexOf("Brazil") > 0);
-    	assertTrue(json.indexOf("France") < 0);
-    	*/
-	}
 
 	public void testQueryInlineCount() {
     	String json = qs.queryToJson(Customer.class, "$top=3&$inlinecount=allpages");

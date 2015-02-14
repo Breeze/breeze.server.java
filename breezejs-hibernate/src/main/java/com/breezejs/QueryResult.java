@@ -2,6 +2,8 @@ package com.breezejs;
 
 import java.util.Collection;
 
+import com.breezejs.util.JsonGson;
+
 /**
  * Wrapper for results that have an InlineCount, to support paged result sets.
  * @author Steve
@@ -31,6 +33,14 @@ public class QueryResult {
 	}
 	public void setInlineCount(Long inlineCount) {
 		this.inlineCount = inlineCount;
+	}
+	
+	public String toJson() {
+		if (inlineCount == null) {
+			return JsonGson.toJson(results);
+		} else {
+			return JsonGson.toJson(this);
+		}
 	}
 	
 }

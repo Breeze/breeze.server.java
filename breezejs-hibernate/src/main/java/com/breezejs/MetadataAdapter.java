@@ -12,11 +12,11 @@ import com.breezejs.metadata.INavigationProperty;
 import com.breezejs.metadata.IProperty;
 import com.breezejs.metadata.MetadataHelper;
 
-public class MetadataWrapper implements IMetadata {
+public class MetadataAdapter implements IMetadata {
 	private HashMap<String, Object> _resourceEntityTypeMap;
 	private HashMap<String, IEntityType> _entityTypeMap = new HashMap<String, IEntityType>();
 	
-	public MetadataWrapper(Metadata metadata) {
+	public MetadataAdapter(Metadata metadata) {
 		
 		List<HashMap<String, Object>> structuralTypes = (List<HashMap<String, Object>>) metadata.get("structuralTypes");
 		_resourceEntityTypeMap = (HashMap<String, Object>) metadata.get("resourceEntityTypeMap");
@@ -24,18 +24,23 @@ public class MetadataWrapper implements IMetadata {
 			IEntityType entityType = new EntityType(entityMap, this);
 			_entityTypeMap.put(entityType.getName(), entityType);
 		}
-
 	}
 	
 	public IEntityType getEntityTypeForResourceName(String resourceName) {
 		String entityTypeName = (String) _resourceEntityTypeMap.get(resourceName);
+		return getEntityType(entityTypeName);
+	}
+	
+	public IEntityType getEntityTypeForClass(Class<?> clazz) {
+		String entityTypeName = MetadataHelper.getEntityTypeName(clazz);
+		return getEntityType(entityTypeName);
+	}
+
+	public IEntityType getEntityType(String entityTypeName) {
 		if (entityTypeName == null) return null;
 		return _entityTypeMap.get(entityTypeName);
 	}
 	
-	public IEntityType getEntityTypeForEntityTypeName(String entityTypeName) {
-		return _entityTypeMap.get(entityTypeName);
-	}
 	
 	public class EntityType implements IEntityType {
 		private Map<String, Object> _entityMap;
@@ -109,7 +114,7 @@ public class MetadataWrapper implements IMetadata {
 		@Override
 		public IEntityType getEntityType() {
 			String entityTypeName = (String) _npMap.get("entityTypeName");
-			return _metadataWrapper.getEntityTypeForEntityTypeName(entityTypeName);
+			return _metadataWrapper.getEntityType(entityTypeName);
 		}
 
 		@Override

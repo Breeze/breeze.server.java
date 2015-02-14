@@ -10,7 +10,7 @@ import java.util.Map;
 import org.hibernate.SessionFactory;
 
 import com.breezejs.Metadata;
-import com.breezejs.MetadataWrapper;
+import com.breezejs.MetadataAdapter;
 import com.breezejs.hib.MetadataBuilder;
 import com.breezejs.hib.StaticConfigurator;
 import com.breezejs.metadata.DataType;
@@ -41,7 +41,7 @@ public class PredicateTest extends TestCase {
 		MetadataBuilder mb = new MetadataBuilder(sf);
 		
 		Metadata metadata = mb.buildMetadata();
-		_metadataWrapper = new MetadataWrapper(metadata);
+		_metadataWrapper = new MetadataAdapter(metadata);
 	}
 	
 	public void testBinaryPredNull() {

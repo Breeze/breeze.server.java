@@ -1,0 +1,197 @@
+package com.breezejs.hib;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import northwind.model.Customer;
+import northwind.model.Employee;
+import northwind.model.Order;
+import northwind.model.OrderDetail;
+import northwind.model.Product;
+import northwind.model.Supplier;
+
+import com.breezejs.OdataParameters;
+import com.breezejs.QueryResult;
+import com.breezejs.query.EntityQuery;
+import com.breezejs.util.JsonGson;
+
+import junit.framework.TestCase;
+
+public class QueryExecutorTest extends TestCase {
+
+	private QueryExecutor _qe;
+	
+	protected void setUp() throws Exception {
+		super.setUp();
+		// then populate the database with test data...?
+		_qe = new QueryExecutor(StaticConfigurator.getSessionFactory());
+	}
+	
+
+	public void testQueryFilterCustomer() {
+    	// String json = qs.queryToJson(Customer.class, "?$top=5&$filter=country eq 'Brazil'");
+		String json = "{ where: { country: 'Brazil' }, take: 5 }";
+		QueryResult qr = _qe.executeQuery("Customers", json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() == 5);
+		for (Object o: results) {
+			Customer c = (Customer) o;
+			assertTrue(c.getCountry().equals("Brazil"));
+			assertTrue(c.getCompanyName() != null);
+		}
+		
+	}
+	
+	public void testQueryOrderByNestedProp1() {
+//    	String json = qs.queryToJson(OrderDetail.class, "?$filter=orderID lt 10258&$orderby=order/employee/lastName desc&$expand=order/employee");
+		String json = "{ where: { orderID: { lt: 10258 }}, orderBy: 'order.employee.lastName desc', expand: 'order.employee' }";
+		QueryResult qr = _qe.executeQuery("OrderDetails", json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		List<String> lastNames = new ArrayList<String>();
+		List<String> lastNamesCpy = new ArrayList<String>();
+		assertTrue(results.size() > 1);
+		for (Object o: results) {
+			OrderDetail od = (OrderDetail) o;
+			assertTrue(od.getOrderID() < 10258);
+			Order order = od.getOrder();
+			assertTrue(order != null);
+			Employee emp = order.getEmployee();
+			String lastName = emp.getLastName();
+			lastNames.add(lastName);
+			lastNamesCpy.add(lastName);
+		}
+		
+		Collections.sort(lastNames, Collections.reverseOrder());
+		assertTrue(lastNames.equals(lastNamesCpy));
+	}
+
+	public void testQueryFilterOrder() {
+    	// String json = qs.queryToJson(Order.class, "?$top=5&$filter=shipCountry eq 'Brazil'");
+		String json = "{ resourceName: 'Orders', take: 5, where: { shipCountry: 'Brazil' }}";
+		QueryResult qr = _qe.executeQuery(new EntityQuery(json));
+		Collection results = qr.getResults();
+		
+		assertTrue(results.size() == 5);
+		for (Object o: results) {
+			Order order = (Order) o;
+			assertTrue(order.getShipCountry().equals("Brazil"));
+		}
+    	
+	}
+	
+	public void testQueryExpandProduct() {
+    	// String json = qs.queryToJson(Customer.class, "?$top=1&$filter=country eq 'Brazil'&$expand=orders/orderDetails/product");
+		String json = "{ where: { country: 'Brazil' }, take: 1, expand: 'orders.orderDetails.product' }";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() == 1);
+		for (Object o: results) {
+			Customer c = (Customer) o;
+			assertTrue(c.getCountry().equals("Brazil"));
+			Collection<Order> orders = c.getOrders();
+			assertTrue(orders != null);
+			for (Order order: orders) {
+				Set<OrderDetail> ods = order.getOrderDetails();
+				for (OrderDetail od: ods) {
+					Product p = od.getProduct();
+					assertTrue(p != null);
+				}
+			}
+		}
+	}
+	
+	public void testQueryInlineCount() {
+    	// String json = qs.queryToJson(Customer.class, "$top=3&$inlinecount=allpages");
+		String json = "{ take: 3, inlineCountEnabled: true }";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		Long inlineCount = qr.getInlineCount();
+		assertTrue(results.size() == 3);
+		assertTrue(inlineCount > 3);
+		String rJson = qr.toJson();
+	}
+//	
+//	
+////	public void testQuerySelectCountryAndPostalCode() {
+////    	String json = qs.queryToJson(Customer.class, "$top=3&$select=country,postalCode&$inlinecount=allpages");
+////    	assertTrue(json.indexOf("Customer") < 0);
+////    	assertTrue(json.indexOf("Country") > 0);
+////    	assertTrue(json.indexOf("PostalCode") > 0);
+////	}
+//	
+//	public void testQueryFilterOrderIdAndExpand() {
+//    	String json = qs.queryToJson(Order.class, "?$filter=orderID eq 10258&$expand=orderDetails/product/supplier");
+//    	System.out.println(json);
+//    	assertTrue(json.indexOf("Order") > 0);
+//    	assertTrue(hasValue(json, "orderID", "10258"));
+//    	assertTrue(hasValue(json, "productID", "32"));
+//    	assertTrue(hasValue(json, "supplierID", "14"));
+//    	assertTrue(hasValue(json, "contactName", "Elio Rossi"));
+//    	assertTrue(hasValue(json, "city", "Ravenna"));
+//	}
+//
+//	public void testQueryToJsonCriteriaBooleanStringArray() {
+////		fail("Not yet implemented");
+//	}
+//
+//	public void testQueryHQL() {
+//    	QueryService qs = new QueryService(StaticConfigurator.getSessionFactory());
+//		String hqlQuery = "from Order where orderId in (10248, 10249, 10250)";
+//		String json = qs.queryToJson(hqlQuery);
+//    	assertTrue(json.indexOf("Order") > 0);
+//    	assertTrue(hasValue(json, "orderID", "10248"));
+//	}
+//
+//	public void testEqual() {
+//    	String json = qs.queryToJson(Supplier.class, "?$filter=location/city eq 'New Orleans'");
+//    	assertTrue(json.indexOf("Supplier") > 0);
+//    	assertTrue(hasValue(json, "city", "New Orleans"));
+//	}
+//	public void testNotEqual() {
+//    	String json = qs.queryToJson(Supplier.class, "?$filter=location/city ne 'Tokyo'");
+//    	assertTrue(json.indexOf("Supplier") > 0);
+//    	assertTrue(hasValue(json, "city", "New Orleans"));
+//	}
+////	public void testGreaterThan() {
+////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice gt 20.0");
+////    	assertTrue(json.indexOf("Product") > 0);
+////	}
+////	public void testGreaterThanOrEqual() {
+////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice ge 10");
+////    	assertTrue(json.indexOf("Product") > 0);
+////	}
+////	public void testLessThan() {
+////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice lt 20");
+////    	assertTrue(json.indexOf("Product") > 0);
+////	}
+////	public void testLessThanOrEqual() {
+////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice le 100");
+////    	assertTrue(json.indexOf("Product") > 0);
+////	}
+////	public void testLogicalAnd() {
+////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice le 200 and unitPrice gt '3.5'");
+////    	assertTrue(json.indexOf("Product") > 0);
+////	}
+////	public void testLogicalOr() {
+////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice le '3.5' or unitPrice gt '200'");
+////    	assertTrue(json.indexOf("Product") > 0);
+////	}
+////	public void testLogicalNot() {
+////    	String json = qs.queryToJson(Product.class, "?$filter=not endswith(productName,'milk')");
+////    	assertTrue(json.indexOf("Product") > 0);
+////	}
+//	
+////	qs.queryToJson(northwind.model.Customer.class, "?$top=5&$filter=country eq 'Brazil'&$expand=orders/orderDetails/product");
+////	qs.queryToJson(northwind.model.Order.class, "?$filter=orderID eq 10258");
+////	qs.queryToJson(northwind.model.Order.class, "?$filter=orderID eq 10258&$expand=orderDetails/product/supplier");
+	
+}

@@ -51,10 +51,7 @@ public class CriteriaBuilder {
 		_operatorMap.put("le", "<=");
 	}
 	
-	public static Criteria createCriteria(Session session, EntityQuery entityQuery) 	{
-		IEntityType entityType = entityQuery.getEntityType();
-		Class<?> clazz = Reflect.lookupEntityType(entityType.getName());
-		Criteria crit = session.createCriteria(clazz);
+	public static void updateCriteria(Criteria crit, EntityQuery entityQuery) {
 		
 		Integer takeCount = entityQuery.getTakeCount();
 		if (takeCount != null) crit.setMaxResults(takeCount);	
@@ -66,8 +63,7 @@ public class CriteriaBuilder {
     	
     	OrderByClause orderByClause = entityQuery.getOrderByClause();
        	addOrderBy(crit, orderByClause);
-		
-		return crit;
+				
 	}
 	
 	
@@ -91,6 +87,7 @@ public class CriteriaBuilder {
 	}
 
 	private static void addWhere(Criteria crit, Predicate wherePred) {
+		if (wherePred == null) return;
 		Criterion criterion = toCriterion(wherePred);
 		crit.add(criterion);
 	}
