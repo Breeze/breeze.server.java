@@ -110,7 +110,7 @@ public class CriteriaBuilder {
 		Operator op = pred.getOperator();
 		Junction j = (op == Operator.And) ? Restrictions.conjunction() : Restrictions.disjunction();
 		for (Predicate subPred : pred.getPredicates()) {
-			Criterion crit = toCriterion(pred);
+			Criterion crit = toCriterion(subPred);
 			j.add(crit);
 		};
 		return j;

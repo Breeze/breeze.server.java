@@ -44,14 +44,14 @@ public class MetadataAdapter implements IMetadata {
 	
 	public class EntityType implements IEntityType {
 		private Map<String, Object> _entityMap;
-		private IMetadata _metadataWrapper;
+		private IMetadata _metadataAdapter;
 		
 		private String _entityTypeName;
 		private Map<String, IProperty> _propertyMap = new HashMap<String, IProperty>();
 
-		public EntityType(Map<String, Object> entityMap, IMetadata metadataWrapper) {
+		public EntityType(Map<String, Object> entityMap, IMetadata metadataAdapter) {
 			_entityMap = entityMap;
-			_metadataWrapper = metadataWrapper;
+			_metadataAdapter = metadataAdapter;
 			String ns = (String) _entityMap.get("namespace");
 			String shortName = (String) _entityMap.get("shortName");
 			_entityTypeName = MetadataHelper.getEntityTypeName(ns, shortName);
@@ -59,13 +59,13 @@ public class MetadataAdapter implements IMetadata {
 			List<HashMap<String, Object>> properties;
 			properties = (List<HashMap<String, Object>>) _entityMap.get("dataProperties");
 			for (HashMap<String, Object> p: properties) {
-				IDataProperty prop = new DataProperty(p);
+				IDataProperty prop = new DataProperty(p, metadataAdapter);
 				_propertyMap.put(prop.getName(), prop);
 			}
 			properties = (List<HashMap<String, Object>>) _entityMap.get("navigationProperties");
 			if (properties != null) {
 				for (HashMap<String, Object> p: properties) {
-					INavigationProperty prop = new NavigationProperty(p, metadataWrapper);
+					INavigationProperty prop = new NavigationProperty(p, metadataAdapter);
 					_propertyMap.put(prop.getName(), prop);
 				}
 			}
@@ -84,8 +84,10 @@ public class MetadataAdapter implements IMetadata {
 	
 	public class DataProperty implements IDataProperty {
 		private Map<String, Object> _dpMap;
-		public DataProperty(Map<String, Object> dpMap) {
+		private IMetadata _metadataWrapper;
+		public DataProperty(Map<String, Object> dpMap, IMetadata metadataWrapper) {
 			_dpMap = dpMap;
+			_metadataWrapper = metadataWrapper;
 		}
 		@Override
 		public String getName() {
@@ -95,7 +97,14 @@ public class MetadataAdapter implements IMetadata {
 		@Override
 		public DataType getDataType() {
 			String dataTypeName = (String) _dpMap.get("dataType");
+			if (dataTypeName == null) return null;
 			return DataType.fromName(dataTypeName);
+		}
+		
+		public IEntityType getComplexType() {
+			String complexTypeName = (String) _dpMap.get("complexTypeName");
+			if (complexTypeName == null) return null;
+			return _metadataWrapper.getEntityType(complexTypeName);
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package com.breezejs.hib;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.regex.Pattern;
 
 import northwind.model.Customer;
 import northwind.model.Employee;
+import northwind.model.Location;
 import northwind.model.Order;
 import northwind.model.OrderDetail;
 import northwind.model.Product;
@@ -119,6 +121,161 @@ public class QueryExecutorTest extends TestCase {
 		assertTrue(inlineCount > 3);
 		String rJson = qr.toJson();
 	}
+	
+	public void testComplexTypePropEqual() {
+		// String json = qs.queryToJson(Supplier.class, "?$filter=location/city eq 'New Orleans'");
+		String json = "{ where: { location.city: 'New Orleans' }}";
+		QueryResult qr = _qe.executeQuery(Supplier.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Supplier s = (Supplier) o;
+			Location loc = s.getLocation();
+			String city = loc.getCity();
+			assertTrue(city.equals("New Orleans"));
+		}
+	}
+	
+	public void testComplexTypePropNotEqual() {
+		// String json = qs.queryToJson(Supplier.class, "?$filter=location/city ne 'Tokyo'");
+		String json = "{ where: { location.city: { ne: 'Tokyo' }}}";
+		QueryResult qr = _qe.executeQuery(Supplier.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Supplier s = (Supplier) o;
+			Location loc = s.getLocation();
+			String city = loc.getCity();
+			assertTrue(!city.equals("Tokyo"));
+		}
+	}
+	
+	public void testGreaterThanDecimal() {
+		// String json = qs.queryToJson(Product.class, "?$filter=unitPrice gt 20.0");
+		String json = "{ where: { unitPrice: { gt: 20.0 }}}";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Product p = (Product) o;
+			BigDecimal price = p.getUnitPrice();
+			assertTrue(price.doubleValue() > 20.0);
+		}
+	}
+	
+	public void testGreaterThanOrEqualDecimal() {
+		// String json = qs.queryToJson(Product.class, "?$filter=unitPrice ge 20.0");
+		String json = "{ where: { unitPrice: { ge: 20.0 }}}";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Product p = (Product) o;
+			BigDecimal price = p.getUnitPrice();
+			assertTrue(price.doubleValue() >= 20.0);
+		}
+	}
+	
+	public void testLessThanDecimal() {
+		// String json = qs.queryToJson(Product.class, "?$filter=unitPrice lt 20.0");
+		String json = "{ where: { unitPrice: { lt: 10.0 }}}";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Product p = (Product) o;
+			BigDecimal price = p.getUnitPrice();
+			assertTrue(price.doubleValue() < 10.0);
+		}
+	}
+	
+	public void testLessThanOrEqualDecimal() {
+		// String json = qs.queryToJson(Product.class, "?$filter=unitPrice le 20.0");
+		String json = "{ where: { unitPrice: { le: 10.0 }}}";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Product p = (Product) o;
+			BigDecimal price = p.getUnitPrice();
+			assertTrue(price.doubleValue() <= 10.0);
+		}
+	}
+	
+	public void testEndsWith() {
+		String json = "{ where: { productName: { endsWith: 'Sauce' }}}";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Product p = (Product) o;
+			String productName = p.getProductName();
+			assertTrue(productName.endsWith("Sauce"));
+		}
+	}
+	
+	public void testStartsWith() {
+		String json = "{ where: { productName: { startsWith: 'Ch' }}}";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Product p = (Product) o;
+			String productName = p.getProductName();
+			assertTrue(productName.startsWith("Ch"));
+		}
+	}
+	
+	public void testAndWithDecimal() {
+		String json = "{ where: { unitPrice: { le: 10.0, gt: 3.5 }}}";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Product p = (Product) o;
+			BigDecimal price = p.getUnitPrice();
+			assertTrue(price.doubleValue() <= 10.0);
+			assertTrue(price.doubleValue() > 3.5);
+		}
+	}
+	
+	public void testOrWithDecimal() {
+		String json = "{ where: { or: [ { unitPrice: { ge: 200.0 }}, { unitPrice: { lt: 3.5 }}] }}";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Product p = (Product) o;
+			BigDecimal price = p.getUnitPrice();
+			assertTrue(price.doubleValue() >= 200.0 || price.doubleValue() < 3.5);
+		}
+	}
+
+
+	public void testLogicalNot() {
+		// String json = qs.queryToJson(Product.class, "?$filter=not endswith(productName,'milk')");
+		String json = "{ where: { not: { productName: { endsWith: 'milk' }}}}";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o: results) {
+			Product p = (Product) o;
+			String productName = p.getProductName();
+			assertTrue(!productName.endsWith("milk"));
+		}
+	}
+
 //	
 //	
 ////	public void testQuerySelectCountryAndPostalCode() {
@@ -151,44 +308,8 @@ public class QueryExecutorTest extends TestCase {
 //    	assertTrue(hasValue(json, "orderID", "10248"));
 //	}
 //
-//	public void testEqual() {
-//    	String json = qs.queryToJson(Supplier.class, "?$filter=location/city eq 'New Orleans'");
-//    	assertTrue(json.indexOf("Supplier") > 0);
-//    	assertTrue(hasValue(json, "city", "New Orleans"));
+
 //	}
-//	public void testNotEqual() {
-//    	String json = qs.queryToJson(Supplier.class, "?$filter=location/city ne 'Tokyo'");
-//    	assertTrue(json.indexOf("Supplier") > 0);
-//    	assertTrue(hasValue(json, "city", "New Orleans"));
-//	}
-////	public void testGreaterThan() {
-////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice gt 20.0");
-////    	assertTrue(json.indexOf("Product") > 0);
-////	}
-////	public void testGreaterThanOrEqual() {
-////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice ge 10");
-////    	assertTrue(json.indexOf("Product") > 0);
-////	}
-////	public void testLessThan() {
-////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice lt 20");
-////    	assertTrue(json.indexOf("Product") > 0);
-////	}
-////	public void testLessThanOrEqual() {
-////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice le 100");
-////    	assertTrue(json.indexOf("Product") > 0);
-////	}
-////	public void testLogicalAnd() {
-////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice le 200 and unitPrice gt '3.5'");
-////    	assertTrue(json.indexOf("Product") > 0);
-////	}
-////	public void testLogicalOr() {
-////    	String json = qs.queryToJson(Product.class, "?$filter=unitPrice le '3.5' or unitPrice gt '200'");
-////    	assertTrue(json.indexOf("Product") > 0);
-////	}
-////	public void testLogicalNot() {
-////    	String json = qs.queryToJson(Product.class, "?$filter=not endswith(productName,'milk')");
-////    	assertTrue(json.indexOf("Product") > 0);
-////	}
 //	
 ////	qs.queryToJson(northwind.model.Customer.class, "?$top=5&$filter=country eq 'Brazil'&$expand=orders/orderDetails/product");
 ////	qs.queryToJson(northwind.model.Order.class, "?$filter=orderID eq 10258");

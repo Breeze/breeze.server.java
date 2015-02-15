@@ -31,8 +31,13 @@ public class MetadataHelper {
 				return null;
 			}
 			prop = nextEntityType.getProperty(propName);
-			if (prop != null && prop instanceof INavigationProperty) {
-				nextEntityType = ((INavigationProperty) prop).getEntityType();
+			if (prop != null) {
+				if (prop instanceof INavigationProperty) {
+					nextEntityType = ((INavigationProperty) prop).getEntityType();
+				} else {
+					// may return null - this is ok;
+					nextEntityType = ((IDataProperty) prop).getComplexType();
+				}
 			} else {
 				nextEntityType = null;
 			}
