@@ -35,6 +35,8 @@ public class QueryExecutorTest extends TestCase {
 		_qe = new QueryExecutor(StaticConfigurator.getSessionFactory());
 	}
 	
+	// TODO Need to add select support
+	
 
 	public void testQueryFilterCustomer() {
     	// String json = qs.queryToJson(Customer.class, "?$top=5&$filter=country eq 'Brazil'");
@@ -276,43 +278,6 @@ public class QueryExecutorTest extends TestCase {
 		}
 	}
 
-//	
-//	
-////	public void testQuerySelectCountryAndPostalCode() {
-////    	String json = qs.queryToJson(Customer.class, "$top=3&$select=country,postalCode&$inlinecount=allpages");
-////    	assertTrue(json.indexOf("Customer") < 0);
-////    	assertTrue(json.indexOf("Country") > 0);
-////    	assertTrue(json.indexOf("PostalCode") > 0);
-////	}
-//	
-//	public void testQueryFilterOrderIdAndExpand() {
-//    	String json = qs.queryToJson(Order.class, "?$filter=orderID eq 10258&$expand=orderDetails/product/supplier");
-//    	System.out.println(json);
-//    	assertTrue(json.indexOf("Order") > 0);
-//    	assertTrue(hasValue(json, "orderID", "10258"));
-//    	assertTrue(hasValue(json, "productID", "32"));
-//    	assertTrue(hasValue(json, "supplierID", "14"));
-//    	assertTrue(hasValue(json, "contactName", "Elio Rossi"));
-//    	assertTrue(hasValue(json, "city", "Ravenna"));
-//	}
-//
-//	public void testQueryToJsonCriteriaBooleanStringArray() {
-////		fail("Not yet implemented");
-//	}
-//
-//	public void testQueryHQL() {
-//    	QueryService qs = new QueryService(StaticConfigurator.getSessionFactory());
-//		String hqlQuery = "from Order where orderId in (10248, 10249, 10250)";
-//		String json = qs.queryToJson(hqlQuery);
-//    	assertTrue(json.indexOf("Order") > 0);
-//    	assertTrue(hasValue(json, "orderID", "10248"));
-//	}
-//
 
-//	}
-//	
-////	qs.queryToJson(northwind.model.Customer.class, "?$top=5&$filter=country eq 'Brazil'&$expand=orders/orderDetails/product");
-////	qs.queryToJson(northwind.model.Order.class, "?$filter=orderID eq 10258");
-////	qs.queryToJson(northwind.model.Order.class, "?$filter=orderID eq 10258&$expand=orderDetails/product/supplier");
-	
+		
 }
