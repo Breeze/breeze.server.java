@@ -178,29 +178,14 @@ public class CriteriaBuilder {
 		if (obc == null) return;
 
 		for(OrderByItem item: obc.getOrderByItems()) {
-
-			String[] fields = item.getPropertyPath().split("\\.");
+			CriteriaAlias ca = CriteriaAlias.create(crit, item.getPropertyPath());
 			
-			String nextField;
-			Criteria nextCrit = crit;
-			if (fields.length == 1) {
-				nextField = fields[0];
-			} else {
-				String nextAlias = "";
-				for (int i = 0; i < fields.length - 1; i = i + 1) {
-					nextField = nextAlias == "" ? fields[i] : nextAlias + "." + fields[i];
-					nextAlias = fields[i] + "_" + i;
-					nextCrit = nextCrit.createAlias(nextField, nextAlias);
-				}
-				nextField = nextAlias + "." + fields[fields.length - 1];
-			}
-			Order order = item.isDesc() ? Order.desc(nextField) : Order.asc(nextField);
-			nextCrit.addOrder(order);
+			Order order = item.isDesc() ? Order.desc(ca.alias) : Order.asc(ca.alias);
+			ca.crit.addOrder(order);
 		}
 
 	}
 	
-
-
+	
 
 }	
