@@ -19,7 +19,6 @@ public class MetadataHelper {
     	return simpleName + ":#" + packageName;
     }
     
-
 	// returns the final property from a property path or null if not found.
 	public static IProperty getPropertyFromPath(String propertyPath, IEntityType entityType) {
 		// List<String> paths = StringFns.ToList(propertyPath, "\\.");

@@ -1,9 +1,11 @@
 package com.breezejs.hib;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +30,8 @@ import junit.framework.TestCase;
 public class QueryExecutorTest extends TestCase {
 
 	private QueryExecutor _qe;
+
+	// private SimpleDateFormat DATEFMT = new SimpleDateFormat("dd/MM/yyyy");
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -68,7 +72,7 @@ public class QueryExecutorTest extends TestCase {
 
 	}
 
-	public void testOrderByNestedProp1() {
+	public void testOrderByNested3Deep() {
 		// String json = qs.queryToJson(OrderDetail.class,
 		// "?$filter=orderID lt 10258&$orderby=order/employee/lastName desc&$expand=order/employee");
 		String json = "{ where: { orderID: { lt: 10258 }}, orderBy: 'order.employee.lastName desc', expand: 'order.employee' }";
@@ -93,7 +97,7 @@ public class QueryExecutorTest extends TestCase {
 		assertTrue(lastNames.equals(lastNamesCpy));
 	}
 
-	public void testExpandProduct() {
+	public void testExpandNested3Deep() {
 		// String json = qs.queryToJson(Customer.class,
 		// "?$top=1&$filter=country eq 'Brazil'&$expand=orders/orderDetails/product");
 		String json = "{ where: { country: 'Brazil' }, take: 1, expand: 'orders.orderDetails.product' }";
@@ -127,6 +131,35 @@ public class QueryExecutorTest extends TestCase {
 		assertTrue(inlineCount > 3);
 		String rJson = qr.toJson();
 	}
+	
+	public void testGreaterThanDateProps() {
+		String json = "{ where: { birthDate: { lt: 'hireDate'}}}";
+		QueryResult qr = _qe.executeQuery(Employee.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Employee emp = (Employee) o;
+			Date birthDt = emp.getBirthDate();
+			Date hireDt = emp.getHireDate();
+			assertTrue(birthDt.compareTo(hireDt) < 0);
+		}
+	}
+
+	public void testCompareStringProps() {
+		String json = "{ where: { notes: { contains: 'firstName'}}}";
+		QueryResult qr = _qe.executeQuery(Employee.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Employee emp = (Employee) o;
+			String notes = emp.getNotes();
+			String firstName = emp.getFirstName();
+			assertTrue(notes.indexOf(firstName) >= 0);
+		}
+	}
+
 
 	public void testComplexTypePropEqual() {
 		// String json = qs.queryToJson(Supplier.class,
@@ -172,6 +205,23 @@ public class QueryExecutorTest extends TestCase {
 			Product p = (Product) o;
 			BigDecimal price = p.getUnitPrice();
 			assertTrue(price.doubleValue() > 20.0);
+		}
+	}
+
+	public void testGreaterThanDate() {
+		// String json = qs.queryToJson(Product.class,
+		// "?$filter=unitPrice gt 20.0");
+
+		Date latestBirthDate = toDate(1956, 1, 1);
+		String json = "{ where: { birthDate: { lt: '1956-01-01T00:00:00' }}}";
+		QueryResult qr = _qe.executeQuery(Employee.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Employee emp = (Employee) o;
+			Date birthDt = emp.getBirthDate();
+			assertTrue(birthDt.compareTo(latestBirthDate) < 0);
 		}
 	}
 
@@ -247,12 +297,9 @@ public class QueryExecutorTest extends TestCase {
 	}
 
 	public void testContains() {
-		String json = "{ where: { productName: { contains: 'ried' }}}"; // xxx
-																		// Dried
-																		// xxx,
-																		// xxx
-																		// Fried
-																		// xxx
+		// ...Dried/Fried...
+		String json = "{ where: { productName: { contains: 'ried' }}}";
+
 		QueryResult qr = _qe.executeQuery(Product.class, json);
 		Collection results = qr.getResults();
 		String rJson = qr.toJson();
@@ -307,7 +354,7 @@ public class QueryExecutorTest extends TestCase {
 		}
 	}
 
-	public void testNestedQuery() {
+	public void testNestedQueryString() {
 		// String json = qs.queryToJson(Product.class,
 		// "?$filter=not endswith(productName,'milk')");
 		String json = "{ where: { 'employee.lastName': { startsWith: 'D' }}}";
@@ -321,6 +368,79 @@ public class QueryExecutorTest extends TestCase {
 			String lastName = emp.getLastName();
 			assertTrue(lastName.startsWith("D"));
 		}
+	}
+
+	public void testNestedQueryDate() {
+		Date latestBirthDate = toDate(1956, 1, 1);
+		String json = "{ where: { employee.birthDate: { gt: '1960-01-01T00:00:00' }}}";
+		QueryResult qr = _qe.executeQuery(Order.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Order order = (Order) o;
+			Employee emp = order.getEmployee();
+			Date birthDate = emp.getBirthDate();
+			assertTrue(birthDate.compareTo(latestBirthDate) > 0);
+		}
+	}
+
+	public void testRegularQueryWithNestedQueryString() {
+		// String json = qs.queryToJson(Product.class,
+		// "?$filter=not endswith(productName,'milk')");
+		String json = "{ where: { freight: {gt: 100.0} , 'employee.lastName': { startsWith: 'D' }}}";
+		QueryResult qr = _qe.executeQuery(Order.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Order order = (Order) o;
+			BigDecimal freight = order.getFreight();
+			assertTrue(freight.doubleValue() > 100.0);
+			Employee emp = order.getEmployee();
+			String lastName = emp.getLastName();
+			assertTrue(lastName.startsWith("D"));
+		}
+	}
+
+	public void testNestedQueryString3Deep() {
+		// String json = qs.queryToJson(Product.class,
+		// "?$filter=not endswith(productName,'milk')");
+		String json = "{ where: { 'order.employee.lastName': { startsWith: 'D' }}}";
+		QueryResult qr = _qe.executeQuery(OrderDetail.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			OrderDetail od = (OrderDetail) o;
+			Order order = od.getOrder();
+			Employee emp = order.getEmployee();
+			String lastName = emp.getLastName();
+			assertTrue(lastName.startsWith("D"));
+		}
+	}
+
+	public void testNestedQueryInt() {
+		// String json = qs.queryToJson(Product.class,
+		// "?$filter=not endswith(productName,'milk')");
+		String json = "{ where: { 'product.productID': 1}}";
+		QueryResult qr = _qe.executeQuery(OrderDetail.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			OrderDetail od = (OrderDetail) o;
+			Product p = od.getProduct();
+			Integer id = p.getProductID();
+			assertTrue(id == 1);
+		}
+	}
+
+	private Date toDate(int yr, int month, int day) {
+		int y = yr - 1900;
+		int m = month - 1;
+		// wierd rules: yy - 1900, mm (0-11), dd (1-31)
+		return new Date(y, m, day);
 	}
 
 }

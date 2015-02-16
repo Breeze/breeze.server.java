@@ -4,11 +4,11 @@ import org.hibernate.Criteria;
 
 
 class CriteriaAlias {
-	public Criteria crit;
+	public Criteria criteria;
 	public String alias;
 
-	CriteriaAlias(Criteria crit, String alias) {
-		this.crit = crit;
+	public CriteriaAlias(Criteria crit, String alias) {
+		this.criteria = crit;
 		this.alias = alias;
 	}
 

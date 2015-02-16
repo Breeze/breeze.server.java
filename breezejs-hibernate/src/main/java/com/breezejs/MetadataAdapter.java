@@ -59,13 +59,13 @@ public class MetadataAdapter implements IMetadata {
 			List<HashMap<String, Object>> properties;
 			properties = (List<HashMap<String, Object>>) _entityMap.get("dataProperties");
 			for (HashMap<String, Object> p: properties) {
-				IDataProperty prop = new DataProperty(p, metadataAdapter);
+				IDataProperty prop = new DataProperty(this, p, metadataAdapter);
 				_propertyMap.put(prop.getName(), prop);
 			}
 			properties = (List<HashMap<String, Object>>) _entityMap.get("navigationProperties");
 			if (properties != null) {
 				for (HashMap<String, Object> p: properties) {
-					INavigationProperty prop = new NavigationProperty(p, metadataAdapter);
+					INavigationProperty prop = new NavigationProperty(this, p, metadataAdapter);
 					_propertyMap.put(prop.getName(), prop);
 				}
 			}
@@ -80,12 +80,19 @@ public class MetadataAdapter implements IMetadata {
 		public IProperty getProperty(String propertyName) {
 			return _propertyMap.get(propertyName);
 		}
+		
+		public boolean isComplexType() {
+			Boolean isComplexType = (Boolean) _entityMap.get("isComplexType");
+			return isComplexType != null && isComplexType == true;
+		}
 	}
 	
 	public class DataProperty implements IDataProperty {
+		private IEntityType _parentType;
 		private Map<String, Object> _dpMap;
 		private IMetadata _metadataWrapper;
-		public DataProperty(Map<String, Object> dpMap, IMetadata metadataWrapper) {
+		public DataProperty(IEntityType parentType, Map<String, Object> dpMap, IMetadata metadataWrapper) {
+			_parentType = parentType;
 			_dpMap = dpMap;
 			_metadataWrapper = metadataWrapper;
 		}
@@ -106,12 +113,19 @@ public class MetadataAdapter implements IMetadata {
 			if (complexTypeName == null) return null;
 			return _metadataWrapper.getEntityType(complexTypeName);
 		}
+		
+		@Override
+		public IEntityType getParentType() {
+			return _parentType;
+		}
 	}
 	
 	public class NavigationProperty implements INavigationProperty {
+		private IEntityType _parentType;
 		private Map<String, Object> _npMap;
 		private IMetadata _metadataWrapper;
-		public NavigationProperty(Map<String, Object> npMap, IMetadata metadataWrapper) {
+		public NavigationProperty(IEntityType parentType, Map<String, Object> npMap, IMetadata metadataWrapper) {
+			_parentType = parentType;
 			_npMap = npMap;
 			_metadataWrapper = metadataWrapper;
 		}
@@ -125,6 +139,12 @@ public class MetadataAdapter implements IMetadata {
 			String entityTypeName = (String) _npMap.get("entityTypeName");
 			return _metadataWrapper.getEntityType(entityTypeName);
 		}
+		
+		@Override
+		public IEntityType getParentType() {
+			return _parentType;
+		}
+
 
 		@Override
 		public boolean isScalar() {

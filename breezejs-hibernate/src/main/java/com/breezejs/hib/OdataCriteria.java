@@ -147,7 +147,7 @@ public class OdataCriteria {
 	/**
 	 * Create a Criterion from a simple filter expression.  Handles OData filters of the form
 	 * $filter=country eq 'Brazil'
-	 * @param crit 
+	 * @param criteria 
 	 * @param filterString OData $filter.  Only filters of the form [field] [op] [value] are supported..
 	 * @return an OperatorExpression or PropertyExpression
 	 */
