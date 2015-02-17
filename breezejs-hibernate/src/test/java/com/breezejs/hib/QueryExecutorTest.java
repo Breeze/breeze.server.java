@@ -487,6 +487,38 @@ public class QueryExecutorTest extends TestCase {
 			assertTrue(unitPrice.doubleValue() > 20.0);
 		}
 	}
+	
+	public void testAny() {
+		String json = "{ where: { orders: { any: { freight: { gt: 950.0 } } } } }";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() < 5);
+		for (Object o : results) {
+			Customer c = (Customer) o;
+		}
+	}
+	
+	public void testAnyWithExpand() {
+		String json = "{ where: { orders: { any: { freight: { gt: 950.0 } } } }, expand: 'orders' }";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() < 5);
+		for (Object o : results) {
+			Customer c = (Customer) o;
+			Collection<Order> orders = c.getOrders();
+			assertTrue(orders.size() > 0);
+			boolean isOk = false;
+			for (Order order: orders) {
+				if (order.getFreight().doubleValue() > 950.0) {
+					isOk = true;
+				}
+			}
+			assertTrue(isOk);
+		}
+	}
+
 
 	private Date toDate(int yr, int month, int day) {
 		int y = yr - 1900;

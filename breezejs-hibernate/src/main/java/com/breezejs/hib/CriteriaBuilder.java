@@ -80,7 +80,7 @@ public class CriteriaBuilder {
 	
 	private void addWhere(Criteria crit, Predicate wherePred) {
 		if (wherePred == null) return;
-		CriteriaResult cr = toCriterion(crit, wherePred);
+		CriteriaResult cr = toCriterion(crit, wherePred, null);
 		cr.criteria.add(cr.criterion);
 	}
 	
@@ -135,16 +135,16 @@ public class CriteriaBuilder {
 
 
 	
-	private CriteriaResult toCriterion(Criteria crit, Predicate pred) {
+	private CriteriaResult toCriterion(Criteria crit, Predicate pred, String contextAlias) {
 		
 		if (pred instanceof AndOrPredicate) {
-			return  createCriterion(crit, (AndOrPredicate) pred);
+			return  createCriterion(crit, (AndOrPredicate) pred, contextAlias);
 		} else if (pred instanceof AnyAllPredicate) {
-			return createCriterion(crit, (AnyAllPredicate) pred);
+			return createCriterion(crit, (AnyAllPredicate) pred, contextAlias);
 		} else if (pred instanceof BinaryPredicate) {
-			return createCriterion(crit, (BinaryPredicate) pred);
+			return createCriterion(crit, (BinaryPredicate) pred, contextAlias);
 		} else if (pred instanceof UnaryPredicate) {
-			return createCriterion(crit, (UnaryPredicate) pred);
+			return createCriterion(crit, (UnaryPredicate) pred, contextAlias);
 		} else {
 			throw new RuntimeException("Unable to recognize predicate: " + pred.getOperator().getName());
 		}
@@ -159,33 +159,54 @@ public class CriteriaBuilder {
 	//       .add(Restrictions.eq(freight, 100);
 	
 	
-	private  CriteriaResult createCriterion(Criteria crit, AndOrPredicate pred) {
+	private  CriteriaResult createCriterion(Criteria crit, AndOrPredicate pred, String contextAlias) {
 		Operator op = pred.getOperator();
 		Junction j = (op == Operator.And) ? Restrictions.conjunction() : Restrictions.disjunction();
 		
 		Criteria nextCrit = crit;
 		for (Predicate subPred : pred.getPredicates()) {
-			CriteriaResult cr = toCriterion(nextCrit, subPred);
+			CriteriaResult cr = toCriterion(nextCrit, subPred, contextAlias);
 			j.add(cr.criterion);
 			nextCrit = cr.criteria;
 		};
 		return new CriteriaResult(nextCrit, j);
 	}
 	
-	private  CriteriaResult createCriterion(Criteria crit, AnyAllPredicate pred) {
-		throw new RuntimeException("Any/All predicates are not yet supported.");
+	private  CriteriaResult createCriterion(Criteria crit, AnyAllPredicate pred, String contextAlias) {
+		// throw new RuntimeException("Any/All predicates are not yet supported.");
 		// May need additional Metadata for this. In order to construct
 		// an EXISTS subquery we need to have the join columns.
-		//		Operator op = pred.getOperator();
-		//		PropExpression pexpr = pred.getExpr();
+		Operator op = pred.getOperator();
+		if (op == Operator.Any) {
+			PropExpression pexpr = pred.getExpr();
+			Predicate nextPred = pred.getPredicate();
+			String propertyPath = pexpr.getPropertyPath();
+			Criteria nextCrit = crit.createAlias(propertyPath, "x");
+			CriteriaResult cr = toCriterion(nextCrit, nextPred, "x");
+			return cr;
+		} 
+		
+		throw new RuntimeException("'All' predicates are not yet supported.");
+//		Criteria cdCriteria = session.createCriteria(CD.class, "cd");
+//		criteria.createAlias("cd.tracks", "track");
+//		criteria.add(Restrictions.eq("track.title", "someTitle"));
+//		criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
+		
+		
+		// need join columns
+//		DetachedCriteria subquery = DetachedCriteria.forClass(Bar.class, "b")
+//				 .add(Property.forName("b.a_id").eqProperty("a.id"))
+//
+//				Criteria criteria = session.createCriteria(Foo.class, "a")
+//				 .add(Subqueries.notExists(subquery);
 	}
 	
-	private  CriteriaResult createCriterion(Criteria crit, UnaryPredicate pred) {
-		CriteriaResult cr = toCriterion(crit, pred.getPredicate());
+	private  CriteriaResult createCriterion(Criteria crit, UnaryPredicate pred, String contextAlias) {
+		CriteriaResult cr = toCriterion(crit, pred.getPredicate(), contextAlias);
 		return new CriteriaResult(cr.criteria, Restrictions.not(cr.criterion));
 	}
 	
-	private  CriteriaResult createCriterion(Criteria crit, BinaryPredicate pred) {
+	private  CriteriaResult createCriterion(Criteria crit, BinaryPredicate pred, String contextAlias) {
 		Operator op = pred.getOperator();
 		String symbol = _operatorMap.get(op.getName());
 		Expression expr1 = pred.getExpr1();
@@ -202,7 +223,8 @@ public class CriteriaBuilder {
 				ca = _aliasBuilder.create(crit, propPath);	
 			}
 			
-			String alias = ca.alias;
+			String alias = (contextAlias == null) ? ca.alias : contextAlias + "." + ca.alias;
+
 			if (expr2 instanceof LitExpression) {
 				Object value = ((LitExpression) expr2).getValue();
 				if (value == null) {
