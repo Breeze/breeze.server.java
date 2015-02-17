@@ -40,7 +40,8 @@ public class QueryExecutorTest extends TestCase {
 		_qe = new QueryExecutor(StaticConfigurator.getSessionFactory());
 	}
 
-	// TODO Need to add select support
+	// TODO - take 0 test
+	// TODO - 
 
 	public void testSimple() {
 		// String json = qs.queryToJson(Customer.class,

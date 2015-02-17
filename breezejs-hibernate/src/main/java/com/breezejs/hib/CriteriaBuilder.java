@@ -18,8 +18,8 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.transform.Transformers;
 
-import com.breezejs.OdataParameters;
-import com.breezejs.hib.CriteriaAliasBuilder.CriteriaAlias;
+
+
 import com.breezejs.metadata.IEntityType;
 import com.breezejs.query.AndOrPredicate;
 import com.breezejs.query.AnyAllPredicate;
@@ -80,21 +80,20 @@ public class CriteriaBuilder {
 	
 	private void addWhere(Criteria crit, Predicate wherePred) {
 		if (wherePred == null) return;
-		CriteriaResult cr = toCriterion(crit, wherePred, null);
-		cr.criteria.add(cr.criterion);
+		Criterion cr = toCriterion(crit, wherePred, null);
+		crit.add(cr);
 	}
 	
 	private void addSelect(Criteria crit, SelectClause selectClause) {
 		if (selectClause == null) return;
 		ProjectionList projList = Projections.projectionList();
-		Criteria nextCrit = crit;
+		
 		for(String propertyPath : selectClause.getPropertyPaths()) {
-			CriteriaAlias ca = _aliasBuilder.create(nextCrit, propertyPath);
-			projList.add(Projections.property(ca.alias).as(propertyPath));
-			nextCrit = ca.criteria;
+			String propertyName = _aliasBuilder.getPropertyName(crit, propertyPath);
+			projList.add(Projections.property(propertyName).as(propertyPath));
 		}
-		nextCrit.setProjection(projList);
-		nextCrit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		crit.setProjection(projList);
+		crit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 	}
 	
 	// Basically doing something like this for nested props
@@ -107,10 +106,10 @@ public class CriteriaBuilder {
 		if (obc == null) return;
 
 		for(OrderByItem item: obc.getOrderByItems()) {
-			CriteriaAlias ca = _aliasBuilder.create(crit, item.getPropertyPath());
+			String propertyName = _aliasBuilder.getPropertyName(crit, item.getPropertyPath());
 			
-			Order order = item.isDesc() ? Order.desc(ca.alias) : Order.asc(ca.alias);
-			ca.criteria.addOrder(order);
+			Order order = item.isDesc() ? Order.desc(propertyName) : Order.asc(propertyName);
+			crit.addOrder(order);
 		}
 	}
 
@@ -135,7 +134,7 @@ public class CriteriaBuilder {
 
 
 	
-	private CriteriaResult toCriterion(Criteria crit, Predicate pred, String contextAlias) {
+	private Criterion toCriterion(Criteria crit, Predicate pred, String contextAlias) {
 		
 		if (pred instanceof AndOrPredicate) {
 			return  createCriterion(crit, (AndOrPredicate) pred, contextAlias);
@@ -159,20 +158,18 @@ public class CriteriaBuilder {
 	//       .add(Restrictions.eq(freight, 100);
 	
 	
-	private  CriteriaResult createCriterion(Criteria crit, AndOrPredicate pred, String contextAlias) {
+	private  Criterion createCriterion(Criteria crit, AndOrPredicate pred, String contextAlias) {
 		Operator op = pred.getOperator();
-		Junction j = (op == Operator.And) ? Restrictions.conjunction() : Restrictions.disjunction();
+		Junction junction = (op == Operator.And) ? Restrictions.conjunction() : Restrictions.disjunction();
 		
-		Criteria nextCrit = crit;
 		for (Predicate subPred : pred.getPredicates()) {
-			CriteriaResult cr = toCriterion(nextCrit, subPred, contextAlias);
-			j.add(cr.criterion);
-			nextCrit = cr.criteria;
+			Criterion cr = toCriterion(crit, subPred, contextAlias);
+			junction.add(cr);
 		};
-		return new CriteriaResult(nextCrit, j);
+		return junction;
 	}
 	
-	private  CriteriaResult createCriterion(Criteria crit, AnyAllPredicate pred, String contextAlias) {
+	private  Criterion createCriterion(Criteria crit, AnyAllPredicate pred, String contextAlias) {
 		// throw new RuntimeException("Any/All predicates are not yet supported.");
 		// May need additional Metadata for this. In order to construct
 		// an EXISTS subquery we need to have the join columns.
@@ -182,7 +179,7 @@ public class CriteriaBuilder {
 			Predicate nextPred = pred.getPredicate();
 			String propertyPath = pexpr.getPropertyPath();
 			Criteria nextCrit = crit.createAlias(propertyPath, "x");
-			CriteriaResult cr = toCriterion(nextCrit, nextPred, "x");
+			Criterion cr = toCriterion(nextCrit, nextPred, "x");
 			return cr;
 		} 
 		
@@ -201,62 +198,62 @@ public class CriteriaBuilder {
 //				 .add(Subqueries.notExists(subquery);
 	}
 	
-	private  CriteriaResult createCriterion(Criteria crit, UnaryPredicate pred, String contextAlias) {
-		CriteriaResult cr = toCriterion(crit, pred.getPredicate(), contextAlias);
-		return new CriteriaResult(cr.criteria, Restrictions.not(cr.criterion));
+	private  Criterion createCriterion(Criteria crit, UnaryPredicate pred, String contextAlias) {
+		Criterion cr = toCriterion(crit, pred.getPredicate(), contextAlias);
+		return Restrictions.not(cr);
 	}
 	
-	private  CriteriaResult createCriterion(Criteria crit, BinaryPredicate pred, String contextAlias) {
+	private  Criterion createCriterion(Criteria crit, BinaryPredicate pred, String contextAlias) {
 		Operator op = pred.getOperator();
 		String symbol = _operatorMap.get(op.getName());
 		Expression expr1 = pred.getExpr1();
 		Expression expr2 = pred.getExpr2();
-		Criterion c;
+		Criterion cr;
 		if (expr1 instanceof PropExpression) {
 			PropExpression pexpr1 = (PropExpression) expr1;
 			String propPath = pexpr1.getPropertyPath();
-			CriteriaAlias ca;
+			String propName;
 			if (pexpr1.getProperty().getParentType().isComplexType()) {
 				// don't process the property path in this case.
-				ca = _aliasBuilder.noAlias(crit, propPath);
+				propName = propPath;
 			} else {
-				ca = _aliasBuilder.create(crit, propPath);	
+				propName = _aliasBuilder.getPropertyName(crit, propPath);	
 			}
 			
-			String alias = (contextAlias == null) ? ca.alias : contextAlias + "." + ca.alias;
+			propName = (contextAlias == null) ? propName : contextAlias + "." + propName;
 
 			if (expr2 instanceof LitExpression) {
 				Object value = ((LitExpression) expr2).getValue();
 				if (value == null) {
-					c= Restrictions.isNull(alias);
+					cr= Restrictions.isNull(propName);
 				} else if (symbol != null) {
-					c = new OperatorExpression(alias, value, symbol);
+					cr = new OperatorExpression(propName, value, symbol);
 				} else if (op == Operator.In) {
-					c = Restrictions.in(alias, (Object[]) value);
+					cr = Restrictions.in(propName, (Object[]) value);
 				} else if (op == Operator.StartsWith) {
-					c = Restrictions.like(alias, ((String) value), MatchMode.START );
+					cr = Restrictions.like(propName, ((String) value), MatchMode.START );
 				} else if (op == Operator.EndsWith) {
-					c = Restrictions.like(alias, (String) value, MatchMode.END);
+					cr = Restrictions.like(propName, (String) value, MatchMode.END);
 				} else if (op == Operator.Contains) {
-					c = Restrictions.like(alias, ((String) value), MatchMode.ANYWHERE);
+					cr = Restrictions.like(propName, ((String) value), MatchMode.ANYWHERE);
 				} else {
 					throw new RuntimeException("Binary Predicate with the " + op.getName() + "operator is not yet supported.");
 				}
 			} else {
 				String otherPropPath = ((PropExpression) expr2).getPropertyPath();
 				if (symbol != null) {
-					c = new PropertyExpression(alias, otherPropPath, symbol);
+					cr = new PropertyExpression(propName, otherPropPath, symbol);
 				} else if (op == Operator.StartsWith) {
-					c = new LikePropertyExpression(alias, otherPropPath, MatchMode.START );
+					cr = new LikePropertyExpression(propName, otherPropPath, MatchMode.START );
 				} else if (op == Operator.EndsWith) {
-					c = new LikePropertyExpression(alias, otherPropPath, MatchMode.END);
+					cr = new LikePropertyExpression(propName, otherPropPath, MatchMode.END);
 				} else if (op == Operator.Contains) {
-					c = new LikePropertyExpression(alias, otherPropPath, MatchMode.ANYWHERE);
+					cr = new LikePropertyExpression(propName, otherPropPath, MatchMode.ANYWHERE);
 				} else {
 					throw new RuntimeException("Property comparison with the " + op.getName() + "operator is not yet supported.");
 				}
 			}
-			return new CriteriaResult(ca.criteria, c);
+			return cr;
 		} else {
 			throw new RuntimeException("Function expressions not yet supported.");
 		}
