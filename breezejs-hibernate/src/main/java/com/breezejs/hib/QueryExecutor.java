@@ -16,7 +16,7 @@ import com.breezejs.query.ExpandClause;
 import com.breezejs.util.Reflect;
 
 public class QueryExecutor {
-	public static final Logger log = Logger.getLogger(QueryService.class);
+	public static final Logger log = Logger.getLogger(QueryExecutor.class);
 	private SessionFactory _sessionFactory;
 	private MetadataAdapter _metadataAdapter;
 
@@ -54,7 +54,7 @@ public class QueryExecutor {
 	 * @param op OdataParameters representing the OData operations on the query
 	 * @return the query results as JSON
 	 */
-	private QueryResult executeQuery(EntityQuery entityQuery, IEntityType entityType) {
+	public QueryResult executeQuery(EntityQuery entityQuery, IEntityType entityType) {
 		entityQuery.validate(entityType);
 
 		Class<?> clazz = Reflect.lookupEntityType(entityType.getName());

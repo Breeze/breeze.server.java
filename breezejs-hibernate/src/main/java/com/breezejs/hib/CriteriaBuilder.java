@@ -1,12 +1,9 @@
 package com.breezejs.hib;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-
 import org.hibernate.Criteria;
-import org.hibernate.Session;
+
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.MatchMode;
@@ -18,9 +15,6 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.transform.Transformers;
 
-
-
-import com.breezejs.metadata.IEntityType;
 import com.breezejs.query.AndOrPredicate;
 import com.breezejs.query.AnyAllPredicate;
 import com.breezejs.query.BinaryPredicate;
@@ -34,11 +28,6 @@ import com.breezejs.query.Predicate;
 import com.breezejs.query.PropExpression;
 import com.breezejs.query.SelectClause;
 import com.breezejs.query.UnaryPredicate;
-import com.breezejs.util.Reflect;
-import com.breezejs.util.TypeFns;
-import com.google.common.primitives.Doubles;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
 
 /**
  * Converts EntityQuery into Hibernate Criteria.
@@ -65,10 +54,16 @@ public class CriteriaBuilder {
 	public void updateCriteria(Criteria crit, EntityQuery entityQuery) {
 		
 		Integer takeCount = entityQuery.getTakeCount();
-		if (takeCount != null) crit.setMaxResults(takeCount);	
-		
-		Integer skipCount = entityQuery.getSkipCount();
-    	if (skipCount != null) crit.setFirstResult(skipCount);
+ 
+		if (takeCount != null && takeCount == 0) {
+			// Hack because setMaxResults(0) returns all records instead of none.
+			// so we do then equiv of skip 'everything' instead.
+			crit.setFirstResult(Integer.MAX_VALUE);
+		} else {
+			if (takeCount != null) crit.setMaxResults(takeCount); 
+			Integer skipCount = entityQuery.getSkipCount();
+	    	if (skipCount != null) crit.setFirstResult(skipCount);
+		}
     	
     	addWhere(crit, entityQuery.getWherePredicate());
     	

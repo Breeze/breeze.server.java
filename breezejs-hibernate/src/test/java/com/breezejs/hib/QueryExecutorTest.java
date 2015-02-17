@@ -43,7 +43,7 @@ public class QueryExecutorTest extends TestCase {
 	// TODO - take 0 test
 	// TODO - 
 
-	public void testSimple() {
+	public void testSimpleWhereTake() {
 		// String json = qs.queryToJson(Customer.class,
 		// "?$top=5&$filter=country eq 'Brazil'");
 		String json = "{ where: { country: 'Brazil' }, take: 5 }";
@@ -131,6 +131,16 @@ public class QueryExecutorTest extends TestCase {
 		Long inlineCount = qr.getInlineCount();
 		assertTrue(results.size() == 3);
 		assertTrue(inlineCount > 3);
+		String rJson = qr.toJson();
+	}
+	
+	public void testInlineCountWithTake0() {
+		String json = "{ take: 0, inlineCountEnabled: true }";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		Long inlineCount = qr.getInlineCount();
+		assertTrue(results.size() == 0);
+		assertTrue(inlineCount > 30);
 		String rJson = qr.toJson();
 	}
 	

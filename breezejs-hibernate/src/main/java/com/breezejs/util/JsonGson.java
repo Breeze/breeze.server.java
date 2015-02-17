@@ -90,6 +90,7 @@ public class JsonGson {
 	public static Object fromMap(Class<?> clazz, Map map) {
 		try {
 			return null;
+			// TODO: think about using Apache BeanUtils for this.
 			// Object bean = JSONDeserializer.read(clazz, map);
 			// return bean;
 		} catch (Exception e) {
