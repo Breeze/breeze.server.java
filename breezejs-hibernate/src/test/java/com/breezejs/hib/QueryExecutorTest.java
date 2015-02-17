@@ -386,7 +386,7 @@ public class QueryExecutorTest extends TestCase {
 		}
 	}
 
-	public void testRegularQueryWithNestedQueryString() {
+	public void testNestedWhereString() {
 		// String json = qs.queryToJson(Product.class,
 		// "?$filter=not endswith(productName,'milk')");
 		String json = "{ where: { freight: {gt: 100.0} , 'employee.lastName': { startsWith: 'D' }}}";
@@ -404,7 +404,7 @@ public class QueryExecutorTest extends TestCase {
 		}
 	}
 
-	public void testNestedQueryString3Deep() {
+	public void testNestedWhereString3Deep() {
 		// String json = qs.queryToJson(Product.class,
 		// "?$filter=not endswith(productName,'milk')");
 		String json = "{ where: { 'order.employee.lastName': { startsWith: 'D' }}}";
@@ -421,7 +421,7 @@ public class QueryExecutorTest extends TestCase {
 		}
 	}
 
-	public void testNestedQueryInt() {
+	public void testNestedWhereInt() {
 		// String json = qs.queryToJson(Product.class,
 		// "?$filter=not endswith(productName,'milk')");
 		String json = "{ where: { 'product.productID': 1}}";

@@ -65,7 +65,8 @@ public class QueryExecutor {
 		try {
 			session.beginTransaction();
 			Criteria crit = session.createCriteria(clazz);
-	    	CriteriaBuilder.updateCriteria(crit, entityQuery);
+			CriteriaBuilder builder = new CriteriaBuilder();
+	    	builder.updateCriteria(crit, entityQuery);
 	    	// execute the query
 	    	List result = crit.list();
 	    	
@@ -78,7 +79,7 @@ public class QueryExecutor {
 			}
 			
 			if (entityQuery.isInlineCountEnabled()) {
-				CriteriaBuilder.applyInlineCount(crit);
+				builder.applyInlineCount(crit);
 				long countResult = (Long) crit.uniqueResult();
 				log.debugv("queryn: inline count={0}", countResult);
 				

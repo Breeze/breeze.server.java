@@ -19,6 +19,7 @@ import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.transform.Transformers;
 
 import com.breezejs.OdataParameters;
+import com.breezejs.hib.CriteriaAliasBuilder.CriteriaAlias;
 import com.breezejs.metadata.IEntityType;
 import com.breezejs.query.AndOrPredicate;
 import com.breezejs.query.AnyAllPredicate;
@@ -45,6 +46,11 @@ import com.google.common.primitives.Longs;
  * @see http://docs.jboss.org/hibernate/core/3.6/javadocs/org/hibernate/Criteria.html
  */
 public class CriteriaBuilder {
+	
+	private CriteriaAliasBuilder _aliasBuilder;
+	public CriteriaBuilder() {
+		_aliasBuilder = new CriteriaAliasBuilder();
+	}
 
 	private static final HashMap<String, String> _operatorMap = new HashMap<String, String>();
 	static {
@@ -56,7 +62,7 @@ public class CriteriaBuilder {
 		_operatorMap.put("le", "<=");
 	}
 	
-	public static void updateCriteria(Criteria crit, EntityQuery entityQuery) {
+	public void updateCriteria(Criteria crit, EntityQuery entityQuery) {
 		
 		Integer takeCount = entityQuery.getTakeCount();
 		if (takeCount != null) crit.setMaxResults(takeCount);	
@@ -72,18 +78,18 @@ public class CriteriaBuilder {
 				
 	}
 	
-	private static void addWhere(Criteria crit, Predicate wherePred) {
+	private void addWhere(Criteria crit, Predicate wherePred) {
 		if (wherePred == null) return;
 		CriteriaResult cr = toCriterion(crit, wherePred);
 		cr.criteria.add(cr.criterion);
 	}
 	
-	private static void addSelect(Criteria crit, SelectClause selectClause) {
+	private void addSelect(Criteria crit, SelectClause selectClause) {
 		if (selectClause == null) return;
 		ProjectionList projList = Projections.projectionList();
 		Criteria nextCrit = crit;
 		for(String propertyPath : selectClause.getPropertyPaths()) {
-			CriteriaAlias ca = CriteriaAlias.create(nextCrit, propertyPath);
+			CriteriaAlias ca = _aliasBuilder.create(nextCrit, propertyPath);
 			projList.add(Projections.property(ca.alias).as(propertyPath));
 			nextCrit = ca.criteria;
 		}
@@ -97,11 +103,11 @@ public class CriteriaBuilder {
 			 .createAlias("product_1.category", "category_2")
 			 .addOrder( Order.desc(category_2.name");
     */
-	private static void addOrderBy(Criteria crit, OrderByClause obc) {
+	private void addOrderBy(Criteria crit, OrderByClause obc) {
 		if (obc == null) return;
 
 		for(OrderByItem item: obc.getOrderByItems()) {
-			CriteriaAlias ca = CriteriaAlias.create(crit, item.getPropertyPath());
+			CriteriaAlias ca = _aliasBuilder.create(crit, item.getPropertyPath());
 			
 			Order order = item.isDesc() ? Order.desc(ca.alias) : Order.asc(ca.alias);
 			ca.criteria.addOrder(order);
@@ -114,7 +120,7 @@ public class CriteriaBuilder {
 	 * @param crit a Criteria object.  Should already contain only filters that affect the row count.
 	 * @return the same Criteria that was passed in, with operations added.
 	 */
-	public static Criteria applyInlineCount(Criteria crit) 	{
+	public Criteria applyInlineCount(Criteria crit) 	{
     	crit.setMaxResults(0);
     	crit.setFirstResult(0);
     	CriteriaImpl impl = (CriteriaImpl) crit;
@@ -129,7 +135,7 @@ public class CriteriaBuilder {
 
 
 	
-	private static CriteriaResult toCriterion(Criteria crit, Predicate pred) {
+	private CriteriaResult toCriterion(Criteria crit, Predicate pred) {
 		
 		if (pred instanceof AndOrPredicate) {
 			return  createCriterion(crit, (AndOrPredicate) pred);
@@ -153,7 +159,7 @@ public class CriteriaBuilder {
 	//       .add(Restrictions.eq(freight, 100);
 	
 	
-	private static CriteriaResult createCriterion(Criteria crit, AndOrPredicate pred) {
+	private  CriteriaResult createCriterion(Criteria crit, AndOrPredicate pred) {
 		Operator op = pred.getOperator();
 		Junction j = (op == Operator.And) ? Restrictions.conjunction() : Restrictions.disjunction();
 		
@@ -166,7 +172,7 @@ public class CriteriaBuilder {
 		return new CriteriaResult(nextCrit, j);
 	}
 	
-	private static CriteriaResult createCriterion(Criteria crit, AnyAllPredicate pred) {
+	private  CriteriaResult createCriterion(Criteria crit, AnyAllPredicate pred) {
 		throw new RuntimeException("Any/All predicates are not yet supported.");
 		// May need additional Metadata for this. In order to construct
 		// an EXISTS subquery we need to have the join columns.
@@ -174,12 +180,12 @@ public class CriteriaBuilder {
 		//		PropExpression pexpr = pred.getExpr();
 	}
 	
-	private static CriteriaResult createCriterion(Criteria crit, UnaryPredicate pred) {
+	private  CriteriaResult createCriterion(Criteria crit, UnaryPredicate pred) {
 		CriteriaResult cr = toCriterion(crit, pred.getPredicate());
 		return new CriteriaResult(cr.criteria, Restrictions.not(cr.criterion));
 	}
 	
-	private static CriteriaResult createCriterion(Criteria crit, BinaryPredicate pred) {
+	private  CriteriaResult createCriterion(Criteria crit, BinaryPredicate pred) {
 		Operator op = pred.getOperator();
 		String symbol = _operatorMap.get(op.getName());
 		Expression expr1 = pred.getExpr1();
@@ -191,9 +197,9 @@ public class CriteriaBuilder {
 			CriteriaAlias ca;
 			if (pexpr1.getProperty().getParentType().isComplexType()) {
 				// don't process the property path in this case.
-				ca = new CriteriaAlias(crit, propPath);
+				ca = _aliasBuilder.noAlias(crit, propPath);
 			} else {
-				ca = CriteriaAlias.create(crit, propPath);	
+				ca = _aliasBuilder.create(crit, propPath);	
 			}
 			
 			String alias = ca.alias;
