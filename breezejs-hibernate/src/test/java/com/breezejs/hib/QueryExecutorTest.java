@@ -414,6 +414,23 @@ public class QueryExecutorTest extends TestCase {
 			assertTrue(lastName.startsWith("D"));
 		}
 	}
+	
+	public void testNestedWhereWithAnd() {
+		// 
+		String json = "{ where: { 'product.productID': { gt: 11} , 'product.productName': { startsWith: 'Q' }}}";
+		QueryResult qr = _qe.executeQuery(OrderDetail.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			OrderDetail od = (OrderDetail) o;
+			
+			Product p = od.getProduct();
+			assertTrue(p.getProductName().startsWith("Q"));
+			assertTrue(p.getProductID() > 11);
+		}
+	}
+	 
 
 	public void testNestedWhereString3Deep() {
 		// String json = qs.queryToJson(Product.class,
