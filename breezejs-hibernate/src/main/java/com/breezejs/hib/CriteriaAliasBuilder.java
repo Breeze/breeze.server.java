@@ -20,29 +20,35 @@ class CriteriaAliasBuilder  {
 			return propNames[0];
 		} else {
 			// check cache
-			String nextPropName = null;
+			String cachedAlias = _cache.get(propertyPath);
+			if (cachedAlias != null) {
+				return cachedAlias;
+			}
+			String nextPropName;
 			String nextAlias = "";
 			for (int i = 0; i < propNames.length - 1; i = i + 1) {
 				nextPropName = nextAlias == "" ? propNames[i] : nextAlias + "." + propNames[i];
-				nextAlias = getAlias(crit, nextPropName);
+				nextAlias = _cache.get(nextPropName);
+				if (nextAlias == null) {
+					nextAlias = propNames[i] + "_" + _offset++;
+					crit.createAlias(nextPropName, nextAlias);
+					_cache.put(nextPropName, nextAlias);
+				}
 			}
 			nextPropName = nextAlias + "." + propNames[propNames.length - 1];
+			_cache.put(propertyPath, nextPropName);
 			return nextPropName;
 		}
-		
 	}
-	
-	private String getAlias(Criteria crit, String propPath) {
-		String alias = _cache.get(propPath);
+
+	// Used by any/all to get initial expression alias 
+	public String getSimpleAlias(Criteria crit, String propName) {
+		String alias = _cache.get(propName);
 		if (alias == null) {
-			String[] propNames = propPath.split("\\.");
-			String propName = propNames[propNames.length - 1];
 			alias = propName + "_" + _offset++;
-			crit.createAlias(propPath, alias);
-			_cache.put(propPath, alias);
+			crit.createAlias(propName,  alias);
 		}
 		return alias;
-
 	}
 
 }

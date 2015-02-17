@@ -195,9 +195,10 @@ public class CriteriaBuilder {
 		if (op == Operator.Any) {
 			PropExpression pexpr = pred.getExpr();
 			Predicate nextPred = pred.getPredicate();
+			// TODO: should check that propertyPath below is not nested - i.e. a simple navigation propertyName
 			String propertyPath = pexpr.getPropertyPath();
-			Criteria nextCrit = crit.createAlias(propertyPath, "x");
-			Criterion cr = toCriterion(nextCrit, nextPred, "x");
+			String nextContextAlias = _aliasBuilder.getSimpleAlias(crit, propertyPath);
+			Criterion cr = toCriterion(crit, nextPred, nextContextAlias);
 			return cr;
 		}
 
