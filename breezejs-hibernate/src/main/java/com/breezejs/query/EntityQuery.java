@@ -16,6 +16,7 @@ public class EntityQuery {
 	private Integer _skipCount;
 	private Integer _takeCount;
 	private boolean _inlineCountEnabled;
+	private IEntityType _entityType;
 	
 	
 	public EntityQuery(String json) {
@@ -38,11 +39,16 @@ public class EntityQuery {
 	}
 	
 	public void validate(IEntityType entityType) {
+		_entityType = entityType;
 		if (_wherePredicate != null) {
 			_wherePredicate.validate(entityType);
 		}
 	}
 
+	// only available after validate is called.
+	public IEntityType getEntityType() {
+		return _entityType;
+	}
 	
 	public void setResourceName(String resourceName) {
 		_resourceName = resourceName;

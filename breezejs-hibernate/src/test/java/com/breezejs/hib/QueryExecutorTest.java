@@ -40,8 +40,8 @@ public class QueryExecutorTest extends TestCase {
 		_qe = new QueryExecutor(StaticConfigurator.getSessionFactory());
 	}
 
-	// TODO - take 0 test
-	// TODO - 
+	// TODO - select scalar navProps
+	// TODO - select nonscalar navProps
 
 	public void testSimpleWhereTake() {
 		// String json = qs.queryToJson(Customer.class,
@@ -350,8 +350,21 @@ public class QueryExecutorTest extends TestCase {
 					|| price.doubleValue() < 3.5);
 		}
 	}
-
-	public void testLogicalNot() {
+	
+	public void testNotWithOr() {
+		String json = "{ where: { not: { or: [ { companyName: { startsWith: 'B'}}, { city: { startsWith: 'L' }} ] } } }";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Customer c = (Customer) o;
+			assertTrue(!c.getCompanyName().startsWith("B"));
+			assertTrue(!c.getCity().startsWith("L"));
+		}
+	}
+	
+	public void testNot() {
 		// String json = qs.queryToJson(Product.class,
 		// "?$filter=not endswith(productName,'milk')");
 		String json = "{ where: { not: { productName: { endsWith: 'milk' }}}}";
@@ -480,7 +493,22 @@ public class QueryExecutorTest extends TestCase {
 		}
 	}
 	
-	public void testNestedSelect() {
+	public void testNestedSelectScalarNav() {
+
+		String json = "{ where: { unitPrice: { gt: 20.0 }}, select: 'productName,supplier' }";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			HashMap<String, Object> hm = (HashMap<String, Object>) o;
+			String productName = (String) hm.get("productName");
+			Supplier supplier = (Supplier) hm.get("supplier");
+			assertTrue(supplier.getCompanyName() != null);
+		}
+	}
+
+	public void testNestedSelectData() {
 		String json = "{ where: { unitPrice: { gt: 20.0 }}, select: 'productName,supplier.companyName,unitPrice' }";
 		QueryResult qr = _qe.executeQuery(Product.class, json);
 		Collection results = qr.getResults();

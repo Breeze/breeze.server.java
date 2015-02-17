@@ -2,8 +2,8 @@ package com.breezejs.hib;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import org.hibernate.Criteria;
 
+import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.MatchMode;
@@ -15,6 +15,9 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.transform.Transformers;
 
+import com.breezejs.metadata.INavigationProperty;
+import com.breezejs.metadata.IProperty;
+import com.breezejs.metadata.MetadataHelper;
 import com.breezejs.query.AndOrPredicate;
 import com.breezejs.query.AnyAllPredicate;
 import com.breezejs.query.BinaryPredicate;
@@ -40,6 +43,7 @@ import com.breezejs.query.UnaryPredicate;
 public class CriteriaBuilder {
 
 	private CriteriaAliasBuilder _aliasBuilder;
+	private EntityQuery _entityQuery;
 
 	public CriteriaBuilder() {
 		_aliasBuilder = new CriteriaAliasBuilder();
@@ -60,7 +64,7 @@ public class CriteriaBuilder {
 	}
 
 	public void updateCriteria(Criteria crit, EntityQuery entityQuery) {
-
+		_entityQuery = entityQuery;
 		Integer takeCount = entityQuery.getTakeCount();
 		if (takeCount != null && takeCount == 0) {
 			// Hack because setMaxResults(0) returns all records instead of
@@ -100,6 +104,12 @@ public class CriteriaBuilder {
 			String propertyName = _aliasBuilder.getPropertyName(crit,
 					propertyPath);
 			projList.add(Projections.property(propertyName).as(propertyPath));
+			// TODO: if last prop of the path is a navigation prop
+			// then create one addl alias;
+			IProperty prop = MetadataHelper.getPropertyFromPath(propertyPath, _entityQuery.getEntityType());
+			if (prop instanceof INavigationProperty) {
+				_aliasBuilder.getPropertyName(crit, propertyName);
+			}
 		}
 		crit.setProjection(projList);
 		crit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
