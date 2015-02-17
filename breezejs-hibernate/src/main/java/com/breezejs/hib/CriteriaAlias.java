@@ -10,6 +10,7 @@ class CriteriaAlias {
 	public CriteriaAlias(Criteria crit, String alias) {
 		this.criteria = crit;
 		this.alias = alias;
+		
 	}
 
 	public  static CriteriaAlias create(Criteria crit, String propertyPath) {

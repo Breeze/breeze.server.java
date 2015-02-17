@@ -11,10 +11,12 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
+import org.hibernate.transform.Transformers;
 
 import com.breezejs.OdataParameters;
 import com.breezejs.metadata.IEntityType;
@@ -29,6 +31,7 @@ import com.breezejs.query.OrderByClause;
 import com.breezejs.query.OrderByItem;
 import com.breezejs.query.Predicate;
 import com.breezejs.query.PropExpression;
+import com.breezejs.query.SelectClause;
 import com.breezejs.query.UnaryPredicate;
 import com.breezejs.util.Reflect;
 import com.breezejs.util.TypeFns;
@@ -57,18 +60,54 @@ public class CriteriaBuilder {
 		
 		Integer takeCount = entityQuery.getTakeCount();
 		if (takeCount != null) crit.setMaxResults(takeCount);	
+		
 		Integer skipCount = entityQuery.getSkipCount();
     	if (skipCount != null) crit.setFirstResult(skipCount);
     	
-    	Predicate wherePredicate = entityQuery.getWherePredicate();
-    	addWhere(crit, wherePredicate);
+    	addWhere(crit, entityQuery.getWherePredicate());
     	
-    	OrderByClause orderByClause = entityQuery.getOrderByClause();
-       	addOrderBy(crit, orderByClause);
+    	addSelect(crit, entityQuery.getSelectClause());
+    	
+       	addOrderBy(crit, entityQuery.getOrderByClause());
 				
 	}
 	
+	private static void addWhere(Criteria crit, Predicate wherePred) {
+		if (wherePred == null) return;
+		CriteriaResult cr = toCriterion(crit, wherePred);
+		cr.criteria.add(cr.criterion);
+	}
 	
+	private static void addSelect(Criteria crit, SelectClause selectClause) {
+		if (selectClause == null) return;
+		ProjectionList projList = Projections.projectionList();
+		Criteria nextCrit = crit;
+		for(String propertyPath : selectClause.getPropertyPaths()) {
+			CriteriaAlias ca = CriteriaAlias.create(nextCrit, propertyPath);
+			projList.add(Projections.property(ca.alias).as(propertyPath));
+			nextCrit = ca.criteria;
+		}
+		nextCrit.setProjection(projList);
+		nextCrit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+	}
+	
+	// Basically doing something like this for nested props
+	/* Criteria criteria = session.createCriteria(OrderDetail.class)
+			 .createAlias("product", "product_1")
+			 .createAlias("product_1.category", "category_2")
+			 .addOrder( Order.desc(category_2.name");
+    */
+	private static void addOrderBy(Criteria crit, OrderByClause obc) {
+		if (obc == null) return;
+
+		for(OrderByItem item: obc.getOrderByItems()) {
+			CriteriaAlias ca = CriteriaAlias.create(crit, item.getPropertyPath());
+			
+			Order order = item.isDesc() ? Order.desc(ca.alias) : Order.asc(ca.alias);
+			ca.criteria.addOrder(order);
+		}
+	}
+
 	/**
 	 * Apply the OData $inlinecount to the (already filtered) Criteria.
 	 * Removes $skip and $top and $orderby operations and adds a rowCount projection.
@@ -88,11 +127,7 @@ public class CriteriaBuilder {
 		return crit;
 	}
 
-	private static void addWhere(Criteria crit, Predicate wherePred) {
-		if (wherePred == null) return;
-		CriteriaResult cr = toCriterion(crit, wherePred);
-		cr.criteria.add(cr.criterion);
-	}
+
 	
 	private static CriteriaResult toCriterion(Criteria crit, Predicate pred) {
 		
@@ -200,23 +235,7 @@ public class CriteriaBuilder {
 		
 	}
 	
-	// Basically doing something like this for nested props
-	/* Criteria criteria = session.createCriteria(OrderDetail.class)
-			 .createAlias("product", "product_1")
-			 .createAlias("product_1.category", "category_2")
-			 .addOrder( Order.desc(category_2.name");
-    */
-	private static void addOrderBy(Criteria crit, OrderByClause obc) {
-		if (obc == null) return;
 
-		for(OrderByItem item: obc.getOrderByItems()) {
-			CriteriaAlias ca = CriteriaAlias.create(crit, item.getPropertyPath());
-			
-			Order order = item.isDesc() ? Order.desc(ca.alias) : Order.asc(ca.alias);
-			ca.criteria.addOrder(order);
-		}
-
-	}
 	
 	
 

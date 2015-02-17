@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -433,6 +434,57 @@ public class QueryExecutorTest extends TestCase {
 			Product p = od.getProduct();
 			Integer id = p.getProductID();
 			assertTrue(id == 1);
+		}
+	}
+	
+	public void testSelect() {
+
+		String json = "{ where: { unitPrice: { gt: 20.0 }}, select: 'productName,unitPrice' }";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			HashMap<String, Object> hm = (HashMap<String, Object>) o;
+			String productName = (String) hm.get("productName");
+			BigDecimal unitPrice = (BigDecimal) hm.get("unitPrice");
+			assertTrue(unitPrice.doubleValue() > 20.0);
+		}
+	}
+	
+	public void testNestedSelect() {
+		String json = "{ where: { unitPrice: { gt: 20.0 }}, select: 'productName,supplier.companyName,unitPrice' }";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			HashMap<String, Object> hm = (HashMap<String, Object>) o;
+			String productName = (String) hm.get("productName");
+			assertTrue(productName.length() > 0);
+			String supplierCompany = (String) hm.get("supplier.companyName");
+			assertTrue(supplierCompany.length() > 0);
+			assertTrue(productName.length() > 0);
+			BigDecimal unitPrice = (BigDecimal) hm.get("unitPrice");
+			assertTrue(unitPrice.doubleValue() > 20.0);
+		}
+	}
+	
+	public void testNestedWhereWithNestedSelect() {
+		String json = "{ where: { unitPrice: { gt: 20.0 }, 'supplier.companyName': { startsWith: 'S' }}, select: 'productName,supplier.companyName,unitPrice' }";
+		QueryResult qr = _qe.executeQuery(Product.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			HashMap<String, Object> hm = (HashMap<String, Object>) o;
+			String productName = (String) hm.get("productName");
+			assertTrue(productName.length() > 0);
+			String supplierCompany = (String) hm.get("supplier.companyName");
+			assertTrue(supplierCompany.startsWith("S"));
+			assertTrue(productName.length() > 0);
+			BigDecimal unitPrice = (BigDecimal) hm.get("unitPrice");
+			assertTrue(unitPrice.doubleValue() > 20.0);
 		}
 	}
 
