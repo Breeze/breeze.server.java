@@ -52,8 +52,7 @@ public class CriteriaBuilder {
 	}
 
 	// TODO: handle 'All'
-	// TODO: fix prop 'like' prop preds
-	// TODO: handle 'In' clauses
+	// TODO: fix select with nonscalar nav props.
 
 	private static final HashMap<String, String> _operatorMap = new HashMap<String, String>();
 	static {

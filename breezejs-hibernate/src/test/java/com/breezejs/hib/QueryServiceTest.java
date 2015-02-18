@@ -40,8 +40,7 @@ public class QueryServiceTest extends TestCase {
 		_qe = new QueryService(StaticConfigurator.getSessionFactory());
 	}
 
-	// TODO - select scalar navProps
-	// TODO - select nonscalar navProps
+	// TODO: test boolean where - waiting on 'discontinued' field
 
 	public void testSimpleWhereTake() {
 		// String json = qs.queryToJson(Customer.class,
