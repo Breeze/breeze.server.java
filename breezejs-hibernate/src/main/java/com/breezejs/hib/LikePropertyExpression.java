@@ -59,11 +59,11 @@ public class LikePropertyExpression implements Criterion {
 		String pct = "'%'";
 		String expr = p1 + " like ";
 		if (mode == MatchMode.ANYWHERE) {
-			return expr + pct + " + " + p2 + " + " + pct;  
+			return expr + "concat(" + pct + "," + p2 + "," + pct + ")";  
 		} else if (mode == MatchMode.START) {
-			return expr + pct + " + " + p2;
+			return expr + "concat(" + p2 + "," + pct + ")";
 		} else if (mode == MatchMode.END) {
-			return expr + p2 + " + " + pct;
+			return expr + "concat(" + pct + "," + p2 + ")";
 		} else if (mode == MatchMode.EXACT) {
 			return expr + p2;
 		} else { 

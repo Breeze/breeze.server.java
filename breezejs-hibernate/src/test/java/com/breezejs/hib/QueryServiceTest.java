@@ -157,7 +157,7 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 
-	public void testCompareStringProps() {
+	public void testContainsTwoProps() {
 		String json = "{ where: { notes: { contains: 'firstName'}}}";
 		QueryResult qr = _qe.executeQuery(Employee.class, json);
 		Collection results = qr.getResults();
@@ -171,6 +171,19 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 
+	public void testStartsWithTwoProps() {
+		String json = "{ where: { notes: { startsWith: 'firstName'}}}";
+		QueryResult qr = _qe.executeQuery(Employee.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Employee emp = (Employee) o;
+			String notes = emp.getNotes();
+			String firstName = emp.getFirstName();
+			assertTrue(notes.indexOf(firstName) == 0);
+		}
+	}
 
 	public void testComplexTypePropEqual() {
 		// String json = qs.queryToJson(Supplier.class,
