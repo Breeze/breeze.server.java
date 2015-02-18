@@ -19,9 +19,25 @@ public class MetadataHelper {
     	return simpleName + ":#" + packageName;
     }
     
+	/**
+	 * Given a name in the form "Customer:#northwind.model", returns Class northwind.model.Customer.
+	 * @param entityTypeName
+	 * @return
+	 */
+	public static Class lookupEntityType(String entityTypeName) {
+		String[] parts = entityTypeName.split(":#", 2);
+		String className = parts[1] + '.' + parts[0];
+		
+		try {
+			Class clazz = Class.forName(className);
+			return clazz;
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("No class found for " + entityTypeName, e);
+		}
+	}
+    
 	// returns the final property from a property path or null if not found.
 	public static IProperty getPropertyFromPath(String propertyPath, IEntityType entityType) {
-		// List<String> paths = StringFns.ToList(propertyPath, "\\.");
 		String[] paths = propertyPath.split("\\.");
 		IEntityType nextEntityType = entityType;
 		IProperty prop = null;

@@ -15,6 +15,7 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.transform.Transformers;
 
+import com.breezejs.metadata.IEntityType;
 import com.breezejs.metadata.INavigationProperty;
 import com.breezejs.metadata.IProperty;
 import com.breezejs.metadata.MetadataHelper;
@@ -26,7 +27,7 @@ import com.breezejs.query.Expression;
 import com.breezejs.query.LitExpression;
 import com.breezejs.query.Operator;
 import com.breezejs.query.OrderByClause;
-import com.breezejs.query.OrderByItem;
+import com.breezejs.query.OrderByClause.OrderByItem;
 import com.breezejs.query.Predicate;
 import com.breezejs.query.PropExpression;
 import com.breezejs.query.SelectClause;
@@ -45,8 +46,8 @@ public class CriteriaBuilder {
 	private CriteriaAliasBuilder _aliasBuilder;
 	private EntityQuery _entityQuery;
 
-	public CriteriaBuilder() {
-		_aliasBuilder = new CriteriaAliasBuilder();
+	public CriteriaBuilder(IEntityType entityType) {
+		_aliasBuilder = new CriteriaAliasBuilder(entityType);
 	}
 
 	// TODO: handle 'All'
@@ -104,15 +105,16 @@ public class CriteriaBuilder {
 			String propertyName = _aliasBuilder.getPropertyName(crit,
 					propertyPath);
 			projList.add(Projections.property(propertyName).as(propertyPath));
-			// TODO: if last prop of the path is a navigation prop
-			// then create one addl alias;
-			IProperty prop = MetadataHelper.getPropertyFromPath(propertyPath, _entityQuery.getEntityType());
-			if (prop instanceof INavigationProperty) {
-				_aliasBuilder.getPropertyName(crit, propertyName);
-			}
+//			// TODO: if last prop of the path is a navigation prop
+//			// then create one addl alias;
+//			IProperty prop = MetadataHelper.getPropertyFromPath(propertyPath, _entityQuery.getEntityType());
+//			if (prop instanceof INavigationProperty) {
+//				_aliasBuilder.getPropertyName(crit, propertyName);
+//			}
 		}
 		crit.setProjection(projList);
 		crit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		
 	}
 
 	// Basically doing something like this for nested props
@@ -125,7 +127,7 @@ public class CriteriaBuilder {
 		if (obc == null)
 			return;
 
-		for (OrderByItem item : obc.getOrderByItems()) {
+		for (OrderByItem item : obc.getOrderByItems()) { 
 			String propertyName = _aliasBuilder.getPropertyName(crit,
 					item.getPropertyPath());
 			Order order = item.isDesc() ? Order.desc(propertyName) : Order

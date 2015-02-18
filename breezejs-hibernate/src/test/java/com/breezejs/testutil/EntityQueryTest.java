@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.breezejs.query.EntityQuery;
 import com.breezejs.query.OrderByClause;
-import com.breezejs.query.OrderByItem;
+import com.breezejs.query.OrderByClause.OrderByItem;
 import com.breezejs.util.JsonGson;
 
 import junit.framework.TestCase;

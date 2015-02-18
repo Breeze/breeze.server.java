@@ -43,6 +43,12 @@ public class EntityQuery {
 		if (_wherePredicate != null) {
 			_wherePredicate.validate(entityType);
 		}
+		if (_orderByClause != null) {
+			_orderByClause.validate(entityType);
+		}
+		if (_selectClause != null) {
+			_selectClause.validate(entityType);
+		}
 	}
 
 	// only available after validate is called.

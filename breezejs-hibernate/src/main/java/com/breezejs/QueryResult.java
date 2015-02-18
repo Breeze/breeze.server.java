@@ -9,7 +9,7 @@ import com.breezejs.util.JsonGson;
  * @author Steve
  */
 public class QueryResult {
-	private Collection results;
+	private Collection<?> results;
 	private Long inlineCount;
 	
 	public QueryResult(Collection results) {

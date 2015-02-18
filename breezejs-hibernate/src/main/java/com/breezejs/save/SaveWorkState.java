@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.breezejs.metadata.MetadataHelper;
 import com.breezejs.util.JsonGson;
-import com.breezejs.util.Reflect;
 
 public class SaveWorkState {
 
@@ -72,7 +72,7 @@ public class SaveWorkState {
 		map.remove("entityAspect");
 
 		String entityTypeName = (String) aspect.get("entityTypeName");
-		Class type = Reflect.lookupEntityType(entityTypeName);
+		Class type = MetadataHelper.lookupEntityType(entityTypeName);
 		info.entity = JsonGson.fromMap(type, map);
 
 		info.entityState = EntityState.valueOf((String) aspect.get("entityState"));

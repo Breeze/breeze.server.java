@@ -3,6 +3,9 @@ package com.breezejs.query;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.breezejs.metadata.IEntityType;
+import com.breezejs.metadata.IProperty;
+import com.breezejs.metadata.MetadataHelper;
 import com.breezejs.util.StringFns;
 
 public class OrderByClause {
@@ -26,8 +29,12 @@ public class OrderByClause {
     		OrderByItem obItem = new OrderByItem(itemParts[0], isDesc);
     		_orderByItems.add(obItem);
     	}
-   	
-
+    }
+    
+    public void validate(IEntityType entityType) {
+    	for (OrderByItem item: _orderByItems) {
+    		item.validate(entityType);
+    	}
     }
     
 	public String getSource() {
@@ -39,5 +46,31 @@ public class OrderByClause {
 		return _orderByItems;
 	}
 
-    
+	public class OrderByItem {
+		String _propertyPath;
+		boolean _isDesc;	
+		IProperty _property;
+		
+		public OrderByItem(String propertyPath, boolean isDesc) {
+			_propertyPath = propertyPath;
+			_isDesc = isDesc;
+		}
+		
+		public String getPropertyPath() {
+			return _propertyPath;
+		}
+
+		public boolean isDesc() {
+			return _isDesc;
+		}
+		
+		public IProperty getProperty() {
+			return _property;
+		}
+		
+	    public void validate(IEntityType entityType) {
+	    	_property = MetadataHelper.getPropertyFromPath(_propertyPath, entityType);
+	    }
+
+	}
 }

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 
-import com.breezejs.util.Reflect;
+import com.breezejs.util.TypeFns;
 
 /**
  * Initializes Hibernate proxies and collections prior to serialization.
@@ -64,7 +64,7 @@ public class HibernateExpander {
 			return;
 		String propName = expandPath[pathIndex];
 		Class clazz = parent.getClass();
-		PropertyDescriptor pd = Reflect.findPropertyDescriptor(clazz, propName);
+		PropertyDescriptor pd = TypeFns.findPropertyDescriptor(clazz, propName);
 		Method method = pd.getReadMethod();
 		Object child = method.invoke(parent, (Object[]) null);
 		pathIndex++;

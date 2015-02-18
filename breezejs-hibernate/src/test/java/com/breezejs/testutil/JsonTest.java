@@ -4,7 +4,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import com.breezejs.hib.QueryService;
+
 import com.breezejs.hib.StaticConfigurator;
 import com.breezejs.util.JsonGson;
 

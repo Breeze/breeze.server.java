@@ -145,7 +145,6 @@ public class MetadataAdapter implements IMetadata {
 			return _parentType;
 		}
 
-
 		@Override
 		public boolean isScalar() {
 			return (boolean) _npMap.get("isScalar");
