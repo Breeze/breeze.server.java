@@ -42,6 +42,39 @@ public class QueryServiceTest extends TestCase {
 	// TODO - select scalar navProps
 	// TODO - select nonscalar navProps
 
+	public void testEmptyQuery() {
+		String json = "";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 5);
+		for (Object o : results) {
+			Customer c = (Customer) o;
+		}
+	}
+	
+	public void testNullQuery() {
+		String json = null;
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 5);
+		for (Object o : results) {
+			Customer c = (Customer) o;
+		}
+	}
+
+	public void testNonJsonQuery() {
+		String json = "x=4&y=z";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 5);
+		for (Object o : results) {
+			Customer c = (Customer) o;
+		}
+	}
+	
 	public void testSimpleWhereTake() {
 		// String json = qs.queryToJson(Customer.class,
 		// "?$top=5&$filter=country eq 'Brazil'");
