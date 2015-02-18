@@ -3,6 +3,7 @@ package com.breezejs.hib;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -39,8 +40,7 @@ public class QueryServiceTest extends TestCase {
 		_qe = new QueryService(StaticConfigurator.getSessionFactory());
 	}
 
-	// TODO - select scalar navProps
-	// TODO - select nonscalar navProps
+	// TODO: test boolean where - waiting on 'discontinued' field
 
 	public void testEmptyQuery() {
 		String json = "";
@@ -190,7 +190,7 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 
-	public void testCompareStringProps() {
+	public void testContainsTwoProps() {
 		String json = "{ where: { notes: { contains: 'firstName'}}}";
 		QueryResult qr = _qe.executeQuery(Employee.class, json);
 		Collection results = qr.getResults();
@@ -204,6 +204,48 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 
+	public void testStartsWithTwoProps() {
+		String json = "{ where: { notes: { startsWith: 'firstName'}}}";
+		QueryResult qr = _qe.executeQuery(Employee.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Employee emp = (Employee) o;
+			String notes = emp.getNotes();
+			String firstName = emp.getFirstName();
+			assertTrue(notes.indexOf(firstName) == 0);
+		}
+	}
+	
+	public void testInString() {
+		String[] countries = {"Austria", "Italy", "Norway"}; 
+		String json = "{ where: { country: { in: ['Austria', 'Italy', 'Norway'] } } }";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Customer cust = (Customer) o;
+			String country = cust.getCountry(); 
+			assertTrue(Arrays.asList(countries).contains(country));
+		}
+	}
+	
+	public void testInInt() {
+		int[] empIds = {1, 2, 4}; 
+		String json = "{ where: { reportsToEmployeeID: { in: [1 ,2 ,4] } } }";
+		QueryResult qr = _qe.executeQuery(Employee.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Employee emp = (Employee) o;
+			int empId = emp.getReportsToEmployeeID();
+			assertTrue(empId == 1 || empId == 2 || empId == 4);
+			// assertTrue(Arrays.asList(empIds).contains(emp.getReportsToEmployeeID()));
+		}
+	}
 
 	public void testComplexTypePropEqual() {
 		// String json = qs.queryToJson(Supplier.class,

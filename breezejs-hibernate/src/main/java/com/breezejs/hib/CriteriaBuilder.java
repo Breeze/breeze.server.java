@@ -2,6 +2,7 @@ package com.breezejs.hib;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
@@ -51,8 +52,7 @@ public class CriteriaBuilder {
 	}
 
 	// TODO: handle 'All'
-	// TODO: fix prop 'like' prop preds
-	// TODO: handle 'In' clauses
+	// TODO: fix select with nonscalar nav props.
 
 	private static final HashMap<String, String> _operatorMap = new HashMap<String, String>();
 	static {
@@ -225,6 +225,10 @@ public class CriteriaBuilder {
 		//
 		// Criteria criteria = session.createCriteria(Foo.class, "a")
 		// .add(Subqueries.notExists(subquery);
+		
+//		DetachedCriteria.forClass( Enrolment.class, "e" )
+//		+						.setProjection( Projections.id() )
+//		+						.add( Restrictions.sqlRestriction( "{c}.coursecode = {e}.coursecode" ) ) )
 	}
 
 	private Criterion createCriterion(Criteria crit, UnaryPredicate pred,
@@ -261,7 +265,7 @@ public class CriteriaBuilder {
 				} else if (symbol != null) {
 					cr = new OperatorExpression(propName, value, symbol);
 				} else if (op == Operator.In) {
-					cr = Restrictions.in(propName, (Object[]) value);
+					cr = Restrictions.in(propName, ((List) value).toArray());
 				} else if (op == Operator.StartsWith) {
 					cr = Restrictions.like(propName, ((String) value),
 							MatchMode.START);
@@ -276,6 +280,7 @@ public class CriteriaBuilder {
 							+ op.getName() + "operator is not yet supported.");
 				}
 			} else {
+				// javax.persistence.criteria.CriteriaBuilder x = new javax.persistence.criteria.CriteriaBuilder();
 				String otherPropPath = ((PropExpression) expr2)
 						.getPropertyPath();
 				if (symbol != null) {
@@ -293,6 +298,7 @@ public class CriteriaBuilder {
 					throw new RuntimeException("Property comparison with the "
 							+ op.getName() + "operator is not yet supported.");
 				}
+
 			}
 			return cr;
 		} else {

@@ -2,6 +2,7 @@ package com.breezejs.hib;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
@@ -76,8 +77,7 @@ public class QueryService {
 			log.debugv("query: result size={0}", result.size());
 			ExpandClause expandClause = entityQuery.getExpandClause();
 			if (expandClause != null) {
-				List<String> propertyPaths = expandClause.getPropertyPaths(); 
-				String[] expands = propertyPaths.toArray(new String[propertyPaths.size()]);
+				List<String> expands = expandClause.getPropertyPaths(); 
 				HibernateExpander.initializeList(result, expands);
 			}
 			
@@ -86,8 +86,7 @@ public class QueryService {
 			// itself a navigation property (either scalar or nonscalar).
 			if (builder.containsNavPropertyProxy() && entityQuery.getSelectClause() != null) {
 				for (Object row: result) {
-					HashMap<String, Object> map = (HashMap<String, Object>) row;
-					for (Object value: map.values()) {
+					for (Object value: ((Map) row).values()) {
 						if (value instanceof HibernateProxy) {
 							Hibernate.initialize(value);
 						}
