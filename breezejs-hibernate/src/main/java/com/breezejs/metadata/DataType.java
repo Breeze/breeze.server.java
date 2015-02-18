@@ -3,8 +3,10 @@ package com.breezejs.metadata;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public class DataType {
@@ -63,6 +65,13 @@ public class DataType {
 
 		if (value == null || value.getClass() == dataType.getJavaClass()) {
 			return value;
+		} else if (value instanceof List) {
+			// this occurs with an 'In' clause
+			List<Object> newList = new ArrayList<Object>();
+			for (Object item: (List) value) {
+				newList.add(coerceData(item, dataType));
+			}
+			return newList;
 		} else if (dataType == DataType.Int16) {
 			Double dValue = (Double) coerceData(value, DataType.Double);
 			return dValue.shortValue();
@@ -83,6 +92,7 @@ public class DataType {
 			Double dValue = (Double) coerceData(value, DataType.Double);
 			return dValue.byteValue();
 		} else if (dataType == DataType.DateTime || dataType == DataType.DateTimeOffset) {
+			// ISO 8601 format parser
 			return javax.xml.bind.DatatypeConverter.parseDateTime(value.toString()).getTime(); 
 		}
 		

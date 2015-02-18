@@ -13,9 +13,9 @@ import org.hibernate.engine.spi.TypedValue;
 import org.hibernate.internal.util.StringHelper;
 
 /**
- * superclass for comparisons between two properties (with SQL binary operators)
+ * superclass for comparisons between two properties (with like clauses)
  *
- * @author Gavin King
+ * 
  */
 public class LikePropertyExpression implements Criterion {
 	private static final TypedValue[] NO_TYPED_VALUES = new TypedValue[0];
@@ -36,7 +36,6 @@ public class LikePropertyExpression implements Criterion {
 		final String[] lhsColumns = criteriaQuery.findColumns( propertyName, criteria );
 		final String[] rhsColumns = criteriaQuery.findColumns( otherPropertyName, criteria );
 
-		// final String[] comparisons = StringHelper.add( lhsColumns, getOp(), rhsColumns );
 		List<String> comparisons = new ArrayList<String>(); 
 		for (int i = 0; i<lhsColumns.length; i++) {
 			String comp = formatExpr(lhsColumns[0], rhsColumns[0], mode);

@@ -2,6 +2,7 @@ package com.breezejs.hib;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
@@ -265,7 +266,7 @@ public class CriteriaBuilder {
 				} else if (symbol != null) {
 					cr = new OperatorExpression(propName, value, symbol);
 				} else if (op == Operator.In) {
-					cr = Restrictions.in(propName, (Object[]) value);
+					cr = Restrictions.in(propName, ((List) value).toArray());
 				} else if (op == Operator.StartsWith) {
 					cr = Restrictions.like(propName, ((String) value),
 							MatchMode.START);
