@@ -9,13 +9,13 @@ import java.util.Map;
 
 import org.hibernate.SessionFactory;
 
-import com.breezejs.Metadata;
-import com.breezejs.MetadataAdapter;
 import com.breezejs.hib.MetadataBuilder;
 import com.breezejs.hib.StaticConfigurator;
 import com.breezejs.metadata.DataType;
 import com.breezejs.metadata.IEntityType;
 import com.breezejs.metadata.IMetadata;
+import com.breezejs.metadata.Metadata;
+import com.breezejs.metadata.MetadataAdapter;
 import com.breezejs.query.AndOrPredicate;
 import com.breezejs.query.AnyAllPredicate;
 import com.breezejs.query.BinaryPredicate;

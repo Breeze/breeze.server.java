@@ -6,7 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.jboss.logging.Logger;
 
-import com.breezejs.Metadata;
+import com.breezejs.metadata.Metadata;
 import com.breezejs.save.ContextProvider;
 import com.breezejs.save.SaveResult;
 import com.breezejs.util.JsonGson;

@@ -7,13 +7,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.jboss.logging.Logger;
 
-import com.breezejs.Metadata;
-import com.breezejs.MetadataAdapter;
-import com.breezejs.QueryResult;
 import com.breezejs.metadata.IEntityType;
+import com.breezejs.metadata.Metadata;
+import com.breezejs.metadata.MetadataAdapter;
 import com.breezejs.metadata.MetadataHelper;
 import com.breezejs.query.EntityQuery;
 import com.breezejs.query.ExpandClause;
+import com.breezejs.query.QueryResult;
 
 
 public class QueryService {

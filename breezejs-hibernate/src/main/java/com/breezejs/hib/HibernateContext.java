@@ -1,5 +1,6 @@
 package com.breezejs.hib;
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +18,9 @@ import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.ComponentType;
 import org.hibernate.type.Type;
 
-import com.breezejs.Metadata;
+
+
+import com.breezejs.metadata.Metadata;
 import com.breezejs.save.*;
 
 public class HibernateContext extends ContextProvider {

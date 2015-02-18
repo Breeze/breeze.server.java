@@ -21,8 +21,10 @@ import northwind.model.OrderDetail;
 import northwind.model.Product;
 import northwind.model.Supplier;
 
-import com.breezejs.QueryResult;
+
+
 import com.breezejs.query.EntityQuery;
+import com.breezejs.query.QueryResult;
 import com.breezejs.util.JsonGson;
 
 import junit.framework.TestCase;

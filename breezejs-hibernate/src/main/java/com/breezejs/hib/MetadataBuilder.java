@@ -29,7 +29,9 @@ import org.hibernate.service.spi.ServiceRegistryImplementor;
 import org.hibernate.tuple.entity.EntityMetamodel;
 import org.hibernate.type.*;
 
-import com.breezejs.Metadata;
+import com.breezejs.metadata.Metadata;
+
+
 
 /**
  * Builds a data structure containing the metadata required by Breeze.

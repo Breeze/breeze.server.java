@@ -1,4 +1,4 @@
-package com.breezejs;
+package com.breezejs.query;
 
 import java.util.Collection;
 

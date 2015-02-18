@@ -1,4 +1,4 @@
-package com.breezejs;
+package com.breezejs.metadata;
 
 import java.util.HashMap;
 import java.util.List;

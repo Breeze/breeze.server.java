@@ -6,7 +6,7 @@ import java.util.List;
 import org.hibernate.SessionFactory;
 
 
-import com.breezejs.Metadata;
+import com.breezejs.metadata.Metadata;
 import com.breezejs.testutil.Serializer;
 import com.breezejs.util.JsonGson;
 
