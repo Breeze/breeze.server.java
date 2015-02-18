@@ -88,6 +88,10 @@ public class CriteriaBuilder {
 		addOrderBy(crit, entityQuery.getOrderByClause());
 
 	}
+	
+	public boolean containsNavPropertyProxy() {
+		return _aliasBuilder.containsNavPropertyProxy();
+	}
 
 	private void addWhere(Criteria crit, Predicate wherePred) {
 		if (wherePred == null)
@@ -105,12 +109,7 @@ public class CriteriaBuilder {
 			String propertyName = _aliasBuilder.getPropertyName(crit,
 					propertyPath);
 			projList.add(Projections.property(propertyName).as(propertyPath));
-//			// TODO: if last prop of the path is a navigation prop
-//			// then create one addl alias;
-//			IProperty prop = MetadataHelper.getPropertyFromPath(propertyPath, _entityQuery.getEntityType());
-//			if (prop instanceof INavigationProperty) {
-//				_aliasBuilder.getPropertyName(crit, propertyName);
-//			}
+			
 		}
 		crit.setProjection(projList);
 		crit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);

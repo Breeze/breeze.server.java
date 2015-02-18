@@ -21,8 +21,6 @@ import northwind.model.OrderDetail;
 import northwind.model.Product;
 import northwind.model.Supplier;
 
-
-
 import com.breezejs.query.EntityQuery;
 import com.breezejs.query.QueryResult;
 import com.breezejs.util.JsonGson;
@@ -380,7 +378,7 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 
-	public void testNestedQueryString() {
+	public void testWhereNestedString() {
 		// String json = qs.queryToJson(Product.class,
 		// "?$filter=not endswith(productName,'milk')");
 		String json = "{ where: { 'employee.lastName': { startsWith: 'D' }}}";
@@ -396,7 +394,7 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 
-	public void testNestedQueryDate() {
+	public void testWhereNestedDate() {
 		Date latestBirthDate = toDate(1956, 1, 1);
 		String json = "{ where: { employee.birthDate: { gt: '1960-01-01T00:00:00' }}}";
 		QueryResult qr = _qe.executeQuery(Order.class, json);
@@ -411,7 +409,7 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 
-	public void testNestedWhereString() {
+	public void testWhereNestedWithAnd() {
 		// String json = qs.queryToJson(Product.class,
 		// "?$filter=not endswith(productName,'milk')");
 		String json = "{ where: { freight: {gt: 100.0} , 'employee.lastName': { startsWith: 'D' }}}";
@@ -429,7 +427,7 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 	
-	public void testNestedWhereWithAnd() {
+	public void testWhereNestedSameAliasWithAnd() {
 		// 
 		String json = "{ where: { 'product.productID': { gt: 11} , 'product.productName': { startsWith: 'Q' }}}";
 		QueryResult qr = _qe.executeQuery(OrderDetail.class, json);
@@ -446,7 +444,7 @@ public class QueryServiceTest extends TestCase {
 	}
 	 
 
-	public void testNestedWhereString3Deep() {
+	public void testWhereNestedString3Deep() {
 		// String json = qs.queryToJson(Product.class,
 		// "?$filter=not endswith(productName,'milk')");
 		String json = "{ where: { 'order.employee.lastName': { startsWith: 'D' }}}";
@@ -463,7 +461,7 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 
-	public void testNestedWhereInt() {
+	public void testWhereNestedInt() {
 		// String json = qs.queryToJson(Product.class,
 		// "?$filter=not endswith(productName,'milk')");
 		String json = "{ where: { 'product.productID': 1}}";
@@ -494,9 +492,9 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 	
-	public void testNestedSelectScalarNav() {
+	public void testSelectNestedScalarNav() {
 
-		// String json = "{ where: { unitPrice: { gt: 20.0  } }, select: 'productName,supplier', expand: 'supplier' }";
+
 		String json = "{ where: { unitPrice: { gt: 20.0  } }, select: 'productName,supplier, supplier.companyName' }";
 		QueryResult qr = _qe.executeQuery(Product.class, json);
 		Collection results = qr.getResults();
@@ -505,12 +503,31 @@ public class QueryServiceTest extends TestCase {
 		for (Object o : results) {
 			HashMap<String, Object> hm = (HashMap<String, Object>) o;
 			String productName = (String) hm.get("productName");
+			String companyName = (String) hm.get("supplier.companyName");
 			Supplier supplier = (Supplier) hm.get("supplier");
 			assertTrue(supplier.getCompanyName() != null);
+			assertTrue(supplier.getCompanyName().equals(companyName));
+			
+		}
+	}
+	
+	public void testSelectNestedNonScalarNav() {
+		String json = "{ where: { companyName: { startsWith: 'B'  } }, select: 'companyName, orders' }";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			HashMap<String, Object> hm = (HashMap<String, Object>) o;
+			String companyName = (String) hm.get("companyName");
+			Collection<Order> orders = (Collection<Order>) hm.get("orders");
+			assertTrue(orders.size() > 0);
+			
 		}
 	}
 
-	public void testNestedSelectData() {
+
+	public void testSelectNestedData() {
 		String json = "{ where: { unitPrice: { gt: 20.0 }}, select: 'productName,supplier.companyName,unitPrice' }";
 		QueryResult qr = _qe.executeQuery(Product.class, json);
 		Collection results = qr.getResults();
@@ -528,7 +545,7 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 	
-	public void testNestedWhereWithNestedSelect() {
+	public void testSelectNestedWithWhereNested() {
 		String json = "{ where: { unitPrice: { gt: 20.0 }, 'supplier.companyName': { startsWith: 'S' }}, select: 'productName,supplier.companyName,unitPrice' }";
 		QueryResult qr = _qe.executeQuery(Product.class, json);
 		Collection results = qr.getResults();

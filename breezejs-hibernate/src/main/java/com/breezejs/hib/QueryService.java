@@ -1,10 +1,13 @@
 package com.breezejs.hib;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.proxy.HibernateProxy;
 import org.jboss.logging.Logger;
 
 import com.breezejs.metadata.IEntityType;
@@ -76,6 +79,20 @@ public class QueryService {
 				List<String> propertyPaths = expandClause.getPropertyPaths(); 
 				String[] expands = propertyPaths.toArray(new String[propertyPaths.size()]);
 				HibernateExpander.initializeList(result, expands);
+			}
+			
+			// HACK: 
+			// Handles select's where at least one of the projected values is
+			// itself a navigation property (either scalar or nonscalar).
+			if (builder.containsNavPropertyProxy() && entityQuery.getSelectClause() != null) {
+				for (Object row: result) {
+					HashMap<String, Object> map = (HashMap<String, Object>) row;
+					for (Object value: map.values()) {
+						if (value instanceof HibernateProxy) {
+							Hibernate.initialize(value);
+						}
+					}
+				}
 			}
 			
 			if (entityQuery.isInlineCountEnabled()) {

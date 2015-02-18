@@ -16,6 +16,7 @@ class CriteriaAliasBuilder  {
 	private HashMap<String, String> _cache = new HashMap<String, String>();
 	private int _offset = 0;
 	private IEntityType _entityType;
+	private boolean _containsNavPropertyProxy = false;
 	public CriteriaAliasBuilder(IEntityType entityType) {
 		_entityType = entityType;
 	}
@@ -37,9 +38,12 @@ class CriteriaAliasBuilder  {
 			if (isNavPath) {
 				// do not assign to nextAlias;
 				String alias = getAlias(crit, nextPropName, lastPropName);
+				// HACK - because we can't get NavProperties to Eagerly load
+				// when they are the 'projected' item.
+				_containsNavPropertyProxy = true;
+				// TODO: AARGH.... doesn't seem to do anything...
 				crit.setFetchMode(alias, FetchMode.JOIN);
-				// crit.setFetchMode(lastPropName, FetchMode.JOIN);
-				// return alias;
+				crit.setFetchMode(lastPropName, FetchMode.JOIN);
 			} 
 			nextPropName = nextAlias == "" ? lastPropName : nextAlias + "." + lastPropName;
 			return nextPropName;
@@ -58,33 +62,6 @@ class CriteriaAliasBuilder  {
 	}
 	
 
-	
-//	public String getPropertyName(Criteria crit, String propertyPath) {
-//
-//		String[] propNames = propertyPath.split("\\.");
-//
-//		if (propNames.length == 1) {
-//			return propNames[0];
-//		} else {
-//
-//			String nextPropName;
-//			String nextAlias = "";
-//			// not processing last leg of propertyPath because
-//			// it might be a data property and we can't create an alias for that.
-//			for (int i = 0; i < propNames.length - 1; i = i + 1) {
-//				nextPropName = nextAlias == "" ? propNames[i] : nextAlias + "." + propNames[i];
-//				nextAlias = _cache.get(nextPropName);
-//				if (nextAlias == null) {
-//					nextAlias = propNames[i] + "_" + _offset++;
-//					crit.createAlias(nextPropName, nextAlias);
-//					_cache.put(nextPropName, nextAlias);
-//				}
-//			}
-//			nextPropName = nextAlias + "." + propNames[propNames.length - 1];
-//			return nextPropName;
-//		}
-//	}
-
 	// Used by any/all to get initial expression alias 
 	public String getSimpleAlias(Criteria crit, String propName) {
 		String alias = _cache.get(propName);
@@ -93,6 +70,10 @@ class CriteriaAliasBuilder  {
 			crit.createAlias(propName,  alias);
 		}
 		return alias;
+	}
+	
+	public boolean containsNavPropertyProxy() {
+		return _containsNavPropertyProxy;
 	}
 
 }
