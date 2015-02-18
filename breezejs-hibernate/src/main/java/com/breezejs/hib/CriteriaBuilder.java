@@ -225,6 +225,10 @@ public class CriteriaBuilder {
 		//
 		// Criteria criteria = session.createCriteria(Foo.class, "a")
 		// .add(Subqueries.notExists(subquery);
+		
+//		DetachedCriteria.forClass( Enrolment.class, "e" )
+//		+						.setProjection( Projections.id() )
+//		+						.add( Restrictions.sqlRestriction( "{c}.coursecode = {e}.coursecode" ) ) )
 	}
 
 	private Criterion createCriterion(Criteria crit, UnaryPredicate pred,
@@ -276,6 +280,7 @@ public class CriteriaBuilder {
 							+ op.getName() + "operator is not yet supported.");
 				}
 			} else {
+				// javax.persistence.criteria.CriteriaBuilder x = new javax.persistence.criteria.CriteriaBuilder();
 				String otherPropPath = ((PropExpression) expr2)
 						.getPropertyPath();
 				if (symbol != null) {
@@ -293,6 +298,7 @@ public class CriteriaBuilder {
 					throw new RuntimeException("Property comparison with the "
 							+ op.getName() + "operator is not yet supported.");
 				}
+
 			}
 			return cr;
 		} else {

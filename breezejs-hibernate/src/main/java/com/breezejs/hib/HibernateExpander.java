@@ -35,7 +35,7 @@ public class HibernateExpander {
 	 * @param roots - Collection of Hibernate-mapped objects
 	 * @param expandPaths - properties relative to the roots
 	 */
-	public static void initializeList(Collection roots, String[] expandPaths) {
+	public static void initializeList(Collection roots, List<String> expandPaths) {
 		try {
 			List<String[]> paths = splitPaths(expandPaths);
 			for (Object root : roots) {
@@ -96,7 +96,7 @@ public class HibernateExpander {
 	 * @param expandPaths
 	 * @return
 	 */
-	private static List<String[]> splitPaths(String[] expandPaths) {
+	private static List<String[]> splitPaths(List<String> expandPaths) {
 		Pattern delims = Pattern.compile("[/.]");
 		List<String[]> paths = new ArrayList<String[]>();
 		for (String expandPath : expandPaths) {
