@@ -30,7 +30,7 @@
 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-server-2.6.jar"/>
 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/osgi-resource-locator-1.0.1.jar"/>
 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/xml-apis-1.0.b2.jar"/>
-	<classpathentry kind="lib" path="C:/Java/apache-tomcat-7.0.47/lib/mysql-connector-java-5.1.30-bin.jar"/>
-	<classpathentry kind="lib" path="C:/Java/apache-tomcat-7.0.47/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="C:/Java/apache-tomcat-7.0.59-windows-x64/apache-tomcat-7.0.59/lib/mysql-connector-java-5.1.30-bin.jar"/>
+	<classpathentry kind="lib" path="C:/Java/apache-tomcat-7.0.59-windows-x64/apache-tomcat-7.0.59/lib/servlet-api.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

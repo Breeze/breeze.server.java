@@ -15,7 +15,7 @@
 		<artifactId>servlet-api</artifactId>
 		<version>3.0</version>
 		<scope>system</scope>
-		<systemPath>C:/Java/apache-tomcat-7.0.47/lib/servlet-api.jar</systemPath>
+		<systemPath>C:/Java/apache-tomcat-7.0.59-windows-x64/apache-tomcat-7.0.59/lib/servlet-api.jar</systemPath>
 	</dependency>
 
 	<dependency>
