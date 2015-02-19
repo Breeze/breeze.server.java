@@ -43,7 +43,7 @@ public class JsonGson {
 			Gson gson = gsonBuilder.create();
 			return gson.toJson(obj);
 		} catch (Exception e) {
-			throw new RuntimeException("Exception serializing " + obj, e);
+			throw new RuntimeException("Exception serializing json: " + obj, e);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class JsonGson {
 			return result;
 
 		} catch (Exception e) {
-			throw new RuntimeException("Exception deserializing " + source, e);
+			throw new RuntimeException("Exception deserializing json: " + source, e);
 		}
 	}
 	
@@ -89,8 +89,14 @@ public class JsonGson {
 	 */
 	public static Object fromMap(Class<?> clazz, Map map) {
 		try {
-			return null;
-			// TODO: think about using Apache BeanUtils for this.
+			String json = toJson(map);;
+			GsonBuilder gsonBuilder = new GsonBuilder()
+			  .setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	        Gson gson = gsonBuilder.create();
+	        Object result = gson.fromJson(json, clazz);
+	        return result;
+			// TODO: alternative is too think about using Apache BeanUtils for this.
+	        // Old code
 			// Object bean = JSONDeserializer.read(clazz, map);
 			// return bean;
 		} catch (Exception e) {

@@ -552,6 +552,26 @@ public class QueryServiceTest extends TestCase {
 		}
 	}
 	
+	public void testSingleCustomerClone() {
+
+		String json = "{ take: 1 }";
+		QueryResult qr = _qe.executeQuery(Customer.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() == 1);
+		for (Object o : results) {
+			Customer cust = (Customer) o;
+			String custJson = JsonGson.toJson(cust, true);
+			Map custMap = JsonGson.fromJson(custJson);
+			Object clone = JsonGson.fromMap(Customer.class, custMap);
+			Customer custClone = (Customer) clone;
+			assertTrue(cust != custClone);
+			assertTrue(cust.getCompanyName().equals(custClone.getCompanyName()));
+			assertTrue(cust.getCustomerID().equals(custClone.getCustomerID()));
+		}
+	}
+
+	
 	public void testSelect() {
 
 		String json = "{ where: { unitPrice: { gt: 20.0 }}, select: 'productName,unitPrice' }";

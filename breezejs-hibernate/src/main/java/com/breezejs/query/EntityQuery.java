@@ -20,7 +20,16 @@ public class EntityQuery {
 	
 	
 	public EntityQuery(String json) {
-		Map qmap = JsonGson.fromJson(json);
+		if (json == null || json.length() == 0) {
+			return;
+		}
+		Map qmap;
+		try {
+			qmap = JsonGson.fromJson(json);
+		} catch(Exception e) {
+			throw new RuntimeException("This EntityQuery ctor requires a valid json string. The following is not json: " + json);
+		}
+		
 		this._resourceName = (String) qmap.get("resourceName");
 		this._skipCount = processCount(qmap.get("skip"));
 		this._takeCount = processCount(qmap.get("take"));
