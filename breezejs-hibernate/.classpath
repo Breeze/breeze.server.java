@@ -5,34 +5,18 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/antlr-2.7.7.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/aopalliance-repackaged-2.2.0.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/guava-14.0.1.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/hibernate-commons-annotations-4.0.4.Final.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/hibernate-core-4.3.0.Final.jar" sourcepath="C:/Java/hibernate-release-4.3.0.Final/project/hibernate-core/src/main/java"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/hk2-api-2.2.0.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/hk2-locator-2.2.0.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/hk2-utils-2.2.0.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jandex-1.1.0.Final.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/javassist-3.18.1-GA.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/javax.annotation-api-1.2.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/javax.inject-2.2.0.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/javax.ws.rs-api-2.0.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jboss-logging-3.1.3.GA.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jboss-logging-annotations-1.2.0.Beta1.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jboss-transaction-api_1.2_spec-1.0.0.Final.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jersey-client-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jersey-common-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jersey-container-servlet-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jersey-container-servlet-core-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jersey-guava-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/jersey-server-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/osgi-resource-locator-1.0.1.jar"/>
-	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/validation-api-1.1.0.Final.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/xml-apis-1.0.b2.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/mysql-connector-java-5.1.30.jar"/>
- 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/gson-2.3.1.jar"/>
+	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/gson-2.3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -20,6 +20,7 @@ import northwind.model.Order;
 
 import com.breezejs.metadata.Metadata;
 import com.breezejs.query.QueryResult;
+import com.breezejs.save.SaveResult;
 import com.breezejs.util.JsonGson;
 import com.breezejs.hib.MetadataBuilder;
 import com.breezejs.hib.QueryService;
@@ -66,7 +67,19 @@ public class BreezeTests {
 	@POST
 	@Path("SaveChanges")
 	public Response saveChanges(String saveBundle) {
-		return saveService.saveChanges(saveBundle);
+		SaveResult result = saveService.saveChanges(saveBundle);
+		return toResponse(result);
+	}
+	
+	Response toResponse(SaveResult result) {
+		String json = JsonGson.toJson(result);
+		Response response;
+		if (result.hasErrors()) {
+			response = Response.status(Response.Status.FORBIDDEN).entity(json).build(); 
+		} else {
+			response = Response.ok(json).build();
+		}
+		return response;
 	}
 		
 	@GET

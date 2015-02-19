@@ -1,7 +1,5 @@
 package com.breezejs.hib;
 
-import javax.ws.rs.core.Response;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.jboss.logging.Logger;
@@ -9,7 +7,6 @@ import org.jboss.logging.Logger;
 import com.breezejs.metadata.Metadata;
 import com.breezejs.save.ContextProvider;
 import com.breezejs.save.SaveResult;
-import com.breezejs.util.JsonGson;
 
 /**
  * Class to receive JSON save bundles and save them to Hibernate
@@ -33,31 +30,23 @@ public class SaveService {
 	 * @param source
 	 * @return
 	 */
-	public Response saveChanges(String source) {
+	public SaveResult saveChanges(String source) {
 		log.debugv("saveChanges", "source={0}", source);
-		Response response;
 		Session session = sessionFactory.openSession();
 		try {
 			ContextProvider context = new HibernateContext(session, metadata);
 			SaveResult sr = context.saveChanges(source);
 			
-			String json = JsonGson.toJson(sr);
-			log.debugv("saveChanges: SaveResult={0}", json);
-			if (sr.hasErrors()) {
-				response = Response.status(Response.Status.FORBIDDEN).entity(json).build(); 
-			} else {
-				response = Response.ok(json).build();
-			}
+			return sr;
 		}
     	catch (Exception e) {
     		log.errorv(e, "saveChanges: source={0}", source);
-    		String json = JsonGson.toJson(e);
-			response = Response.serverError().entity(json).build(); 
+    		if (e instanceof RuntimeException) throw e;
+    		throw new RuntimeException(e);
     	}
     	finally {
     		session.close();
     	}    	
-		return response;
 	}
 	
 }

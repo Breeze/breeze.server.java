@@ -1,7 +1,5 @@
 package com.breezejs.hib;
 
-import javax.ws.rs.core.Response;
-
 import junit.framework.TestCase;
 
 public class SaveServiceTest extends TestCase {

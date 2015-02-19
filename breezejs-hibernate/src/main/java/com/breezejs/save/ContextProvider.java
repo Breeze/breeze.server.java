@@ -3,7 +3,7 @@ package com.breezejs.save;
 import java.util.List;
 import java.util.Map;
 
-import com.breezejs.util.JsonGson;;
+import com.breezejs.util.JsonGson;
 
 public class ContextProvider {
 
