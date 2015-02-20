@@ -1,5 +1,7 @@
 package northwind.service;
 
+import java.net.URLDecoder;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.BeanParam;
@@ -45,6 +47,7 @@ public class BreezeTests {
 	public BreezeTests(@Context ServletContext ctx) {
 		this ((SessionFactory) ctx.getAttribute(AppContextListener.SESSIONFACTORY),
 				(Metadata) ctx.getAttribute(AppContextListener.METADATA));
+		System.out.println("----- GOT HERE ---------");
 	}
 
 	/** Create instance using provided sessionFactory and metadata.  This is private, just for testing */
@@ -85,7 +88,9 @@ public class BreezeTests {
 	@GET
 	@Path("Customers")
 	public String getCustomers(@Context HttpServletRequest request) {
-		QueryResult result = queryService.executeQuery(Customer.class, request.getQueryString());
+		String qs = request.getQueryString();
+		String json = URLDecoder.decode(qs);
+		QueryResult result = queryService.executeQuery(Customer.class, json);
 		return result.toJson();
 	}
 
