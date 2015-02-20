@@ -30,6 +30,6 @@
 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-server-2.6.jar"/>
 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/osgi-resource-locator-1.0.1.jar"/>
 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/xml-apis-1.0.b2.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/javax.servlet-api-3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/javax.servlet-api-3.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

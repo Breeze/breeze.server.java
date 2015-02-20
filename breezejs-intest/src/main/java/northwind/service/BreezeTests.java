@@ -18,6 +18,7 @@ import org.hibernate.cfg.Configuration;
 import northwind.model.Customer;
 import northwind.model.Order;
 
+import com.breeze.webtest.AppContextListener;
 import com.breezejs.metadata.Metadata;
 import com.breezejs.query.QueryResult;
 import com.breezejs.save.SaveResult;

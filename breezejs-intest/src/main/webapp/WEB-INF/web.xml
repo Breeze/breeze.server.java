@@ -13,7 +13,7 @@
 
     <!-- Initialize the app configuration upon startup -->
     <listener>
-      <listener-class>northwind.service.AppContextListener</listener-class>
+      <listener-class>com.breeze.webtest.AppContextListener</listener-class>
     </listener>  
     
 <!--
@@ -45,10 +45,21 @@
 		
     <load-on-startup>1</load-on-startup>
   </servlet>
+
+  <servlet>
+    <servlet-name>Northwind</servlet-name>
+    <servlet-class>northwind.service.NorthwindTestServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
   
   <servlet-mapping>
     <servlet-name>Jersey</servlet-name>
     <url-pattern>/breeze/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>Northwind</servlet-name>
+    <url-pattern>/northwind/*</url-pattern>
   </servlet-mapping>
 
 </web-app>

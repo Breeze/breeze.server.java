@@ -1,4 +1,4 @@
-package northwind.service;
+package com.breeze.webtest;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
