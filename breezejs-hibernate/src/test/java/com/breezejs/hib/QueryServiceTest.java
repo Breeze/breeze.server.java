@@ -63,17 +63,6 @@ public class QueryServiceTest extends TestCase {
 			Customer c = (Customer) o;
 		}
 	}
-
-	public void testNonJsonQuery() {
-		String json = "x=4&y=z";
-		QueryResult qr = _qe.executeQuery(Customer.class, json);
-		Collection results = qr.getResults();
-		String rJson = qr.toJson();
-		assertTrue(results.size() > 5);
-		for (Object o : results) {
-			Customer c = (Customer) o;
-		}
-	}
 	
 	public void testSimpleWhereTake() {
 		// String json = qs.queryToJson(Customer.class,
