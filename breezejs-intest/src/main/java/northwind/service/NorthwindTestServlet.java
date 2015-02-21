@@ -17,6 +17,5 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
 		executeQuery("Customers", json, response);
 	}
 	
-
 	
 }

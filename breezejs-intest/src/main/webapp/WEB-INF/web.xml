@@ -29,34 +29,13 @@
 -->
 
     <!-- Define servlets  -->
-  <servlet>
-    <servlet-name>Jersey</servlet-name>
-    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-	<init-param>
-	    <param-name>jersey.config.server.provider.classnames</param-name>
-	    <param-value>
-	        northwind.service.BreezeTests
-	    </param-value>
-	</init-param>
-	<init-param>
-	    <param-name>jersey.config.server.tracing</param-name>
-	    <param-value>ALL</param-value>
-	</init-param>
-		
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-
+    
   <servlet>
     <servlet-name>Northwind</servlet-name>
     <servlet-class>northwind.service.NorthwindTestServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
   
-  <servlet-mapping>
-    <servlet-name>Jersey</servlet-name>
-    <url-pattern>/breeze/*</url-pattern>
-  </servlet-mapping>
-
   <servlet-mapping>
     <servlet-name>Northwind</servlet-name>
     <url-pattern>/northwind/*</url-pattern>
