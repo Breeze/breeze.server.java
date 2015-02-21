@@ -1,11 +1,15 @@
 package com.breeze.webtest;
 
+import java.lang.reflect.Method;
+import java.net.URLDecoder;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.hibernate.SessionFactory;
 
+import com.breeze.webtest.ControllerServlet.ControllerException;
 import com.breezejs.hib.QueryService;
 import com.breezejs.hib.SaveService;
 import com.breezejs.metadata.Metadata;
@@ -39,9 +43,25 @@ public class BreezeControllerServlet extends ControllerServlet {
 
 	@Override
 	protected void handleRequest(HttpServletRequest request, HttpServletResponse response) {
-		String resourceName = super.getMethodName(request);
-		String json = request.getQueryString();
-		executeQuery(resourceName, json, response);
+		try {
+
+			String methodName = getMethodName(request);
+			Method method = getMethod(this, methodName);
+			if (method != null) {
+				dispatch(this, method, request, response);
+			} else {
+				String pathInfo = request.getPathInfo();
+				String resourceName = pathInfo.substring(1);
+				String qs = request.getQueryString();
+				String json = URLDecoder.decode(qs);
+				executeQuery(resourceName, json, response);				
+			}
+				
+		} catch (ControllerException ex) {
+			sendError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
+		} catch (Throwable ex) {
+			sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+		}
 	}
 	
 	public String getMetadata() {
@@ -61,8 +81,14 @@ public class BreezeControllerServlet extends ControllerServlet {
 		writeResponse(response, json);
 	}
 	
+	
 	protected void executeQuery(String resourceName, String json, HttpServletResponse response) {
 		QueryResult result = this.queryService.executeQuery(resourceName, json);
+		writeResponse(response, result.toJson());
+	}
+	
+	protected void executeQuery(Class clazz, String json, HttpServletResponse response) {
+		QueryResult result = this.queryService.executeQuery(clazz, json);
 		writeResponse(response, result.toJson());
 	}
 }

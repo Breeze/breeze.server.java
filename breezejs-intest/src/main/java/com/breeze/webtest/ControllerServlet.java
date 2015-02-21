@@ -21,27 +21,20 @@ public abstract class ControllerServlet extends HttpServlet {
 		doGetOrPost(request, response);
 	}
 
-	private void doGetOrPost(HttpServletRequest request, HttpServletResponse response) {
-		try {
-			request.setAttribute("servletPath", request.getServletPath());
-			String methodName = getMethodName(request);
-			Method method = getMethod(this, methodName); 
-			dispatch(method, this, request, response);
-		} catch (ControllerNotFoundException ex) {
-			sendError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
-		} catch (Throwable ex) {
-			sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-		}
+	protected void doGetOrPost(HttpServletRequest request, HttpServletResponse response) {
+		request.setAttribute("servletPath", request.getServletPath());
+		handleRequest(request, response);
 	}
 
-	protected void dispatch(Method m, Object target, HttpServletRequest request, HttpServletResponse response)
-			throws ControllerNotFoundException {
+	protected void dispatch(Object target, Method m, HttpServletRequest request, HttpServletResponse response)
+			throws ControllerException {
 		try {
 			m.invoke(target, new Object[] { request, response });
 		} catch (IllegalAccessException ex) {
-			throw new ControllerNotFoundException("couldn't access method");
+			throw new ControllerException("couldn't access method");
 		} catch (InvocationTargetException ex) {
-			throw new ControllerNotFoundException("object doesn't have method");
+			Throwable targetEx = ex.getTargetException();
+			throw new ControllerException(targetEx.getMessage());
 		}
 	}
 	
@@ -77,31 +70,30 @@ public abstract class ControllerServlet extends HttpServlet {
 
 	static final Class[] sFormalArgs = { HttpServletRequest.class, HttpServletResponse.class };
 
-	protected Method getMethod(Object target, String methodName) throws ControllerNotFoundException {
+	protected Method getMethod(Object target, String methodName) {
 		try {
 			return target.getClass().getMethod(methodName, sFormalArgs);
 		} catch (NoSuchMethodException ex) {
-			throw new ControllerNotFoundException("couldn't get method");
+			return null;
 		}
 	}
 
 	protected String getMethodName(HttpServletRequest req) {
-		String defaultMethod = "handleRequest";
-		if (req.getPathInfo() == null)
-			return defaultMethod;
+		if (req.getPathInfo() == null) return null;
 
 		StringTokenizer tokens = new StringTokenizer(req.getPathInfo(), "/");
 		if (tokens.hasMoreTokens()) {
 			return tokens.nextToken();
-		} else
-			return defaultMethod;
+		} else {
+			return null;
+		}
 	}
 	
 	protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response);
 
-	class ControllerNotFoundException extends ServletException {
+	class ControllerException extends ServletException {
 
-		ControllerNotFoundException(String reason) {
+		ControllerException(String reason) {
 			super(reason);
 		}
 

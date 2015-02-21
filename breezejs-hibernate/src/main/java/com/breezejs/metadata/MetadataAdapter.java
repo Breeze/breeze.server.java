@@ -28,6 +28,9 @@ public class MetadataAdapter implements IMetadata {
 	
 	public IEntityType getEntityTypeForResourceName(String resourceName) {
 		String entityTypeName = (String) _resourceEntityTypeMap.get(resourceName);
+		if (entityTypeName == null) {
+			throw new RuntimeException("There is no entityType name registered for this resource: " + resourceName);
+		}
 		return getEntityType(entityTypeName);
 	}
 	
