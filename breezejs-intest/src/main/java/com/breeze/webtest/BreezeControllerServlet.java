@@ -44,8 +44,13 @@ public class BreezeControllerServlet extends ControllerServlet {
 	@Override
 	protected void handleRequest(HttpServletRequest request, HttpServletResponse response) {
 		try {
-
+				
 			String methodName = getMethodName(request);
+  
+			if (methodName.equals("Metadata")) {
+				writeResponse(response, getMetadata());
+				return;
+			}
 			Method method = getMethod(this, methodName);
 			if (method != null) {
 				dispatch(this, method, request, response);
@@ -53,7 +58,8 @@ public class BreezeControllerServlet extends ControllerServlet {
 				String pathInfo = request.getPathInfo();
 				String resourceName = pathInfo.substring(1);
 				String qs = request.getQueryString();
-				String json = URLDecoder.decode(qs);
+			
+				String json = qs != null ? URLDecoder.decode(qs) : null;
 				executeQuery(resourceName, json, response);				
 			}
 				
