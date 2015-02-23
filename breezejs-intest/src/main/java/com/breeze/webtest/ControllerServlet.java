@@ -2,6 +2,7 @@ package com.breeze.webtest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
@@ -10,6 +11,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.breezejs.util.JsonGson;
 
 public abstract class ControllerServlet extends HttpServlet {
 
@@ -53,7 +56,13 @@ public abstract class ControllerServlet extends HttpServlet {
 		
 	protected void writeResponse(HttpServletResponse response, String data) {
 		try {
+			response.setContentType("application/json;charset=UTF-8");
 			response.getWriter().write(data);
+//			PrintWriter out = response.getWriter();
+//  
+//			out.print(data);
+//			out.flush();
+
 		} catch (IOException e) {
 			// TODO log this
 			e.printStackTrace();

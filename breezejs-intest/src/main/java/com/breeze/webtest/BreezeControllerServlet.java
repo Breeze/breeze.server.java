@@ -20,10 +20,10 @@ import com.breezejs.util.JsonGson;
 public class BreezeControllerServlet extends ControllerServlet {
 	private static final long serialVersionUID = 1L;
 	
-	protected QueryService queryService;
-	protected SaveService saveService;
-	protected Metadata metadata;
-	protected static String metadataJson; 
+	protected QueryService _queryService;
+	protected SaveService _saveService;
+	protected Metadata _metadata;
+	protected String _metadataJson; 
 	
 	/** Create instance using the injected ServletContext */
 	@Override
@@ -36,9 +36,10 @@ public class BreezeControllerServlet extends ControllerServlet {
 	/** Create instance using provided sessionFactory and metadata.  */
 	private void init(SessionFactory sessionFactory, Metadata metadata) {
 		System.out.println("BreezeTests: sessionFactory=" + sessionFactory + ", metadata=" + metadata);
-    	this.queryService = new QueryService(sessionFactory);
-    	this.saveService = new SaveService(sessionFactory, metadata);
-    	this.metadata = metadata;
+    	this._queryService = new QueryService(sessionFactory);
+    	this._saveService = new SaveService(sessionFactory, metadata);
+    	this._metadata = metadata;
+    	this._metadataJson = JsonGson.toJson(this._metadata, false);
 	}
 
 	@Override
@@ -71,15 +72,12 @@ public class BreezeControllerServlet extends ControllerServlet {
 	}
 	
 	public String getMetadata() {
-		if (metadataJson == null) {
-			metadataJson = JsonGson.toJson(this.metadata, false);
-		}
-		return metadataJson;
+		return _metadataJson;
 	}
 	
 	public void saveChanges(HttpServletRequest request, HttpServletResponse response) {
 		String saveBundle = readPostData(request);
-		SaveResult result = saveService.saveChanges(saveBundle);
+		SaveResult result = _saveService.saveChanges(saveBundle);
 		String json = JsonGson.toJson(result);
 		if (result.hasErrors()) {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -89,12 +87,12 @@ public class BreezeControllerServlet extends ControllerServlet {
 	
 	
 	protected void executeQuery(String resourceName, String json, HttpServletResponse response) {
-		QueryResult result = this.queryService.executeQuery(resourceName, json);
+		QueryResult result = this._queryService.executeQuery(resourceName, json);
 		writeResponse(response, result.toJson());
 	}
 	
 	protected void executeQuery(Class clazz, String json, HttpServletResponse response) {
-		QueryResult result = this.queryService.executeQuery(clazz, json);
+		QueryResult result = this._queryService.executeQuery(clazz, json);
 		writeResponse(response, result.toJson());
 	}
 }
