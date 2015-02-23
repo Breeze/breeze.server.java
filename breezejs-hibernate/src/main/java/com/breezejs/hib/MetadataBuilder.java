@@ -539,7 +539,9 @@ public class MetadataBuilder {
             // Look up the related foreign key name using the column name
             String fkName = null;
             Map<String, Object> relatedDataProperty = relatedDataPropertyMap.get(columnNames);
+            
             if (relatedDataProperty != null) {
+            	fkName = (String) relatedDataProperty.get("nameOnServer");
             	if (propType.getForeignKeyDirection() == ForeignKeyDirection.FOREIGN_KEY_FROM_PARENT) 
             	{
                     nmap.put("foreignKeyNamesOnServer", new String[] { fkName });

@@ -36,9 +36,24 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   
+    <servlet>
+    <servlet-name>TestHarness</servlet-name>
+    <servlet-class>northwind.service.TestHarnessServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  
+
+  
   <servlet-mapping>
     <servlet-name>Northwind</servlet-name>
     <url-pattern>/northwind/*</url-pattern>
+  </servlet-mapping>
+  
+    <servlet-mapping>
+    <servlet-name>TestHarness</servlet-name>
+    <url-pattern>/breezeTests/*</url-pattern>
+    <url-pattern>*.js</url-pattern>
+    <url-pattern>*.css</url-pattern>
   </servlet-mapping>
   
 <!--    <servlet-mapping> -->

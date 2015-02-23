@@ -22,39 +22,39 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
 		executeQuery("Customers", json, response);
 	}
 	
-	public void breezeTest(HttpServletRequest request, HttpServletResponse response) {
-
-		String testCaseDir = "C:\\GitHub\\breeze.js\\test\\";
-		String fileName = testCaseDir + "index.hibernate.html";
+//	public void breezeTest(HttpServletRequest request, HttpServletResponse response) {
+//
+//		String testCaseDir = "C:\\GitHub\\breeze.js\\test\\";
+//		String fileName = testCaseDir + "index.hibernate.html";
+////		try {
+////			response.sendRedirect(fileName);
+////		} catch (IOException e1) {
+////			throw new RuntimeException("Unable to redirect to: " + fileName);
+////		}
+//		// response.setHeader("Content-Type", "text/html");
+//		response.setContentType("text/html");
+//	    // response.setHeader("Content-Disposition", "filename=\"hoge.txt\"");
+//	    File srcFile = new File(fileName);
+//	    // FileUtils.copyFile(srcFile, response.getOutputStream());
+//		
+//	    FileInputStream fileIn;
 //		try {
-//			response.sendRedirect(fileName);
-//		} catch (IOException e1) {
-//			throw new RuntimeException("Unable to redirect to: " + fileName);
+//			fileIn = new FileInputStream(srcFile);
+//			ServletOutputStream out = response.getOutputStream();
+//	     
+//		    byte[] outputByte = new byte[4096];
+//		    //copy binary contect to output stream
+//		    while(fileIn.read(outputByte, 0, 4096) != -1) 	    {
+//		    	out.write(outputByte, 0, 4096);
+//		    }
+//		    fileIn.close();
+//		    out.flush();
+//		    out.close();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			throw new RuntimeException("Unable to read: " + fileName);
 //		}
-		// response.setHeader("Content-Type", "text/html");
-		response.setContentType("text/html");
-	    // response.setHeader("Content-Disposition", "filename=\"hoge.txt\"");
-	    File srcFile = new File(fileName);
-	    // FileUtils.copyFile(srcFile, response.getOutputStream());
-		
-	    FileInputStream fileIn;
-		try {
-			fileIn = new FileInputStream(srcFile);
-			ServletOutputStream out = response.getOutputStream();
-	     
-		    byte[] outputByte = new byte[4096];
-		    //copy binary contect to output stream
-		    while(fileIn.read(outputByte, 0, 4096) != -1) 	    {
-		    	out.write(outputByte, 0, 4096);
-		    }
-		    fileIn.close();
-		    out.flush();
-		    out.close();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw new RuntimeException("Unable to read: " + fileName);
-		}
-
-	}
+//
+//	}
 	
 }
