@@ -261,7 +261,14 @@ public class CriteriaBuilder {
 			if (expr2 instanceof LitExpression) {
 				Object value = ((LitExpression) expr2).getValue();
 				if (value == null) {
-					cr = Restrictions.isNull(propName);
+					if (op == Operator.Equals) {
+						cr = Restrictions.isNull(propName);
+					} else if (op == Operator.NotEquals) {
+						cr = Restrictions.isNotNull(propName);
+					} else {
+						throw new RuntimeException("Binary Predicate with a null value and the "
+								+ op.getName() + "operator is not supported .");
+					}
 				} else if (symbol != null) {
 					cr = new OperatorExpression(propName, value, symbol);
 				} else if (op == Operator.In) {

@@ -28,7 +28,7 @@ public class EntityQueryTest extends TestCase {
 	
 	public void testParseOrderBy() {
 		String jsFrom = "'resourceName': 'order'";
-		String jsOrderBy = "'orderBy': 'freight, employee.firstName desc'";
+		String jsOrderBy = "'orderBy': ['freight', 'employee.firstName desc']";
 		String json = "{" + jsFrom + "," + jsOrderBy + "}".replace("'", "\""); 
 		
 		EntityQuery eq = new EntityQuery(json);

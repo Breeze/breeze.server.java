@@ -61,6 +61,10 @@ public class BreezeControllerServlet extends ControllerServlet {
 				String qs = request.getQueryString();
 			
 				String json = qs != null ? URLDecoder.decode(qs) : null;
+				// HACK
+				if (json.endsWith("&")) {
+					json = json.substring(0, json.length()-1);
+				}
 				executeQuery(resourceName, json, response);				
 			}
 				

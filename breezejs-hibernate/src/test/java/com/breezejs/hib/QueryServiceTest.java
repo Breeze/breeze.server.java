@@ -98,7 +98,7 @@ public class QueryServiceTest extends TestCase {
 	public void testOrderByNested3Deep() {
 		// String json = qs.queryToJson(OrderDetail.class,
 		// "?$filter=orderID lt 10258&$orderby=order/employee/lastName desc&$expand=order/employee");
-		String json = "{ where: { orderID: { lt: 10258 }}, orderBy: 'order.employee.lastName desc', expand: 'order.employee' }";
+		String json = "{ where: { orderID: { lt: 10258 }}, orderBy: ['order.employee.lastName desc'], expand: 'order.employee' }";
 		QueryResult qr = _qe.executeQuery("OrderDetails", json);
 		Collection results = qr.getResults();
 		String rJson = qr.toJson();
@@ -123,7 +123,7 @@ public class QueryServiceTest extends TestCase {
 	public void testExpandNested3Deep() {
 		// String json = qs.queryToJson(Customer.class,
 		// "?$top=1&$filter=country eq 'Brazil'&$expand=orders/orderDetails/product");
-		String json = "{ where: { country: 'Brazil' }, take: 1, expand: 'orders.orderDetails.product' }";
+		String json = "{ where: { country: 'Brazil' }, take: 1, expand: ['orders.orderDetails.product'] }";
 		QueryResult qr = _qe.executeQuery(Customer.class, json);
 		Collection results = qr.getResults();
 		String rJson = qr.toJson();
@@ -146,7 +146,7 @@ public class QueryServiceTest extends TestCase {
 	public void testInlineCount() {
 		// String json = qs.queryToJson(Customer.class,
 		// "$top=3&$inlinecount=allpages");
-		String json = "{ take: 3, inlineCountEnabled: true }";
+		String json = "{ take: 3, inlineCount: true }";
 		QueryResult qr = _qe.executeQuery(Customer.class, json);
 		Collection results = qr.getResults();
 		Long inlineCount = qr.getInlineCount();
@@ -156,7 +156,7 @@ public class QueryServiceTest extends TestCase {
 	}
 	
 	public void testInlineCountWithTake0() {
-		String json = "{ take: 0, inlineCountEnabled: true }";
+		String json = "{ take: 0, inlineCount: true }";
 		QueryResult qr = _qe.executeQuery(Customer.class, json);
 		Collection results = qr.getResults();
 		Long inlineCount = qr.getInlineCount();
@@ -677,6 +677,44 @@ public class QueryServiceTest extends TestCase {
 			assertTrue(isOk);
 		}
 	}
+	
+	public void testAndNotEqWithOrderByAndExpand() {
+//		var p = Predicate.create("freight", ">", 100).and("customerID", "!=", null);
+//	    var query = new breeze.EntityQuery()
+//	        .from("Orders")
+//	        .where(p)
+//	        .orderBy("orderID")
+//	        .expand("customer")
+//	        .take(1);
+		String json = "{ where: { freight: { gt: 100.0 }, customerID: { ne: null }}, orderBy: ['orderID'], expand: ['customer'] }";
+		QueryResult qr = _qe.executeQuery(Order.class, json);
+		Collection results = qr.getResults();
+		String rJson = qr.toJson();
+		assertTrue(results.size() > 0);
+		for (Object o : results) {
+			Order order = (Order) o;
+			BigDecimal freight = order.getFreight();
+			assertTrue(freight.doubleValue() > 100.0);
+			assertTrue(order.getCustomerID() != null);
+		}
+	}
+	
+
+//	
+	  public void testNestedOrderByAndExpand() {
+//		  var q1 = EntityQuery.from("Products")
+//			        .expand("category")
+//			        .orderBy("category.categoryName, productName");
+			String json = "{ orderBy: ['category.categoryName', 'productName'], expand: ['category'] }";
+			QueryResult qr = _qe.executeQuery(Product.class, json);
+			Collection results = qr.getResults();
+			String rJson = qr.toJson();
+			assertTrue(results.size() > 0);
+			for (Object o : results) {
+				Product product = (Product) o;
+				// TODO:
+			}
+		}
 
 
 	private Date toDate(int yr, int month, int day) {

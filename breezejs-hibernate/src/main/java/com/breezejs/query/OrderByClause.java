@@ -9,20 +9,18 @@ import com.breezejs.metadata.MetadataHelper;
 import com.breezejs.util.StringFns;
 
 public class OrderByClause {
-	private String _source;
+
 	private List<OrderByItem> _orderByItems;
 
 	
-	public static final OrderByClause fromString(String source) {
-		return (source == null) ? null : new OrderByClause(source);
+	public static final OrderByClause from(List<String> propertyPaths) {
+		return (propertyPaths == null) ? null : new OrderByClause(propertyPaths);
 	}
 	
-    public OrderByClause(String source) {
-    	_source = source;
-    	
-    	List<String> items = StringFns.ToList(source, "\\,");
+    public OrderByClause(List<String> propertyPaths) {
+
     	_orderByItems = new ArrayList<OrderByItem>();
-    	for (String item : items) {
+    	for (String item : propertyPaths) {
     		// Intervening whitespace
     		String[] itemParts = item.trim().split("\\s+");
     		boolean isDesc = itemParts.length == 1 ? false : itemParts[1].equals("desc");
@@ -37,11 +35,6 @@ public class OrderByClause {
     	}
     }
     
-	public String getSource() {
-		return _source;
-	}
-
-
 	public List<OrderByItem> getOrderByItems() {
 		return _orderByItems;
 	}

@@ -6,22 +6,17 @@ import java.util.List;
 import com.breezejs.util.StringFns;
 
 public class ExpandClause {
-	private String _source;
 	private List<String> _propertyPaths;
 	
 
-	public static final ExpandClause fromString(String source) {
-		return (source == null) ? null : new ExpandClause(source);
+	public static final ExpandClause from(List<String> propertyPaths) {
+		return (propertyPaths == null) ? null : new ExpandClause(propertyPaths);
 	}
 	
-	public ExpandClause(String source) {
-		_source = source;
-		_propertyPaths = StringFns.ToList(source, "\\,");
+	public ExpandClause(List<String> propertyPaths) {
+		_propertyPaths = propertyPaths;
 	}
 
-	public String getSource() {
-		return _source;
-	}
 	
 	public List<String> getPropertyPaths() {
 		return _propertyPaths;

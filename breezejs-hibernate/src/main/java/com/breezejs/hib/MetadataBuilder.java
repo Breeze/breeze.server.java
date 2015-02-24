@@ -529,7 +529,9 @@ public class MetadataBuilder {
                 if (elementPersister != null)
                 {
                     String joinProp = getPropertyNameForColumn(elementPersister, columnNames);
-                    nmap.put("invForeignKeyNamesOnServer", new String[] { joinProp });
+                    if (joinProp != null) {
+                    	nmap.put("invForeignKeyNamesOnServer", new String[] { joinProp });
+                    }
                 }
             }
         }

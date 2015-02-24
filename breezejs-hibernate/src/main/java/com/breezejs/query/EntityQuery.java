@@ -1,11 +1,13 @@
 package com.breezejs.query;
 
+import java.util.List;
 import java.util.Map;
 
 import com.breezejs.metadata.IEntityType;
 import com.breezejs.metadata.IMetadata;
 import com.breezejs.metadata.MetadataHelper;
 import com.breezejs.util.JsonGson;
+import com.breezejs.util.StringFns;
 
 public class EntityQuery {
 	private String _resourceName;
@@ -34,12 +36,21 @@ public class EntityQuery {
 		this._skipCount = processCount(qmap.get("skip"));
 		this._takeCount = processCount(qmap.get("take"));
 		this._wherePredicate = Predicate.predicateFromMap((Map) qmap.get("where"));
-		this._orderByClause = OrderByClause.fromString( (String) qmap.get("orderBy"));
-		this._selectClause = SelectClause.fromString( (String) qmap.get("select"));
-		this._expandClause = ExpandClause.fromString( (String) qmap.get("expand"));
-		if (qmap.containsKey("inlineCountEnabled")) {
-			this._inlineCountEnabled = ((Boolean) qmap.get("inlineCountEnabled")).booleanValue();
+		this._orderByClause = OrderByClause.from(toStringList(qmap.get("orderBy")));
+		this._selectClause = SelectClause.from(toStringList(qmap.get("select")));
+		this._expandClause = ExpandClause.from(toStringList(qmap.get("expand")));
+		if (qmap.containsKey("inlineCount")) {
+			this._inlineCountEnabled = ((Boolean) qmap.get("inlineCount")).booleanValue();
 		}
+	}
+	
+	private List<String> toStringList(Object src) {
+		if (src == null) return null;
+		if (src instanceof List) {
+			return (List<String>) src;
+		} else if (src instanceof String) {
+			return StringFns.ToList((String) src);
+		} throw new RuntimeException("Unable to convert to a List<String>");
 	}
 	
 	private Integer processCount(Object o) {
