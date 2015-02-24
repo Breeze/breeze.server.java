@@ -52,6 +52,10 @@ public class BreezeControllerServlet extends ControllerServlet {
 				writeResponse(response, getMetadata());
 				return;
 			}
+			if (methodName.equals("SaveChanges")) {
+				saveChanges(request, response);
+				return;
+			}
 			Method method = getMethod(this, methodName);
 			if (method != null) {
 				dispatch(this, method, request, response);
