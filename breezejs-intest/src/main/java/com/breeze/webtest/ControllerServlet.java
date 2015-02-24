@@ -58,8 +58,7 @@ public abstract class ControllerServlet extends HttpServlet {
 		try {
 			response.setContentType("application/json;charset=UTF-8");
 			response.getWriter().write(data);
-//			PrintWriter out = response.getWriter();
-//  
+//			PrintWriter out = response.getWriter(); 
 //			out.print(data);
 //			out.flush();
 
@@ -69,13 +68,23 @@ public abstract class ControllerServlet extends HttpServlet {
 		}
 	}
 	
-	protected void sendError(HttpServletResponse response, int statusCode, String message) {
+	protected void writeError(HttpServletResponse response, int status, String message) {
 		try {
-			response.sendError(statusCode, message);
+			HttpErrorInfo err = new HttpErrorInfo(status, message);
+			String errMsg = JsonGson.toJson(err);
+			response.setContentType("application/json;charset=UTF-8");
+			response.setStatus(status);
+			response.getWriter().write(errMsg);
+//			PrintWriter out = response.getWriter(); 
+//			out.print(data);
+//			out.flush();
+
 		} catch (IOException e) {
+			// TODO log this
 			e.printStackTrace();
 		}
 	}
+
 
 	static final Class[] sFormalArgs = { HttpServletRequest.class, HttpServletResponse.class };
 

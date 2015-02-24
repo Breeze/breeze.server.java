@@ -94,6 +94,8 @@ public class DataType {
 		} else if (dataType == DataType.DateTime || dataType == DataType.DateTimeOffset) {
 			// ISO 8601 format parser
 			return javax.xml.bind.DatatypeConverter.parseDateTime(value.toString()).getTime(); 
+		} else if (dataType == DataType.Guid) {
+			return  UUID.fromString(value.toString());
 		}
 		
 		return value;

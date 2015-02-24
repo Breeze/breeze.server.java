@@ -745,6 +745,7 @@ public class MetadataBuilder {
         BreezeTypeMap.put("double", "Double");
         BreezeTypeMap.put("float", "Single");
         BreezeTypeMap.put("uuid", "Guid");
+        BreezeTypeMap.put("uuid-char", "Guid");
         BreezeTypeMap.put("uuid-binary", "Guid");
         BreezeTypeMap.put("string", "String");
         BreezeTypeMap.put("time", "Time");

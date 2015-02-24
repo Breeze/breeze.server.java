@@ -3,11 +3,12 @@ package northwind.model;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 
 public class Order {
 
     private int orderID;
-    private String customerID;
+    private UUID customerID;
     private Integer employeeID;
     private Date orderDate;
     private Date requiredDate;
@@ -32,10 +33,10 @@ public class Order {
 	public void setOrderID(int orderID) {
 		this.orderID = orderID;
 	}
-	public String getCustomerID() {
+	public UUID getCustomerID() {
 		return customerID;
 	}
-	public void setCustomerID(String customerID) {
+	public void setCustomerID(UUID customerID) {
 		this.customerID = customerID;
 	}
 	public Integer getEmployeeID() {

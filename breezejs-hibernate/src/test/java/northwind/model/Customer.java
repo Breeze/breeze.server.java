@@ -1,10 +1,11 @@
 package northwind.model;
 
 import java.util.Collection;
+import java.util.UUID;
 
 public class Customer {
 
-	private String customerID;
+	private UUID customerID;
 	private String customerID_OLD;
 	private String companyName;
 	private String contactName;
@@ -20,11 +21,11 @@ public class Customer {
 
 	private Collection<Order> orders;
 
-	public String getCustomerID() {
+	public UUID getCustomerID() {
 		return customerID;
 	}
 
-	public void setCustomerID(String customerID) {
+	public void setCustomerID(UUID customerID) {
 		this.customerID = customerID;
 	}
 

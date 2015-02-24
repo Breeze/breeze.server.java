@@ -73,9 +73,11 @@ public class BreezeControllerServlet extends ControllerServlet {
 			}
 				
 		} catch (ControllerException ex) {
-			sendError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
+			writeError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
 		} catch (Throwable ex) {
-			sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+			// sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+			
+			writeError(response, HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
 		}
 	}
 	
