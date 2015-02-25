@@ -3,7 +3,7 @@
 <hibernate-mapping package="northwind.model">
   <class name="Customer" table="`Customer`" dynamic-update="true">
     <id name="customerID" column="`CustomerID`" type="uuid-char">
-      <generator class="guid" />
+      <generator class="uuid2" />
     </id>
     <version name="rowVersion" type="int" />
     <property name="customerID_OLD" column="`CustomerID_OLD`" type="string" length="5" />
