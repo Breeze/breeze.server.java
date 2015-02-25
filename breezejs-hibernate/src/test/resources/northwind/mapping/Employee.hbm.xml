@@ -24,7 +24,8 @@
     <property name="photoPath" type="string" length="255" />
     <many-to-one name="manager" column="`ReportsToEmployeeID`" class="Employee" />
     <property name="reportsToEmployeeID" type="int" insert="false" update="false"/>
-    <property name="fullName" generated="insert" />
+    <property name="fullName" insert="false" update="false"  />
+<!--     <property name="fullName" generated="insert" /> -->
     <!--Foreign key to Employee (Employee)-->
     <set name="directReports" table="`Employee`" cascade="all-delete-orphan" inverse="true">
       <key column="`ReportsToEmployeeID`" foreign-key="FK_Employee_Employee" />

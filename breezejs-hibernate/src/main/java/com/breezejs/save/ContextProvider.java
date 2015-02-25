@@ -26,7 +26,7 @@ public class ContextProvider {
 			sw.entityErrors = e.entityErrors;
 		} catch (Exception e) {
 			if (!handleSaveException(e, sw)) {
-				throw new RuntimeException(e);
+				throw e;
 			}
 		}
 		

@@ -13,6 +13,7 @@ public class DataType {
 	private String _name;
 	private Class _class;
 	private static HashMap<String, DataType> _nameMap = new HashMap<String, DataType>();
+	private static HashMap<Class, DataType> _classMap = new HashMap<Class, DataType>();
 	
 	public static final DataType Binary = new DataType("Binary");
 	public static final DataType Guid = new DataType("Guid", UUID.class);
@@ -43,6 +44,7 @@ public class DataType {
 		_name = name;
 		_class = clazz;
 		_nameMap.put(name, this);
+		_classMap.put(clazz, this);
 	}
 
 	
@@ -56,6 +58,10 @@ public class DataType {
 	
 	public static DataType fromName(String name) {
 		return _nameMap.get(name);
+	}
+	
+	public static DataType fromClass(Class clazz) {
+		return _classMap.get(clazz);
 	}
 	
 	// Can't use this safely because of missing support for optional parts.

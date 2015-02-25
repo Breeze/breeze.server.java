@@ -756,9 +756,13 @@ public class MetadataBuilder {
         NoLength.add("Int32");
         NoLength.add("Int64");
         NoLength.add("DateTime");
+        NoLength.add("DateTimeOffset");
         NoLength.add("Time");
         NoLength.add("Boolean");
         NoLength.add("Guid");
+        NoLength.add("Double");
+        NoLength.add("Single");
+        NoLength.add("Decimal");
 
         ValidationTypeMap = new HashMap<String, String>();
         ValidationTypeMap.put("Boolean", "bool");

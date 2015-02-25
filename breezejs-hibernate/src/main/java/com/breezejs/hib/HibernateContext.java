@@ -2,6 +2,7 @@ package com.breezejs.hib;
 
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.hibernate.EntityMode;
 import org.hibernate.FlushMode;
+import org.hibernate.JDBCException;
 import org.hibernate.PropertyValueException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -20,7 +22,13 @@ import org.hibernate.type.Type;
 
 
 
+
+
+
+
+import com.breezejs.metadata.DataType;
 import com.breezejs.metadata.Metadata;
+import com.breezejs.metadata.MetadataHelper;
 import com.breezejs.save.*;
 
 public class HibernateContext extends ContextProvider {
@@ -89,9 +97,13 @@ public class HibernateContext extends ContextProvider {
 					pve.getPropertyName(), pve.getMessage()));
 			saveWorkState.entityErrors = entityErrors;
 		} catch (Exception ex) {
-			if (tx.isActive())
-				tx.rollback();
-			throw new RuntimeException(ex);
+			if (tx.isActive()) tx.rollback();
+			if (ex instanceof JDBCException) {
+				JDBCException jdbcEx = (JDBCException) ex;
+				throw new RuntimeException("SQLException: " + jdbcEx.getSQLException().getMessage());
+			} else {
+				throw ex;
+			}
 		} finally {
 			//          if (!hasExistingTransaction) tx.Dispose();
 		}
@@ -161,7 +173,7 @@ public class HibernateContext extends ContextProvider {
 		if (entityInfo.entityState == EntityState.Added) {
 			Object entity = entityInfo.entity;
 			Object id = getIdentifier(entity, meta);
-			KeyMapping km = new KeyMapping(type.getName(), id);
+			KeyMapping km = new KeyMapping(MetadataHelper.getEntityTypeName(type), id);
 			entityKeyMapping.put(entityInfo, km);
 		}
 	}
@@ -233,7 +245,10 @@ public class HibernateContext extends ContextProvider {
 			//        	// because JsonConvert makes all integers Int64
 			//        	oldVersion = vtype.getConstructor(oldVersion.getClass()).newInstance(oldVersion);
 			//        } 
-			classMeta.setPropertyValue(entity, vname, oldVersion);
+			Class versionClazz = classMeta.getPropertyTypes()[vcol].getReturnedClass();
+			DataType dataType = DataType.fromClass(versionClazz);
+			Object oldValue = DataType.coerceData(oldVersion, dataType);
+			classMeta.setPropertyValue(entity, vname, oldValue);
 		}
 	}
 
