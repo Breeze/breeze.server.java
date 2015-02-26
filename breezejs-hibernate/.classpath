@@ -3,7 +3,9 @@
 	<classpathentry kind="src" output="target/classes" path="src/main/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
+
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/antlr-2.7.7.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/hibernate-commons-annotations-4.0.4.Final.jar"/>
@@ -18,5 +20,6 @@
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/junit-3.8.1.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/mysql-connector-java-5.1.30.jar"/>
 	<classpathentry kind="lib" path="target/breezejs-hibernate-0.1a-lib/lib/gson-2.3.1.jar"/>
+
 	<classpathentry kind="output" path="bin"/>
 </classpath>
