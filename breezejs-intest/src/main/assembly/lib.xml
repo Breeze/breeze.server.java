@@ -7,7 +7,7 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <dependencySets>
     <dependencySet>
-      <outputDirectory>WEB-INF/lib</outputDirectory>
+      <outputDirectory>lib</outputDirectory>
       <useProjectArtifact>true</useProjectArtifact>
       <unpack>false</unpack>
       <scope>test</scope>

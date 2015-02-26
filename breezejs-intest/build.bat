@@ -4,4 +4,6 @@ cd ..\breezejs-intest
 
 call mvn package
 
+call mvn assembly:single
+
 call deployToTomcat.bat
