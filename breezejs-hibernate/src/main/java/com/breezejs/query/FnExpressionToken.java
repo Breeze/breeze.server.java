@@ -43,6 +43,10 @@ class FnExpressionToken {
 		} else {
 			String fnName = text;
 			DataType[] argTypes = FnExpression.getArgTypes(fnName);
+			if (argTypes.length != _fnArgs.size()) {
+			    throw new RuntimeException("Incorrect number of arguments to '" + fnName 
+			            + "' function; was expecting " + argTypes.length);
+			}
 			List<Expression> exprs = new ArrayList<Expression>();
 			for (int fnIx = 0; fnIx < _fnArgs.size(); fnIx++) {
 				FnExpressionToken argToken = _fnArgs.get(fnIx);
@@ -62,7 +66,7 @@ class FnExpressionToken {
 			return token;
 		}
 		token = new FnExpressionToken();
-		String badChars = ")'\"";
+		String badChars = "'\"";
 		
 		while (ix < source.length()) {
 			char c = source.charAt(ix);
@@ -73,11 +77,10 @@ class FnExpressionToken {
 				return token;
 			}
 			
-			if (c == ',') {
-				ix++;
+			if (c == ',' || c == ')') {
 				token._nextIx = ix;
 				return token;
-			}
+			}		
 			
 			if (badChars.indexOf(c) >= 0) {
 				throw new RuntimeException("Unable to parse Fn name - encountered: " + c);
@@ -94,16 +97,15 @@ class FnExpressionToken {
 		token._fnArgs = new ArrayList<FnExpressionToken>();
 	
 		while (ix < source.length()) {
-			char c = source.charAt(ix);
-			
-			if (c == ')') {
-				ix++;
-				break;
-			}
-			
+						
 			FnExpressionToken argToken = parseToken(source, ix);
-			token._fnArgs.add(argToken);
 			ix = argToken._nextIx;
+			if (argToken._sb.length() != 0) {
+    			token._fnArgs.add(argToken);
+			}
+			char c = source.charAt(ix);
+			ix++;
+	        if (c == ')') break;
 		}
 		token._nextIx = ix;
 		return;

@@ -32,15 +32,25 @@ public class QueryServiceTest extends TestCase {
 
     private QueryService _qe;
 
-    // private SimpleDateFormat DATEFMT = new SimpleDateFormat("dd/MM/yyyy");
 
     protected void setUp() throws Exception {
         super.setUp();
         // then populate the database with test data...?
         _qe = new QueryService(StaticConfigurator.getSessionFactory());
     }
-
-    // TODO: test boolean where - waiting on 'discontinued' field
+    
+    public void testFuncQuery() {
+        String json = "{ where: { 'month(birthDate)': { gt: 3}}}";
+        QueryResult qr = _qe.executeQuery(Employee.class, json);
+        Collection results = qr.getResults();
+        String rJson = qr.toJson();
+        assertTrue(results.size() > 0);
+        for (Object o : results) {
+            Employee emp = (Employee) o;
+            Date birthDt = emp.getBirthDate();
+            
+        }
+    }
 
     public void testEmptyQuery() {
         String json = "";
@@ -77,7 +87,6 @@ public class QueryServiceTest extends TestCase {
             assertTrue(c.getCountry().equals("Brazil"));
             assertTrue(c.getCompanyName() != null);
         }
-
     }
 
     public void testUsingResourceName() {
@@ -92,7 +101,6 @@ public class QueryServiceTest extends TestCase {
             Order order = (Order) o;
             assertTrue(order.getShipCountry().equals("Brazil"));
         }
-
     }
 
     public void testOrderByNested3Deep() {

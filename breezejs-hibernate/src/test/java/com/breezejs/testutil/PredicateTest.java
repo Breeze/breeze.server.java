@@ -44,6 +44,44 @@ public class PredicateTest extends TestCase {
 		_metadataWrapper = new MetadataAdapter(metadata);
 	}
 	
+	public void testFunc1ArgPred() {
+	    String json = "{ 'month(birthDate)': { gt: 3}}";
+	    Map map = JsonGson.fromJson(json);
+        Predicate pred = Predicate.predicateFromMap(map);
+        assertTrue(pred != null);
+        assertTrue(pred instanceof BinaryPredicate);
+        BinaryPredicate bpred = (BinaryPredicate) pred;
+        
+        IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Employees");
+        pred.validate(et);
+        FnExpression expr1 = (FnExpression) bpred.getExpr1();
+        assert(expr1.getFnName().equals("month"));
+        List<Expression> args = expr1.getExpressions();
+        
+        assertTrue(args.size() == 1);
+        PropExpression arg1 = (PropExpression) args.get(0);
+        assertTrue(arg1.getPropertyPath().equals("birthDate"));
+	}
+	
+	public void testFuncNArgsPred() {
+        String json = "{ 'substring(lastName, 1,3)': { gt: 'ABC'}}";
+        Map map = JsonGson.fromJson(json);
+        Predicate pred = Predicate.predicateFromMap(map);
+        assertTrue(pred != null);
+        assertTrue(pred instanceof BinaryPredicate);
+        BinaryPredicate bpred = (BinaryPredicate) pred;
+        
+        IEntityType et = _metadataWrapper.getEntityTypeForResourceName("Employees");
+        pred.validate(et);
+        FnExpression expr1 = (FnExpression) bpred.getExpr1();
+        assertTrue(expr1.getFnName().equals("substr"));
+        List<Expression> args = expr1.getExpressions();
+        
+        assertTrue(args.size() == 3);
+        PropExpression arg1 = (PropExpression) args.get(0);
+        assertTrue(arg1.getPropertyPath().equals("lastName"));
+    }
+	
 	public void testBinaryPredNull() {
 		 String pJson = "{ shipName: null }";
 		 Map map = JsonGson.fromJson(pJson);
