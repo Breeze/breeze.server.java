@@ -13,22 +13,22 @@
 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jboss-logging-3.1.3.GA.jar"/>
 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jboss-logging-annotations-1.2.0.Beta1.jar"/>
 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jboss-transaction-api_1.2_spec-1.0.0.Final.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/guava-14.0.1.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/javax.ws.rs-api-2.0.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/validation-api-1.1.0.Final.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/javax.annotation-api-1.2.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/aopalliance-repackaged-2.2.0.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/hk2-api-2.2.0.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/hk2-locator-2.2.0.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/hk2-utils-2.2.0.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/javax.inject-2.2.0.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-client-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-common-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-container-servlet-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-container-servlet-core-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-guava-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-server-2.6.jar"/>
-	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/osgi-resource-locator-1.0.1.jar"/>
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/guava-14.0.1.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/javax.ws.rs-api-2.0.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/validation-api-1.1.0.Final.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/javax.annotation-api-1.2.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/aopalliance-repackaged-2.2.0.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/hk2-api-2.2.0.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/hk2-locator-2.2.0.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/hk2-utils-2.2.0.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/javax.inject-2.2.0.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-client-2.6.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-common-2.6.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-container-servlet-2.6.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-container-servlet-core-2.6.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-guava-2.6.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/jersey-server-2.6.jar"/> -->
+<!-- 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/osgi-resource-locator-1.0.1.jar"/> -->
 	<classpathentry kind="lib" path="target/breeze-intest/WEB-INF/lib/xml-apis-1.0.b2.jar"/>
 	<classpathentry kind="lib" path="lib/javax.servlet-api-3.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>

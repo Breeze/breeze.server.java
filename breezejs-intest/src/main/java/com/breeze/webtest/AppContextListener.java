@@ -26,7 +26,7 @@ public class AppContextListener implements ServletContextListener {
 		SessionFactory sessionFactory = configuration.configure().buildSessionFactory();
 		System.out.println("AppContextListener.contextInitialized: sessionFactory=" + sessionFactory);
 		
-		// builds metadata from the Hibernate mappings
+		// builds metadata from the  Hibernate mappings
 		MetadataBuilder metaGen = new MetadataBuilder(sessionFactory, configuration);
 		Metadata metadata = metaGen.buildMetadata();
 		System.out.println("AppContextListener.contextInitialized: metadata=" + metadata);

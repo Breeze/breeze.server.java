@@ -12,7 +12,7 @@ public class Product {
     private Short unitsInStock;
     private Short unitsOnOrder;
     private Short reorderLevel;
-//    private boolean discontinued; discriminator
+    private boolean isDiscontinued; // discriminator
     private int rowVersion;
 
     private Category category;
@@ -71,6 +71,12 @@ public class Product {
 	}
 	public void setReorderLevel(Short reorderLevel) {
 		this.reorderLevel = reorderLevel;
+	}
+	public boolean getIsDiscontinued() {
+	    return isDiscontinued;
+	}
+	public void setIsDiscontinued(boolean discontinued) {
+	    this.isDiscontinued = discontinued;
 	}
 	public int getRowVersion() {
 		return rowVersion;

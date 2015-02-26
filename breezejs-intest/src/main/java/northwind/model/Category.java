@@ -1,10 +1,6 @@
 package northwind.model;
 
-import java.sql.Blob;
-import java.sql.SQLException;
 import java.util.Set;
-
-import org.hibernate.Hibernate;
 
 public class Category {
     private int categoryID;
@@ -46,24 +42,6 @@ public class Category {
 	public void setPicture(byte[] picture) {
 		this.picture = picture;
 	}
-	
-//    /** Don't invoke this.  Used by Hibernate only. */ 
-//	public void setPictureBlob(Blob picture) { 
-//		int blobLength;
-//		try {
-//			blobLength = (int) picture.length();
-//			byte[] blobAsBytes = picture.getBytes(1, blobLength);
-//	        this.picture = blobAsBytes; 
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}  
-//	}
-//	  
-//	/** Don't invoke this.  Used by Hibernate only. */ 
-//    public Blob getPictureBlob() {  
-//    	Hibernate.getLobCreator(sessionfactory.getCurrentSession()).createBlob();
-//	} 
 
 	public int getRowVersion() {
 		return rowVersion;

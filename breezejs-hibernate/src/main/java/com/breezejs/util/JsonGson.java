@@ -18,6 +18,11 @@ public class JsonGson {
 	public static String toJson(Object obj) {
 		return toJson(obj, true);
 	}
+	
+	// private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+	// private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+	private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";	                                                    
+	                                                 
 
 	/**
 	 * Convert the object tree to JSON
@@ -31,8 +36,7 @@ public class JsonGson {
 	 */
 	public static String toJson(Object obj, boolean isGraph) {
 		try {
-			GsonBuilder gsonBuilder = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			GsonBuilder gsonBuilder = newGsonBuilder();
 			if (isGraph) {
 				gsonBuilder
 				    .registerTypeAdapterFactory(new BreezeTypeAdapterFactory())
@@ -55,9 +59,7 @@ public class JsonGson {
 	 */
 	public static Map fromJson(String source) {
 		try {
-			GsonBuilder gsonBuilder = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-			Gson gson = gsonBuilder.create();
+            Gson gson = newGsonBuilder().create();
 			LinkedTreeMap result = gson.fromJson(source, LinkedTreeMap.class);
 			return result;
 
@@ -68,9 +70,7 @@ public class JsonGson {
 	
 	public static Map[] fromJsonArray(String source) {
 		try {
-			GsonBuilder gsonBuilder = new GsonBuilder()
-					.setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-			Gson gson = gsonBuilder.create();
+	        Gson gson = newGsonBuilder().create();
 			LinkedTreeMap[] result = gson.fromJson(source, LinkedTreeMap[].class);
 			return result;
 
@@ -90,9 +90,7 @@ public class JsonGson {
 	public static Object fromMap(Class<?> clazz, Map map) {
 		try {
 			String json = toJson(map);;
-			GsonBuilder gsonBuilder = new GsonBuilder()
-			  .setDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	        Gson gson = gsonBuilder.create();
+	        Gson gson = newGsonBuilder().create();
 	        Object result = gson.fromJson(json, clazz);
 	        return result;
 			// TODO: alternative is too think about using Apache BeanUtils for this.
@@ -104,6 +102,10 @@ public class JsonGson {
 					+ " from " + map, e);
 		}
 
+	}
+	
+	private static GsonBuilder newGsonBuilder() {
+	    return new GsonBuilder().setDateFormat(ISO8601_DATEFORMAT);
 	}
 
 }

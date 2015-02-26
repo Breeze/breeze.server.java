@@ -5,11 +5,8 @@
     <id name="productID" column="`ProductID`" type="int" unsaved-value="0">
       <generator class="native" />
     </id>
-    <discriminator column="discontinued"/>
     <property name="rowVersion" type="int" /><!-- Not marked as version property, for breeze test -->
     <property name="productName" type="string" length="40" not-null="true" />
-    <many-to-one name="supplier" column="`SupplierID`" class="Supplier" />
-    <many-to-one name="category" column="`CategoryID`" class="Category" />
     <property name="supplierID" type="int" insert="false" update="false" />
     <property name="categoryID" type="int" insert="false" update="false" />
     <property name="quantityPerUnit" type="string" length="20" />
@@ -17,11 +14,14 @@
     <property name="unitsInStock" type="short" />
     <property name="unitsOnOrder" type="short" />
     <property name="reorderLevel" type="short" />
-    <!-- <property name="discontinued" type="boolean" not-null="true" /> -->
+    <property name="isDiscontinued" column="discontinued" type="boolean" not-null="true" />
     
-    <subclass name="DiscontinuedProduct" discriminator-value="1">
-      <property name="discontinuedDate" type="timestamp" />
-    </subclass>
+    <many-to-one name="supplier" column="`SupplierID`" class="Supplier" />
+    <many-to-one name="category" column="`CategoryID`" class="Category" />
+    
+<!--     <subclass name="DiscontinuedProduct" discriminator-value="1"> -->
+<!--       <property name="discontinuedDate" type="timestamp" /> -->
+<!--     </subclass> -->
     
     <!--Foreign key to OrderDetail (OrderDetail)
     <set name="orderDetailCollection" table="`OrderDetail`" cascade="all-delete-orphan" inverse="true">
