@@ -41,7 +41,8 @@ public class QueryServiceTest extends TestCase {
     
     public void testFuncQuery() {
         String json = "{ where: { 'month(birthDate)': { gt: 3}}}";
-        QueryResult qr = _qe.executeQuery(Employee.class, json);
+        EntityQuery eq = new EntityQuery(json);
+        QueryResult qr = _qe.executeQuery(Employee.class, eq);
         Collection results = qr.getResults();
         String rJson = qr.toJson();
         assertTrue(results.size() > 0);
@@ -54,7 +55,8 @@ public class QueryServiceTest extends TestCase {
 
     public void testEmptyQuery() {
         String json = "";
-        QueryResult qr = _qe.executeQuery(Customer.class, json);
+        EntityQuery eq = new EntityQuery(json);
+        QueryResult qr = _qe.executeQuery(Customer.class, eq);
         Collection results = qr.getResults();
         String rJson = qr.toJson();
         assertTrue(results.size() > 5);

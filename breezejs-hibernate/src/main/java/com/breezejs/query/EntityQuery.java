@@ -18,6 +18,7 @@ public class EntityQuery {
 	private Integer _skipCount;
 	private Integer _takeCount;
 	private boolean _inlineCountEnabled;
+	private Map _parameters;
 	private IEntityType _entityType;
 	
 	
@@ -39,9 +40,44 @@ public class EntityQuery {
 		this._orderByClause = OrderByClause.from(toStringList(qmap.get("orderBy")));
 		this._selectClause = SelectClause.from(toStringList(qmap.get("select")));
 		this._expandClause = ExpandClause.from(toStringList(qmap.get("expand")));
+		this._parameters = (Map) qmap.get("parameters");
 		if (qmap.containsKey("inlineCount")) {
 			this._inlineCountEnabled = ((Boolean) qmap.get("inlineCount")).booleanValue();
 		}
+	}
+	
+	public EntityQuery(EntityQuery query) {
+	    this._resourceName = query._resourceName;
+	    this._skipCount = query._skipCount;
+	    this._takeCount = query._takeCount;
+	    this._wherePredicate = query._wherePredicate;
+	    this._orderByClause = query._orderByClause;
+	    this._selectClause = query._selectClause;
+	    this._expandClause = query._expandClause;
+	    this._inlineCountEnabled = query._inlineCountEnabled;
+	    this._parameters = query._parameters;
+	           
+	}
+	
+	public EntityQuery where(String json) {
+	    Map qmap = JsonGson.fromJson(json);
+	    Predicate pred = Predicate.predicateFromMap(qmap);
+	    return this.where(pred);
+	}
+	
+	public EntityQuery where(Predicate predicate) {
+        EntityQuery eq = new EntityQuery(this);
+        if (eq._wherePredicate == null) {
+            eq._wherePredicate = predicate;
+        } else if (eq._wherePredicate.getOperator() == Operator.And) {
+            AndOrPredicate andOrPred = (AndOrPredicate) eq._wherePredicate;
+            List<Predicate> preds = andOrPred.getPredicates();
+            preds.add(predicate);
+            eq._wherePredicate = new AndOrPredicate(Operator.And, preds );
+        } else {
+            eq._wherePredicate = new AndOrPredicate(Operator.And, eq._wherePredicate, predicate);
+        }
+        return eq;
 	}
 	
 	private List<String> toStringList(Object src) {
@@ -112,7 +148,9 @@ public class EntityQuery {
 		return _inlineCountEnabled;
 	}
 	
-
+	public Map getParameters() {
+	    return _parameters;
+	}
 
 	
 }
