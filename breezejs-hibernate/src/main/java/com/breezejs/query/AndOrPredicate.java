@@ -2,6 +2,7 @@ package com.breezejs.query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.breezejs.metadata.IEntityType;
@@ -23,7 +24,7 @@ public class AndOrPredicate extends Predicate {
 		return _op;
 	}
 	public List<Predicate> getPredicates() {
-		return new ArrayList<Predicate>(_predicates);
+		return Collections.unmodifiableList(_predicates);
 	}
 	
 	public void validate(IEntityType entityType) {

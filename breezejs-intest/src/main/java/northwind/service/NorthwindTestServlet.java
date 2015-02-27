@@ -21,34 +21,53 @@ import com.breezejs.query.QueryResult;
 
 public class NorthwindTestServlet extends BreezeControllerServlet {
 
-	public void customersInBrazil(HttpServletRequest request, HttpServletResponse response) {
-		String json = "{ where: { country: 'Brazil' }, take: 5 }";
-		executeQuery("Customers", json, response);
-	}
-	
-	public void CustomersStartingWith(HttpServletRequest request, HttpServletResponse response) {
-	    EntityQuery eq = this.extractEntityQuery(request);
-	    String companyName = (String) eq.getParameters().get("companyName");
-	    
-	    Predicate newPred = new BinaryPredicate(Operator.StartsWith, "companyName", companyName);
-	    // create a new EntityQuery object
-	    eq = eq.where(newPred);
-	    executeQuery(Customer.class, eq, response);
-	    
-	    
-	}
-	
-/*	namedQuery.CustomersStartingWith = function(req, res, next) {
-	    // start with client query and add an additional filter.
-	  var companyName = req.query.companyName;
-	  if (companyName == undefined) {
-	    var err = { statusCode: 404, message: "'companyName must be provided'" };
-	    next(err);
-	  }
-	  // need to use upper case because base query came from server
-	  var pred = new breeze.Predicate("CompanyName", "startsWith", companyName);
-	  var entityQuery = EntityQuery.fromUrl(req.url, "Customers").where(pred);
-	  executeEntityQuery(entityQuery, null, res, next);
-	};*/
-	
+    public void customersInBrazil(HttpServletRequest request,
+            HttpServletResponse response) {
+        String json = "{ where: { country: 'Brazil' }, take: 5 }";
+        executeQuery("Customers", json, response);
+    }
+
+    public void CustomersStartingWithA(HttpServletRequest request,
+            HttpServletResponse response) {
+        Predicate newPred = new BinaryPredicate(Operator.StartsWith,
+                "companyName", "A");
+        EntityQuery eq = new EntityQuery().where(newPred);
+        // or ...
+        // EntityQuery eq = new
+        // EntityQuery("{ companyName: { startsWith: 'A' }}");
+        executeQuery(Customer.class, eq, response);
+    };
+
+    public void CustomersStartingWith(HttpServletRequest request,
+            HttpServletResponse response) {
+        EntityQuery eq = this.extractEntityQuery(request);
+        String companyName = (String) eq.getParameters().get("companyName");
+
+        Predicate newPred = new BinaryPredicate(Operator.StartsWith,
+                "companyName", companyName);
+        // create a new EntityQuery object
+        eq = eq.where(newPred);
+        executeQuery(Customer.class, eq, response);
+    }
+
+    public void CustomersOrderedStartingWith(HttpServletRequest request,
+            HttpServletResponse response) {
+        // start with client query and add an additional filter.
+        EntityQuery eq = this.extractEntityQuery(request);
+        String companyName = (String) eq.getParameters().get("companyName");
+
+        Predicate newPred = new BinaryPredicate(Operator.StartsWith,
+                "companyName", companyName);
+        // create a new EntityQuery object
+        eq = eq.where(newPred).orderBy("companyName");
+        executeQuery(Customer.class, eq, response);
+    }
+
+    public void CustomersAndOrders(HttpServletRequest request,
+            HttpServletResponse response) {
+        EntityQuery eq = this.extractEntityQuery(request);
+        // create a new EntityQuery object
+        eq = eq.expand("orders");
+        executeQuery(Customer.class, eq, response);
+    }
 }
