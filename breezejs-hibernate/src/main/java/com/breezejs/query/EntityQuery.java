@@ -128,6 +128,17 @@ public class EntityQuery {
         return eq;
     }
     
+    public EntityQuery take(Integer takeCount) {
+        EntityQuery eq = new EntityQuery(this);
+        eq._takeCount = takeCount;
+        return eq;
+    }
+    
+    public EntityQuery skip(Integer skipCount) {
+        EntityQuery eq = new EntityQuery(this);
+        eq._skipCount = skipCount;
+        return eq;
+    }
 
     private List<String> toStringList(Object src) {
         if (src == null)

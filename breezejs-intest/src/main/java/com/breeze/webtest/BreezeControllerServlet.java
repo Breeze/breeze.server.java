@@ -67,7 +67,8 @@ public class BreezeControllerServlet extends ControllerServlet {
                 String pathInfo = request.getPathInfo();
                 String resourceName = pathInfo.substring(1);
                 EntityQuery entityQuery = extractEntityQuery(request);
-                executeQuery(resourceName, entityQuery, response);
+                QueryResult qr = executeQuery(resourceName, entityQuery);
+                writeResponse(response, qr.toJson());
             }
 
         } catch (ControllerException ex) {
@@ -109,6 +110,8 @@ public class BreezeControllerServlet extends ControllerServlet {
     public String getMetadata() {
         return _metadataJson;
     }
+    
+    
 
     protected void executeQuery(String resourceName, String json,
             HttpServletResponse response) {
@@ -125,17 +128,26 @@ public class BreezeControllerServlet extends ControllerServlet {
         writeResponse(response, result.toJson());
     }
     
-    protected void executeQuery(String resourceName, EntityQuery entityQuery,
-            HttpServletResponse response) {
-        QueryResult result = this._queryService
-                .executeQuery(resourceName, entityQuery);
-        writeResponse(response, result.toJson());
+    protected QueryResult executeQuery(String resourceName, EntityQuery entityQuery) {
+        return  this._queryService.executeQuery(resourceName, entityQuery);
     }
-
-    protected void executeQuery(Class clazz, EntityQuery entityQuery,          
-            HttpServletResponse response) {
-        QueryResult result = this._queryService
-                .executeQuery(clazz, entityQuery);
-        writeResponse(response, result.toJson());
+    
+    protected QueryResult executeQuery(Class clazz, EntityQuery entityQuery) {
+        return  this._queryService.executeQuery(clazz, entityQuery);
     }
-}
+    
+//    protected void executeQuery(String resourceName, EntityQuery entityQuery,
+//            HttpServletResponse response) {
+//        QueryResult result = this._queryService
+//                .executeQuery(resourceName, entityQuery);
+//        writeResponse(response, result.toJson());
+//    }
+//
+//    protected void executeQuery(Class clazz, EntityQuery entityQuery,          
+//            HttpServletResponse response) {
+//        QueryResult result = this._queryService
+//                .executeQuery(clazz, entityQuery);
+//        writeResponse(response, result.toJson());
+//    }
+    
+ }
