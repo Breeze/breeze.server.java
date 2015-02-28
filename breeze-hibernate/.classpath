@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/classes" path="src/main/java"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
+
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/antlr-2.7.7.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/hibernate-commons-annotations-4.0.4.Final.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/hibernate-core-4.3.0.Final.jar" sourcepath="C:/Java/hibernate-release-4.3.0.Final/project/hibernate-core/src/main/java"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/jandex-1.1.0.Final.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/javassist-3.18.1-GA.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/jboss-logging-3.1.3.GA.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/jboss-logging-annotations-1.2.0.Beta1.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/jboss-transaction-api_1.2_spec-1.0.0.Final.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/xml-apis-1.0.b2.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/junit-3.8.1.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/mysql-connector-java-5.1.30.jar"/>
+	<classpathentry kind="lib" path="target/breeze-hibernate-0.1a-lib/lib/gson-2.3.1.jar"/>
+
+	<classpathentry kind="output" path="bin"/>
+</classpath>
