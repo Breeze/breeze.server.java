@@ -1,6 +1,7 @@
 package northwind.model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class Product {
     private int productID;
@@ -12,7 +13,8 @@ public class Product {
     private Short unitsInStock;
     private Short unitsOnOrder;
     private Short reorderLevel;
-    private boolean isDiscontinued; // discriminator
+    private boolean isDiscontinued;
+    private Date discontinuedDate;
     private int rowVersion;
 
     private Category category;
@@ -78,6 +80,13 @@ public class Product {
 	public void setIsDiscontinued(boolean discontinued) {
 	    this.isDiscontinued = discontinued;
 	}
+	public Date getDiscontinuedDate() {
+        return discontinuedDate;
+    }
+    public void setDiscontinuedDate(Date discontinuedDate) {
+        this.discontinuedDate = discontinuedDate;
+    }
+
 	public int getRowVersion() {
 		return rowVersion;
 	}

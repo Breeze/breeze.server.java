@@ -15,13 +15,9 @@
     <property name="unitsOnOrder" type="short" />
     <property name="reorderLevel" type="short" />
     <property name="isDiscontinued" column="discontinued" type="boolean" not-null="true" />
-    
+    <property name="discontinuedDate" type="timestamp" />
     <many-to-one name="supplier" column="`SupplierID`" class="Supplier" />
     <many-to-one name="category" column="`CategoryID`" class="Category" />
-    
-<!--     <subclass name="DiscontinuedProduct" discriminator-value="1"> -->
-<!--       <property name="discontinuedDate" type="timestamp" /> -->
-<!--     </subclass> -->
     
     <!--Foreign key to OrderDetail (OrderDetail)
     <set name="orderDetailCollection" table="`OrderDetail`" cascade="all-delete-orphan" inverse="true">
