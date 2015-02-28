@@ -1,6 +1,7 @@
 package com.breeze.query;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.breeze.util.JsonGson;
 
@@ -9,23 +10,23 @@ import com.breeze.util.JsonGson;
  * @author Steve
  */
 public class QueryResult {
-	private Collection<?> results;
+	private List<?> results;
 	private Long inlineCount;
 	
-	public QueryResult(Collection results) {
+	public QueryResult(List results) {
 		this.results = results;
 		this.inlineCount = null;
 	}
 	
-	public QueryResult(Collection results, Long inlineCount) {
+	public QueryResult(List results, Long inlineCount) {
 		this.results = results;
 		this.inlineCount = inlineCount;
 	}
 	
-	public Collection getResults() {
+	public List getResults() {
 		return results;
 	}
-	public void setResults(Collection results) {
+	public void setResults(List results) {
 		this.results = results;
 	}
 	public Long getInlineCount() {

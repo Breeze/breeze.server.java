@@ -2,6 +2,9 @@ package com.breeze.webtest;
 
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Enumeration;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -9,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.hibernate.SessionFactory;
 
-import com.breeze.webtest.ControllerServlet.ControllerException;
 import com.breeze.hib.QueryService;
 import com.breeze.hib.SaveService;
 import com.breeze.metadata.Metadata;
@@ -56,10 +58,12 @@ public class BreezeControllerServlet extends ControllerServlet {
                 writeResponse(response, getMetadata());
                 return;
             }
+
             if (methodName.equals("SaveChanges")) {
                 saveChanges(request, response);
                 return;
             }
+
             Method method = getMethod(this, methodName);
             if (method != null) {
                 dispatch(this, method, request, response);
@@ -71,9 +75,6 @@ public class BreezeControllerServlet extends ControllerServlet {
                 writeResponse(response, qr.toJson());
             }
 
-        } catch (ControllerException ex) {
-            writeError(response, HttpServletResponse.SC_BAD_REQUEST,
-                    ex.getMessage());
         } catch (Throwable ex) {
             writeError(response, HttpServletResponse.SC_BAD_REQUEST,
                     ex.getMessage());
@@ -91,24 +92,40 @@ public class BreezeControllerServlet extends ControllerServlet {
         writeResponse(response, json);
     }
 
-    protected String extractEntityQueryJson(HttpServletRequest request) {
-        String qs = request.getQueryString();
-
-        String json = (qs != null) ? URLDecoder.decode(qs) : null;
-        // HACK
-        if (json != null && json.indexOf("&") >= 0) {
-            json = json.substring(0, json.indexOf("&"));
-        }
-        return json;
+    public String getMetadata() {
+        return _metadataJson;
     }
-    
+
     protected EntityQuery extractEntityQuery(HttpServletRequest request) {
         String json = extractEntityQueryJson(request);
         return new EntityQuery(json);
     }
 
-    public String getMetadata() {
-        return _metadataJson;
+    protected String extractEntityQueryJson(HttpServletRequest request) {
+        String qs = request.getQueryString();
+        qs = (qs != null) ? URLDecoder.decode(qs) : null;
+        Map<String, String[]> map = request.getParameterMap();
+        String json = null;
+        for (Map.Entry<String, String[]> entry : map.entrySet()) {
+            String parameterName = entry.getKey();
+            String[] value = entry.getValue();
+            
+            if (qs.indexOf("&" + parameterName) == -1) {
+                json = parameterName;
+                // break;
+            }
+        }
+        
+//        // Alternate version - not as safe because queryString might have an '&'        
+//        String json = (qs != null) ? URLDecoder.decode(qs) : null;
+//        // Isolate other parameters from the query
+//        // all other parameters will have the syntax 
+//        // HACK
+//        if (json != null && json.indexOf("&") >= 0) {
+//            json = json.substring(0, json.indexOf("&"));
+//        }
+        
+        return json;
     }
     
     
@@ -116,8 +133,7 @@ public class BreezeControllerServlet extends ControllerServlet {
     protected void executeQuery(String resourceName, String json,
             HttpServletResponse response) {
         EntityQuery eq = new EntityQuery(json);
-        QueryResult result = this._queryService
-                .executeQuery(resourceName, eq);
+        QueryResult result = this._queryService.executeQuery(resourceName, eq);
         writeResponse(response, result.toJson());
     }
 
@@ -127,27 +143,14 @@ public class BreezeControllerServlet extends ControllerServlet {
         QueryResult result = this._queryService.executeQuery(clazz, eq);
         writeResponse(response, result.toJson());
     }
-    
-    protected QueryResult executeQuery(String resourceName, EntityQuery entityQuery) {
-        return  this._queryService.executeQuery(resourceName, entityQuery);
+
+    protected QueryResult executeQuery(String resourceName,
+            EntityQuery entityQuery) {
+        return this._queryService.executeQuery(resourceName, entityQuery);
     }
-    
+
     protected QueryResult executeQuery(Class clazz, EntityQuery entityQuery) {
-        return  this._queryService.executeQuery(clazz, entityQuery);
+        return this._queryService.executeQuery(clazz, entityQuery);
     }
-    
-//    protected void executeQuery(String resourceName, EntityQuery entityQuery,
-//            HttpServletResponse response) {
-//        QueryResult result = this._queryService
-//                .executeQuery(resourceName, entityQuery);
-//        writeResponse(response, result.toJson());
-//    }
-//
-//    protected void executeQuery(Class clazz, EntityQuery entityQuery,          
-//            HttpServletResponse response) {
-//        QueryResult result = this._queryService
-//                .executeQuery(clazz, entityQuery);
-//        writeResponse(response, result.toJson());
-//    }
-    
- }
+
+}

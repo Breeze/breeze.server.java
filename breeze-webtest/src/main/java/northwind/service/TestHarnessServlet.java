@@ -29,7 +29,6 @@ public class TestHarnessServlet extends ControllerServlet {
 		String testCaseDir = "C:\\GitHub\\breeze.js\\test\\";
 		String servletPath = request.getServletPath();
 		 
-		String pathInfo = request.getPathInfo();
 		String fullFileName;
 		if (servletPath.startsWith("/breezeTests")) {
 			fullFileName = testCaseDir + "index.hibernate.html";
@@ -43,9 +42,13 @@ public class TestHarnessServlet extends ControllerServlet {
 				response.setContentType("text/css");
 			}
 		}
-
 		
-	    File srcFile = new File(fullFileName);
+	    writeFileTo(fullFileName, response);
+	}
+
+
+    private void writeFileTo(String fileName, HttpServletResponse response) {
+        File srcFile = new File(fileName);
 		
 	    FileInputStream fileIn;
 		try {
@@ -54,7 +57,7 @@ public class TestHarnessServlet extends ControllerServlet {
 	     
 		    byte[] outputByte = new byte[4096];
 		    int x;
-		    //copy binary contect to output stream
+
 		    while((x = fileIn.read(outputByte, 0, 4096)) != -1) 	    {
 		    	out.write(outputByte, 0, x);
 		    }
@@ -62,10 +65,8 @@ public class TestHarnessServlet extends ControllerServlet {
 		    out.flush();
 		    out.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw new RuntimeException("Unable to read: " + fullFileName);
+			throw new RuntimeException("Unable to read: " + fileName);
 		}
-
-	}
+    }
 	
 }

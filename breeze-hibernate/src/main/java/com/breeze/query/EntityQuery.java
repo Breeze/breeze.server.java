@@ -128,6 +128,25 @@ public class EntityQuery {
         return eq;
     }
     
+    public EntityQuery select(String... propertyPaths) {
+        return select(Arrays.asList(propertyPaths));
+    }
+
+    public EntityQuery select(List<String> propertyPaths) {
+        EntityQuery eq = new EntityQuery(this);
+        if (this._selectClause == null) {
+            eq._selectClause = new SelectClause(propertyPaths);
+        } else {
+            // think about checking if any prop paths are duped.
+            List<String> propPaths = new ArrayList<String>(
+                    this._selectClause.getPropertyPaths());
+            propPaths.addAll(propertyPaths);
+            eq._selectClause = new SelectClause(propPaths);
+        }
+        return eq;
+    }
+
+    
     public EntityQuery take(Integer takeCount) {
         EntityQuery eq = new EntityQuery(this);
         eq._takeCount = takeCount;
