@@ -17,7 +17,7 @@ public class AppContextListener implements ServletContextListener {
 	public static final String SESSIONFACTORY = "sessionFactory";
 	public static final String METADATA = "metadata";
 
-	@Override
+//	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 
 		System.out.println("AppContextListener.contextInitialized begin");
@@ -37,7 +37,7 @@ public class AppContextListener implements ServletContextListener {
 		ctx.setAttribute(METADATA, metadata);
 	}
 
-	@Override
+//	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// Clean up when the app is shut down
 		ServletContext ctx = sce.getServletContext();

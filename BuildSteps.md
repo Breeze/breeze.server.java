@@ -13,10 +13,12 @@
    3) - Build breeze-webTest 
         - From: {breeze-webTest root} Execute: mvn package  
        
-   4) -  Start apache TomCat 
+   4) -  Start Apache TomCat 
      - From {TomCat install dir}/bin  Execute: Startup.bat
+         - or 'catalina jpda start' (if debugging). 															
+
    -  Hit the webServer:
-     - From {browser} Execute: http://localhost:8080/breeze-intest/
+     - From {browser} Execute: http://localhost:8080/breeze-webtest/
      
 
 Steps (1-3) can be accomplished by running build.bat from breeze-webtest root  
