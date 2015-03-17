@@ -7,6 +7,8 @@
 
 	<classpathentry combineaccessrules="false" kind="src"
 		path="/breeze-hibernate" />
+	<classpathentry combineaccessrules="false" kind="src"
+		path="/breeze-northwind" />
 
 	<classpathentry kind="lib"
 		path="target/breeze-webtest-lib/lib/antlr-2.7.7.jar" />

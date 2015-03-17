@@ -1,13 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.breeze</groupId>
-	<artifactId>breeze-hibernate</artifactId>
+	<groupId>northwind</groupId>
 	<packaging>jar</packaging>
 	<version>0.1a</version>
-	<name>breeze-hibernate</name>
+	<name>breeze-northwind</name>
 	<url>http://breezejs.com</url>
-	<description>Tools for creating a Hibernate server for a Breeze client</description>
+	<description>Hibernate model for the NorthwindIB database</description>
 
 	<dependencies>
 
@@ -17,11 +16,11 @@
 			<version>4.3.0.Final</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.3.1</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.google.code.gson</groupId> -->
+<!-- 			<artifactId>gson</artifactId> -->
+<!-- 			<version>2.3.1</version> -->
+<!-- 		</dependency> -->
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -30,19 +29,12 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.30</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-    		<groupId>northwind</groupId>
-	    	<artifactId>breeze-northwind</artifactId>
-		    <version>0.1a</version>
-		    <scope>test</scope>
-	    </dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>mysql</groupId> -->
+<!-- 			<artifactId>mysql-connector-java</artifactId> -->
+<!-- 			<version>5.1.30</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency> -->
 
 	</dependencies>
 
@@ -74,4 +66,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	<artifactId>breeze-northwind</artifactId>
 </project>

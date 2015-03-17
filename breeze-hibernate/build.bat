@@ -1,13 +1,13 @@
-cls
-call mvn clean install -DskipTests
-
-echo local build
+cd ..\breeze-northwind
+call build.bat
+cd ..\breeze-hibernate
+echo Building breeze-hibernate
 echo -----------
-
+call mvn clean install -DskipTests
 call mvn assembly:single
 
-copy src\test\java\northwind\model\*.*         ..\breeze-webtest\src\main\java\northwind\model\
-copy src\test\resources\northwind\mapping\*.*  ..\breeze-webtest\src\main\resources\northwind\mapping\
+rem copy src\test\java\northwind\model\*.*         ..\breeze-webtest\src\main\java\northwind\model\
+rem copy src\test\resources\northwind\mapping\*.*  ..\breeze-webtest\src\main\resources\northwind\mapping\
 
 
 
