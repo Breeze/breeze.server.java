@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -17,7 +18,9 @@ import com.breeze.hib.SaveService;
 import com.breeze.metadata.Metadata;
 import com.breeze.query.EntityQuery;
 import com.breeze.query.QueryResult;
+import com.breeze.save.EntityInfo;
 import com.breeze.save.SaveResult;
+import com.breeze.save.SaveWorkState;
 import com.breeze.util.JsonGson;
 
 public class BreezeControllerServlet extends ControllerServlet {
@@ -60,7 +63,7 @@ public class BreezeControllerServlet extends ControllerServlet {
             }
 
             if (methodName.equals("SaveChanges")) {
-                saveChanges(request, response);
+                saveChanges(request, response );
                 return;
             }
 
@@ -81,16 +84,30 @@ public class BreezeControllerServlet extends ControllerServlet {
         }
     }
 
-    public void saveChanges(HttpServletRequest request,
-            HttpServletResponse response) {
-        String saveBundle = readPostData(request);
-        SaveResult result = _saveService.saveChanges(saveBundle);
+    protected void saveChanges(HttpServletRequest request,
+            HttpServletResponse response ) {
+        Map saveBundle = extractSaveBundleFromRequest(request);
+        SaveWorkState sws = new SaveWorkState(saveBundle);
+        saveChanges(sws, response);
+    }
+    
+    protected void saveChanges(SaveWorkState saveWorkState, HttpServletResponse response) {
+        SaveResult result = _saveService.saveChanges(saveWorkState);
         String json = JsonGson.toJson(result);
         if (result.hasErrors()) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
         writeResponse(response, json);
     }
+    
+    public Map extractSaveBundleFromRequest(HttpServletRequest request) {
+        String saveBundleString = readPostData(request);
+        
+        Map saveBundle = (Map) JsonGson.fromJson(saveBundleString);
+        return saveBundle;
+    }
+    
+
 
     public String getMetadata() {
         return _metadataJson;

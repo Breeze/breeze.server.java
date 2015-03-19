@@ -7,6 +7,7 @@ import org.jboss.logging.Logger;
 import com.breeze.metadata.Metadata;
 import com.breeze.save.ContextProvider;
 import com.breeze.save.SaveResult;
+import com.breeze.save.SaveWorkState;
 
 /**
  * Class to receive JSON save bundles and save them to Hibernate
@@ -30,17 +31,17 @@ public class SaveService {
 	 * @param source
 	 * @return
 	 */
-	public SaveResult saveChanges(String source) {
-		log.debugv("saveChanges", "source={0}", source);
+	public SaveResult saveChanges(SaveWorkState saveWorkState) {
+		// log.debugv("saveChanges", "source={0}", source);
 		Session session = sessionFactory.openSession();
 		try {
 			ContextProvider context = new HibernateContext(session, metadata);
-			SaveResult sr = context.saveChanges(source);
+			SaveResult sr = context.saveChanges(saveWorkState);
 			
 			return sr;
 		}
     	catch (Exception e) {
-    		log.errorv(e, "saveChanges: source={0}", source);
+    		// log.errorv(e, "saveChanges: source={0}", source);
     		if (e instanceof RuntimeException) throw e;
     		throw new RuntimeException(e);
     	}

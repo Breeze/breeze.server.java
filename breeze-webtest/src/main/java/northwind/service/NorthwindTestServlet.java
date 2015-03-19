@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,6 +24,12 @@ import northwind.model.Employee;
 import northwind.model.Order;
 import northwind.model.Product;
 
+
+
+import com.breeze.save.EntityInfo;
+import com.breeze.save.SaveResult;
+import com.breeze.save.SaveWorkState;
+import com.breeze.util.JsonGson;
 import com.breeze.webtest.BreezeControllerServlet;
 import com.breeze.metadata.DataType;
 import com.breeze.query.AndOrPredicate;
@@ -38,9 +45,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
             HttpServletResponse response) {
         String json = "{ where: { country: 'Brazil' }, take: 5 }";
         executeQuery("Customers", json, response);
-    }
-    
-
+    }  
     
     public void CustomerFirstOrDefault(HttpServletRequest request,
             HttpServletResponse response) {
@@ -360,6 +365,31 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         writeResponse(response, qr.toJson());
     }
 
-
+    // Saves
+    
+    public void SaveWithFreight(HttpServletRequest request,
+            HttpServletResponse response) {
+        Map saveBundle = extractSaveBundleFromRequest(request);
+        SaveWorkState sws = new SaveWorkState(saveBundle) {
+            public boolean beforeSaveEntity(EntityInfo entityInfo) {
+                String tag = (String) this.saveOptions.tag;
+                Order order = (Order) entityInfo.entity;
+                if (tag.equals("freight update")) {
+                  order.setFreight(order.getFreight().add(new BigDecimal(1.0) ));
+                } else if (tag.equals("freight update-ov")) {
+                  order.setFreight(order.getFreight().add(new BigDecimal(1.0) ));
+                  entityInfo.originalValuesMap.put("freight",  null);
+                } else if (tag.equals("freight update-force")) {
+                    order.setFreight(order.getFreight().add(new BigDecimal(1.0) ));
+                  entityInfo.forceUpdate = true;
+                }
+            return true;
+          }
+                    
+        };
+        
+        saveChanges(sws, response );
+    }
+    
 
 }

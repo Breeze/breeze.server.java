@@ -6,51 +6,29 @@ import java.util.Map;
 import com.breeze.util.JsonGson;
 
 public class ContextProvider {
-
+    
+    
 	/**
 	 * Build the SaveWorkState from the JSON, and use it to save the changes to the data store.
 	 * @param entities
 	 * @param saveOptions
 	 */
-	public SaveResult saveChanges(String json) {
-		Map saveBundle = JsonGson.fromJson(json);
-		SaveOptions saveOptions = new SaveOptions((Map) saveBundle.get("saveOptions"));
-		List entityMaps = (List<Map>) saveBundle.get("entities");
-		SaveWorkState sw = new SaveWorkState(this, entityMaps);
-		
+	public SaveResult saveChanges(SaveWorkState saveWorkState) {
+		saveWorkState.SetContextProvider(this);
 		try {
-			sw.beforeSave();
-			saveChangesCore(sw);
-			sw.afterSave();
+			saveWorkState.beforeSave();
+			saveChangesCore(saveWorkState);
+			saveWorkState.afterSave();
 		} catch (EntityErrorsException e) {
-			sw.entityErrors = e.entityErrors;
+			saveWorkState.entityErrors = e.entityErrors;
 		} catch (Exception e) {
-			if (!handleSaveException(e, sw)) {
+			if (!handleSaveException(e, saveWorkState)) {
 				throw e;
 			}
 		}
 		
-		SaveResult sr = sw.toSaveResult();
+		SaveResult sr = saveWorkState.toSaveResult();
 		return sr;
-	}
-	
-	/**
-	 * Called when each EntityInfo is materialized (before beforeSaveEntities is called).
-	 * Base implementation always returns true.
-	 * @param entityInfo
-	 * @return true if the entity should be included in the saveMap, false if not.  
-	 */
-	public boolean beforeSaveEntity(EntityInfo entityInfo) throws EntityErrorsException {
-		return true;
-	}
-	
-	/**
-	 * Process the saveMap before the entities are saved.
-	 * @param saveMap all entities that will be saved
-	 * @return saveMap, which may have entities added, changed, or removed.
-	 */
-	public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) throws EntityErrorsException {
-		return saveMap;
 	}
 	
 	/**

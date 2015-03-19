@@ -33,16 +33,6 @@ public class JsonGson {
         return toJson(obj, true);
     }
 
-    // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-    // private static final String ISO8601_DATEFORMAT =
-    // "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    // private static final String ISO8601_DATEFORMAT =
-    // "yyyy-MM-dd'T'HH:mm:ss.SSSX";
-    // private static final String ISO8601_DATEFORMAT =
-    // "yyyy-MM-dd'T'HH:mm:ssZ";
-    // private static final String ISO8601_DATEFORMAT =
-    // "yyyy-MM-dd'T'HH:mm:ssX";
-    private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     /**
      * Convert the object tree to JSON
@@ -126,33 +116,46 @@ public class JsonGson {
     }
 
     private static GsonBuilder newGsonBuilder() {
+        // setDateFormat in commented out line belows works fine for
+        // deserialization but doesn't handle
+        // serialization properly because of need for a TimeZone setting.
+        // Hence the need for the DateTypeAdapter below.
         // return new GsonBuilder().setDateFormat(ISO8601_DATEFORMAT);
 
         GsonBuilder gson = new GsonBuilder().registerTypeAdapter(Date.class,
                 new DateTypeAdapter());
         return gson;
     }
+    
+    // Ugh....
+    // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
+    // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+    // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ssX";
+    private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
 
     private static class DateTypeAdapter implements JsonSerializer<Date>,
             JsonDeserializer<Date> {
-        private final DateFormat dateFormat;
+        private final DateFormat _dateFormat;
 
         private DateTypeAdapter() {
-            dateFormat = new SimpleDateFormat(ISO8601_DATEFORMAT, Locale.US);
-            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            _dateFormat = new SimpleDateFormat(ISO8601_DATEFORMAT, Locale.US);
+            _dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
 
         @Override
         public synchronized JsonElement serialize(Date date, Type type,
                 JsonSerializationContext jsonSerializationContext) {
-            return new JsonPrimitive(dateFormat.format(date));
+            return new JsonPrimitive(_dateFormat.format(date));
         }
 
         @Override
         public synchronized Date deserialize(JsonElement jsonElement,
                 Type type, JsonDeserializationContext jsonDeserializationContext) {
             try {
-                return dateFormat.parse(jsonElement.getAsString());
+                return _dateFormat.parse(jsonElement.getAsString());
             } catch (ParseException e) {
                 throw new JsonParseException(e);
             }
