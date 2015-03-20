@@ -14,7 +14,7 @@ public class ContextProvider {
 	 * @param saveOptions
 	 */
 	public SaveResult saveChanges(SaveWorkState saveWorkState) {
-		saveWorkState.SetContextProvider(this);
+		saveWorkState.contextProvider = this;
 		try {
 			saveWorkState.beforeSave();
 			saveChangesCore(saveWorkState);
@@ -22,7 +22,7 @@ public class ContextProvider {
 		} catch (EntityErrorsException e) {
 			saveWorkState.entityErrors = e.entityErrors;
 		} catch (Exception e) {
-			if (!handleSaveException(e, saveWorkState)) {
+			if (!saveWorkState.handleException(e)) {
 				throw e;
 			}
 		}
@@ -31,34 +31,14 @@ public class ContextProvider {
 		return sr;
 	}
 	
-	/**
-	 * Process the saveMap after entities are saved (and temporary keys replaced)
-	 * @param saveMap all entities which have been saved
-	 * @param keyMappings mapping of temporary keys to real keys
-	 */
-	public void afterSaveEntities(Map<Class, List<EntityInfo>> saveMap, List<KeyMapping> keyMappings) throws EntityErrorsException {
-	}
+	
 	
 	/**
 	 * Save the changes to the database.
 	 */
-	protected void saveChangesCore(SaveWorkState sw) {
+	protected void saveChangesCore(SaveWorkState sw) throws EntityErrorsException {
 	}
 	
-	/**
-	 * Allows subclasses to plug in their own exception handling.  
-	 * This method is called when saveChangesCore throws an exception.
-	 * Subclass implementations of this method should either:
-	 *  1. Throw an exception
-	 *  2. Return false (exception not handled)
-	 *  3. Return true (exception handled) and modify the SaveWorkState accordingly.
-	 * Base implementation returns false (exception not handled).
-	 * @param e Exception that was thrown by saveChangesCore
-	 * @param saveWorkState SaveWorkState when the exception was thrown
-	 * @return true (exception handled) or false (exception not handled)
-	 */
-	protected boolean handleSaveException(Exception e, SaveWorkState saveWorkState) {
-		return false;
-	}
+
 	
 }

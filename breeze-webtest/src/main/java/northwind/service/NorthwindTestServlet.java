@@ -26,12 +26,23 @@ import northwind.model.Product;
 
 
 
+
+
+
+
+
+
+
+import com.breeze.save.EntityError;
+import com.breeze.save.EntityErrorsException;
 import com.breeze.save.EntityInfo;
+import com.breeze.save.KeyMapping;
 import com.breeze.save.SaveResult;
 import com.breeze.save.SaveWorkState;
 import com.breeze.util.JsonGson;
 import com.breeze.webtest.BreezeControllerServlet;
 import com.breeze.metadata.DataType;
+import com.breeze.metadata.MetadataHelper;
 import com.breeze.query.AndOrPredicate;
 import com.breeze.query.BinaryPredicate;
 import com.breeze.query.EntityQuery;
@@ -44,7 +55,8 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
     public void customersInBrazil(HttpServletRequest request,
             HttpServletResponse response) {
         String json = "{ where: { country: 'Brazil' }, take: 5 }";
-        executeQuery("Customers", json, response);
+        QueryResult qr = executeQuery("Customers", json);
+        writeResponse(response, qr.toJson());
     }  
     
     public void CustomerFirstOrDefault(HttpServletRequest request,
@@ -369,7 +381,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
     
     public void SaveWithFreight(HttpServletRequest request,
             HttpServletResponse response) {
-        Map saveBundle = extractSaveBundleFromRequest(request);
+        Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             public boolean beforeSaveEntity(EntityInfo entityInfo) {
                 String tag = (String) this.saveOptions.tag;
@@ -384,12 +396,76 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
                   entityInfo.forceUpdate = true;
                 }
             return true;
-          }
-                    
+          }                  
         };
         
-        saveChanges(sws, response );
+        SaveResult sr = saveChanges(sws);
+        writeSaveResponse(response, sr);
     }
     
-
+    public void SaveWithExit(HttpServletRequest request,
+            HttpServletResponse response) {
+       
+        SaveResult sr = new SaveResult(new ArrayList<Object>(), new ArrayList<KeyMapping>());
+        writeSaveResponse(response, sr);
+    }
+    
+    public void SaveAndThrow(HttpServletRequest request,
+            HttpServletResponse response) {
+       
+        SaveResult sr = new SaveResult(new ArrayList<Object>(), new ArrayList<KeyMapping>());
+        writeSaveResponse(response, sr);
+    }
+    
+    public void SaveWithEntityErrorsException(HttpServletRequest request,
+            HttpServletResponse response)  {
+       
+        Map saveBundle = extractSaveBundle(request);
+        SaveWorkState sws = new SaveWorkState(saveBundle) {
+            public Map<Class, List<EntityInfo>> beforeSaveEntities(
+                    Map<Class, List<EntityInfo>> saveMap) throws EntityErrorsException {
+                List<EntityInfo> orderInfos = saveMap.get(Order.class);
+                if (orderInfos != null) {
+                    List<EntityError> errors = new ArrayList<EntityError>();
+                    for( EntityInfo ei: orderInfos) {
+                        Object[] keyValues = new Object[] { ((Order) ei.entity).getOrderID() };
+                        EntityError err = new EntityError("WrongMethod", 
+                                MetadataHelper.getEntityTypeName(Order.class), 
+                                keyValues, 
+                                "orderID", 
+                                "Cannot save orders with the save method");
+                        errors.add(err);
+                    }
+                    EntityErrorsException ex = new EntityErrorsException("test of custom exception message", errors);
+                    throw ex;
+                }
+                return saveMap;
+            }                  
+        };
+        
+        SaveResult sr = saveChanges(sws);
+        writeSaveResponse(response, sr);
+    }
+    
+    public void SaveCheckUnmappedProperty(HttpServletRequest request,
+            HttpServletResponse response)  {
+       
+        Map saveBundle = extractSaveBundle(request);
+        SaveWorkState sws = new SaveWorkState(saveBundle) {
+            public boolean  beforeSaveEntity(EntityInfo entityInfo) {
+               String unmappedValue = (String) entityInfo.unmappedValuesMap.get("MyUnmappedProperty");
+              
+              if (!unmappedValue.equals("anything22")) {
+                throw new RuntimeException("wrong value for unmapped property:  " + unmappedValue);
+              }
+              Customer cust = (Customer) entityInfo.entity;
+              return false;
+            }                  
+        };
+        
+        SaveResult sr = saveChanges(sws);
+        writeSaveResponse(response, sr);
+    }
+    
+    
 }

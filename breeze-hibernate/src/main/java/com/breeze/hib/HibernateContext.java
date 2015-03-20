@@ -26,6 +26,7 @@ import org.hibernate.type.Type;
 
 
 
+
 import com.breeze.metadata.DataType;
 import com.breeze.metadata.Metadata;
 import com.breeze.metadata.MetadataHelper;
@@ -55,7 +56,8 @@ public class HibernateContext extends ContextProvider {
 	 * Note that this method sets session.FlushMode = FlushMode.MANUAL, so manual flushes are required.
 	 * @param saveWorkState
 	 */
-	protected void saveChangesCore(SaveWorkState saveWorkState) {
+	@Override
+	protected void saveChangesCore(SaveWorkState saveWorkState) throws EntityErrorsException {
 		Map<Class, List<EntityInfo>> saveMap = saveWorkState.saveMap;
 		session.setFlushMode(FlushMode.MANUAL);
 		Transaction tx = session.getTransaction();
