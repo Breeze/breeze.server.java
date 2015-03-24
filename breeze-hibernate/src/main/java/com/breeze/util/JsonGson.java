@@ -30,7 +30,7 @@ public class JsonGson {
      * @return
      */
     public static String toJson(Object obj) {
-        return toJson(obj, true);
+        return toJson(obj, false, false);
     }
 
 
@@ -44,13 +44,16 @@ public class JsonGson {
      *            each object
      * @return
      */
-    public static String toJson(Object obj, boolean isGraph) {
+    public static String toJson(Object obj, boolean includesBreezeEntities, boolean isHibernate) {
         try {
             GsonBuilder gsonBuilder = newGsonBuilder();
-            if (isGraph) {
-                gsonBuilder
+            if (includesBreezeEntities) {
+                gsonBuilder = gsonBuilder
                         .registerTypeAdapterFactory(
-                                new BreezeTypeAdapterFactory())
+                                new BreezeTypeAdapterFactory());
+            }
+            if (isHibernate) {
+                gsonBuilder = gsonBuilder
                         .registerTypeAdapterFactory(
                                 HibernateProxyTypeAdapter.FACTORY)
                         .registerTypeAdapterFactory(
@@ -104,7 +107,7 @@ public class JsonGson {
     public static Object fromMap(Class<?> clazz, Map map) {
         try {
             String json = toJson(map);
-            ;
+            
             Gson gson = newGsonBuilder().create();
             Object result = gson.fromJson(json, clazz);
             return result;
@@ -136,7 +139,8 @@ public class JsonGson {
     private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
 
-    private static class DateTypeAdapter implements JsonSerializer<Date>,
+    private static class DateTypeAdapter implements 
+            JsonSerializer<Date>,
             JsonDeserializer<Date> {
         private final DateFormat _dateFormat;
 

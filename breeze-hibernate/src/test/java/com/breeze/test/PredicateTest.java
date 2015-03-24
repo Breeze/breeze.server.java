@@ -10,8 +10,6 @@ import org.hibernate.SessionFactory;
 import com.breeze.hib.MetadataBuilder;
 import com.breeze.metadata.DataType;
 import com.breeze.metadata.IEntityType;
-import com.breeze.metadata.IMetadata;
-import com.breeze.metadata.RawMetadata;
 import com.breeze.metadata.Metadata;
 import com.breeze.query.AndOrPredicate;
 import com.breeze.query.AnyAllPredicate;
@@ -30,7 +28,7 @@ import junit.framework.TestCase;
 // TODO: need nested property tests
 
 public class PredicateTest extends TestCase {
-	private IMetadata _metadata;
+	private Metadata _metadata;
 	protected void setUp() throws Exception {
 		super.setUp();
 		SessionFactory sf = StaticConfigurator.getSessionFactory();

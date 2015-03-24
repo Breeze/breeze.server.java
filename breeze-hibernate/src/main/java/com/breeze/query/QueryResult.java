@@ -38,9 +38,9 @@ public class QueryResult {
 	
 	public String toJson() {
 		if (inlineCount == null) {
-			return JsonGson.toJson(results);
+			return JsonGson.toJson(results, true, true);
 		} else {
-			return JsonGson.toJson(this);
+			return JsonGson.toJson(this, true, true);
 		}
 	}
 	

@@ -174,7 +174,7 @@ public class BreezeControllerServlet extends ControllerServlet {
 
     protected void writeSaveResponse(HttpServletResponse response,
             SaveResult saveResult) {
-        String json = JsonGson.toJson(saveResult);
+        String json = saveResult.toJson();
         if (saveResult.hasErrors()) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }

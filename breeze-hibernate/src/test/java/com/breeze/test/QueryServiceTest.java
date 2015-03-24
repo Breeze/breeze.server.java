@@ -580,7 +580,7 @@ public class QueryServiceTest extends TestCase {
         assertTrue(results.size() == 1);
         for (Object o : results) {
             Customer cust = (Customer) o;
-            String custJson = JsonGson.toJson(cust, true);
+            String custJson = JsonGson.toJson(cust, true, true);
             Map custMap = JsonGson.fromJson(custJson);
             Object clone = JsonGson.fromMap(Customer.class, custMap);
             Customer custClone = (Customer) clone;

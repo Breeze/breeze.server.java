@@ -2,6 +2,8 @@ package com.breeze.save;
 
 import java.util.List;
 
+import com.breeze.util.JsonGson;
+
 /**
  * Result of a save, which may have either Entities & KeyMappings, or EntityErrors
  * @author Steve
@@ -38,6 +40,9 @@ public class SaveResult {
 	}
 	public boolean hasErrors() {
 		return errors != null && !errors.isEmpty();
+	}
+	public String toJson() {
+	    return JsonGson.toJson(this, true, true);
 	}
 	
 }

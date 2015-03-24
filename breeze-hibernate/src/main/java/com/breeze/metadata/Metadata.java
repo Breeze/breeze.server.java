@@ -7,13 +7,12 @@ import java.util.Map;
 import com.breeze.metadata.DataType;
 import com.breeze.metadata.IDataProperty;
 import com.breeze.metadata.IEntityType;
-import com.breeze.metadata.IMetadata;
 import com.breeze.metadata.INavigationProperty;
 import com.breeze.metadata.IProperty;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.util.JsonGson;
 
-public class Metadata implements IMetadata {
+public class Metadata  {
 	private HashMap<String, Object> _resourceEntityTypeMap;
 	private HashMap<String, IEntityType> _entityTypeMap = new HashMap<String, IEntityType>();
 	private RawMetadata  _rawMetadata;
@@ -32,7 +31,7 @@ public class Metadata implements IMetadata {
 	}
 	
 	public String toJson() {
-	    return JsonGson.toJson(this._rawMetadata, false);
+	    return JsonGson.toJson(this._rawMetadata);
 	}
 	
 	public IEntityType getEntityTypeForResourceName(String resourceName) {
@@ -56,12 +55,12 @@ public class Metadata implements IMetadata {
 	
 	public class EntityType implements IEntityType {
 		private Map<String, Object> _entityMap;
-		private IMetadata _metadata;
+		private Metadata _metadata;
 		
 		private String _entityTypeName;
 		private Map<String, IProperty> _propertyMap = new HashMap<String, IProperty>();
 
-		public EntityType(Map<String, Object> entityMap, IMetadata metadata) {
+		public EntityType(Map<String, Object> entityMap, Metadata metadata) {
 			_entityMap = entityMap;
 			_metadata = metadata;
 			String ns = (String) _entityMap.get("namespace");
@@ -106,8 +105,8 @@ public class Metadata implements IMetadata {
 	public class DataProperty implements IDataProperty {
 		private IEntityType _parentType;
 		private Map<String, Object> _dpMap;
-		private IMetadata _metadata;
-		public DataProperty(IEntityType parentType, Map<String, Object> dpMap, IMetadata metadata) {
+		private Metadata _metadata;
+		public DataProperty(IEntityType parentType, Map<String, Object> dpMap, Metadata metadata) {
 			_parentType = parentType;
 			_dpMap = dpMap;
 			_metadata = metadata;
@@ -139,11 +138,11 @@ public class Metadata implements IMetadata {
 	public class NavigationProperty implements INavigationProperty {
 		private IEntityType _parentType;
 		private Map<String, Object> _npMap;
-		private IMetadata _metadata;
-		public NavigationProperty(IEntityType parentType, Map<String, Object> npMap, IMetadata metadataWrapper) {
+		private Metadata _metadata;
+		public NavigationProperty(IEntityType parentType, Map<String, Object> npMap, Metadata metadata) {
 			_parentType = parentType;
 			_npMap = npMap;
-			_metadata = metadataWrapper;
+			_metadata = metadata;
 		}
 		@Override
 		public String getName() {

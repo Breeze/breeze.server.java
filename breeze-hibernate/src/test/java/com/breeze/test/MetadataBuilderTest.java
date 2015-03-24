@@ -43,7 +43,7 @@ public class MetadataBuilderTest extends TestCase {
 	}
 	
 	public String toJson(RawMetadata metadata) {
-		String json = JsonGson.toJson(metadata, false);
+		String json = JsonGson.toJson(metadata);
 		return json;
 
 	}
