@@ -50,6 +50,7 @@
 		<property name="default_batch_fetch_size">32</property>
 
 		<mapping resource="northwind/mapping/Category.hbm.xml" />
+<!-- 		<mapping resource="northwind/mapping/Comment.hbm.xml" /> -->
 		<mapping resource="northwind/mapping/Customer.hbm.xml" />
 		<mapping resource="northwind/mapping/Employee.hbm.xml" />
 		<mapping resource="northwind/mapping/EmployeeTerritory.hbm.xml" />

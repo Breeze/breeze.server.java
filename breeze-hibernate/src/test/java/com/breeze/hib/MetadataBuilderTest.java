@@ -6,8 +6,12 @@ import java.util.List;
 import org.hibernate.SessionFactory;
 
 
+
+
+import com.breeze.hib.MetadataBuilder;
 import com.breeze.metadata.Metadata;
-import com.breeze.testutil.Serializer;
+import com.breeze.metadata.RawMetadata;
+import com.breeze.hib.Serializer;
 import com.breeze.util.JsonGson;
 
 import junit.framework.TestCase;
@@ -21,15 +25,15 @@ public class MetadataBuilderTest extends TestCase {
 		super.setUp();
 	}
 	
-	public void exportMetadata(Metadata metadata)
+	public void exportMetadata(RawMetadata metadata)
 	{
 		Serializer.write(metadata, NORTHWINDIB_METADATA_SER);
 	}
 	
-	public Metadata importMetadata()
+	public RawMetadata importMetadata()
 	{
 		Object obj = Serializer.read(NORTHWINDIB_METADATA_SER);
-		return (Metadata) obj;
+		return (RawMetadata) obj;
 	}
 	
 	public void exportMetadataString(String json)
@@ -41,7 +45,7 @@ public class MetadataBuilderTest extends TestCase {
 		return Serializer.readString(NORTHWINDIB_METADATA_JSON);
 	}
 	
-	public String toJson(Metadata metadata) {
+	public String toJson(RawMetadata metadata) {
 		String json = JsonGson.toJson(metadata, false);
 		return json;
 
@@ -85,14 +89,14 @@ public class MetadataBuilderTest extends TestCase {
 		MetadataBuilder mb = new MetadataBuilder(sf);
 		
 		Metadata metadata = mb.buildMetadata();
-
+		RawMetadata rawMetadata = metadata.getRawMetadata();
 		assertNotNull(metadata);
-		assertNotNull(metadata.get("localQueryComparisonOptions"));
-		assertTrue(metadata.get("localQueryComparisonOptions") instanceof String);
-		assertTrue(metadata.get("structuralTypes") instanceof List);
-		assertTrue(metadata.get("resourceEntityTypeMap") instanceof HashMap);
-		assertTrue(metadata.foreignKeyMap instanceof HashMap);
-		String jsonMetadata = JsonGson.toJson(metadata);
+		assertNotNull(rawMetadata.get("localQueryComparisonOptions"));
+		assertTrue(rawMetadata.get("localQueryComparisonOptions") instanceof String);
+		assertTrue(rawMetadata.get("structuralTypes") instanceof List);
+		assertTrue(rawMetadata.get("resourceEntityTypeMap") instanceof HashMap);
+		assertTrue(rawMetadata.foreignKeyMap instanceof HashMap);
+		String jsonMetadata = JsonGson.toJson(rawMetadata);
 		
 		// compare to known good metadata
 //		String json = toJson(metadata);

@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.jboss.logging.Logger;
 
 import com.breeze.metadata.Metadata;
+import com.breeze.metadata.RawMetadata;
 import com.breeze.save.ContextProvider;
 import com.breeze.save.SaveResult;
 import com.breeze.save.SaveWorkState;

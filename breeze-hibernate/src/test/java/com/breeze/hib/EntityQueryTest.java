@@ -1,4 +1,4 @@
-package com.breeze.testutil;
+package com.breeze.hib;
 
 import java.util.List;
 import java.util.Map;

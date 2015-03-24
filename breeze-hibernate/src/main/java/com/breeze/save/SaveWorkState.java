@@ -117,7 +117,7 @@ public class SaveWorkState {
         return false;
     }
 
-    private void addToSaveMap(EntityInfo entityInfo) {
+    public void addToSaveMap(EntityInfo entityInfo) {
         Class clazz = entityInfo.entity.getClass();
 
         List<EntityInfo> entityInfos = saveMap.get(clazz);

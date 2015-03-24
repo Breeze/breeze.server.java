@@ -1,11 +1,10 @@
-package com.breeze.testutil;
+package com.breeze.hib;
 
 import java.util.Map;
 
 import junit.framework.TestCase;
 
 
-import com.breeze.hib.StaticConfigurator;
 import com.breeze.util.JsonGson;
 
 public class JsonTest extends TestCase {

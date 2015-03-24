@@ -16,6 +16,7 @@ import org.hibernate.SessionFactory;
 import com.breeze.hib.QueryService;
 import com.breeze.hib.SaveService;
 import com.breeze.metadata.Metadata;
+import com.breeze.metadata.RawMetadata;
 import com.breeze.query.EntityQuery;
 import com.breeze.query.QueryResult;
 import com.breeze.save.EntityInfo;
@@ -44,10 +45,10 @@ public class BreezeControllerServlet extends ControllerServlet {
     private void init(SessionFactory sessionFactory, Metadata metadata) {
         System.out.println("BreezeTests: sessionFactory=" + sessionFactory
                 + ", metadata=" + metadata);
-        this._queryService = new QueryService(sessionFactory);
+        this._queryService = new QueryService(sessionFactory, metadata);
         this._saveService = new SaveService(sessionFactory, metadata);
         this._metadata = metadata;
-        this._metadataJson = JsonGson.toJson(this._metadata, false);
+        this._metadataJson = metadata.toJson();
     }
 
     @Override
@@ -80,7 +81,7 @@ public class BreezeControllerServlet extends ControllerServlet {
         }
     }
 
-    public String getMetadata() {
+    protected String getMetadata() {
         return _metadataJson;
     }
 
@@ -116,9 +117,14 @@ public class BreezeControllerServlet extends ControllerServlet {
     protected void saveChanges(HttpServletRequest request,
             HttpServletResponse response) {
         Map saveBundle = extractSaveBundle(request);
-        SaveWorkState sws = new SaveWorkState(saveBundle);
+        SaveWorkState sws = createSaveWorkState(saveBundle);
         SaveResult sr = saveChanges(sws);
         writeSaveResponse(response, sr);
+    }
+    
+    // override this to provide default Before/After save Entities logic
+    protected SaveWorkState createSaveWorkState(Map saveBundle) {
+        return new SaveWorkState(saveBundle);
     }
 
     protected SaveResult saveChanges(SaveWorkState saveWorkState) {
@@ -159,6 +165,11 @@ public class BreezeControllerServlet extends ControllerServlet {
 
         Map saveBundle = (Map) JsonGson.fromJson(saveBundleString);
         return saveBundle;
+    }
+    
+    protected void writeQueryResponse(HttpServletResponse response,
+            QueryResult queryResult) {
+        writeResponse(response, queryResult.toJson());
     }
 
     protected void writeSaveResponse(HttpServletResponse response,

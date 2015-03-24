@@ -27,14 +27,16 @@ import org.hibernate.type.Type;
 
 
 
+
 import com.breeze.metadata.DataType;
 import com.breeze.metadata.Metadata;
+import com.breeze.metadata.RawMetadata;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.save.*;
 
 public class HibernateContext extends ContextProvider {
 
-	private Metadata metadataMap;
+	private Metadata metadata;
 	private Session session;
 	private List<EntityError> entityErrors = new ArrayList<EntityError>();
 	private Map<EntityInfo, KeyMapping> entityKeyMapping = new HashMap<EntityInfo, KeyMapping>();
@@ -43,9 +45,9 @@ public class HibernateContext extends ContextProvider {
 	 * @param session Hibernate session to be used for saving
 	 * @param metadataMap metadata from MetadataBuilder
 	 */
-	public HibernateContext(Session session, Metadata metadataMap) {
+	public HibernateContext(Session session, Metadata metadata) {
 		this.session = session;
-		this.metadataMap = metadataMap;
+		this.metadata = metadata;
 	}
 	
 
@@ -108,7 +110,7 @@ public class HibernateContext extends ContextProvider {
 	 */
 	protected RelationshipFixer getRelationshipFixer(Map<Class, List<EntityInfo>> saveMap) {
 		// Get the map of foreign key relationships
-		Map<String, String> fkMap = metadataMap.foreignKeyMap;
+		Map<String, String> fkMap = metadata.getRawMetadata().foreignKeyMap;
 		return new RelationshipFixer(saveMap, fkMap, session);
 	}
 

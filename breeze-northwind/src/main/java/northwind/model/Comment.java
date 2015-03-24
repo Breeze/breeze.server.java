@@ -1,0 +1,52 @@
+package northwind.model;
+
+import java.io.Serializable;
+import java.util.Date;
+
+// TODO- metadataBuilder does not yet support this class  
+public class Comment implements Serializable {
+    private Date createdOn;
+    private String comment1;
+    private byte seqNum;
+
+	public Date getCreatedOn() {
+		return createdOn;
+	}
+	
+	public void setCreatedOn(Date createdOn) {
+	    this.createdOn = createdOn;
+	}
+
+	public String getComment1() {
+	    return comment1;
+	}
+	
+	public void setComment1(String comment1) {
+	    this.comment1 = comment1;
+	}
+	
+	public byte getSeqNum() {
+	    return seqNum;
+	}
+	
+	public void setSeqNum(byte seqNum) {
+	    this.seqNum = seqNum;
+	}
+	
+    public int hashCode()
+    {
+        if (createdOn == null) return super.hashCode(); //transient instance
+        if (seqNum == 0) return super.hashCode(); //transient instance
+        return createdOn.hashCode() ^ seqNum;
+
+    }
+
+    public boolean equals(Object obj)
+    {
+        if (obj == null) return false;
+        if (!(obj instanceof Comment)) return false;
+        Comment x = (Comment) obj;
+        return (createdOn.equals(x.getCreatedOn())) && (seqNum == x.getSeqNum());
+    }
+
+}

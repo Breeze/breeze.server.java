@@ -14,6 +14,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hibernate.SessionFactory;
+
 import northwind.model.Customer;
 import northwind.model.Employee;
 import northwind.model.Location;
@@ -22,6 +24,9 @@ import northwind.model.OrderDetail;
 import northwind.model.Product;
 import northwind.model.Supplier;
 
+import com.breeze.hib.MetadataBuilder;
+import com.breeze.hib.QueryService;
+import com.breeze.metadata.Metadata;
 import com.breeze.query.EntityQuery;
 import com.breeze.query.QueryResult;
 import com.breeze.util.JsonGson;
@@ -36,7 +41,10 @@ public class QueryServiceTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         // then populate the database with test data...?
-        _qe = new QueryService(StaticConfigurator.getSessionFactory());
+        SessionFactory sf = StaticConfigurator.getSessionFactory();
+        MetadataBuilder mb = new MetadataBuilder(sf);
+        Metadata metadata = mb.buildMetadata();
+        _qe = new QueryService(sf, metadata);
     }
     
     public void testFuncQuery() {

@@ -58,10 +58,6 @@ public abstract class ControllerServlet extends HttpServlet {
 		try {
 			response.setContentType("application/json;charset=UTF-8");
 			response.getWriter().write(data);
-//			PrintWriter out = response.getWriter(); 
-//			out.print(data);
-//			out.flush();
-
 		} catch (IOException e) {
 			// TODO log this
 			e.printStackTrace();
@@ -75,10 +71,6 @@ public abstract class ControllerServlet extends HttpServlet {
 			response.setContentType("application/json;charset=UTF-8");
 			response.setStatus(status);
 			response.getWriter().write(errMsg);
-//			PrintWriter out = response.getWriter(); 
-//			out.print(data);
-//			out.flush();
-
 		} catch (IOException e) {
 			// TODO log this
 			e.printStackTrace();

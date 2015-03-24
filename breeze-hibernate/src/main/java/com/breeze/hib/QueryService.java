@@ -1,6 +1,5 @@
 package com.breeze.hib;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +12,6 @@ import org.jboss.logging.Logger;
 
 import com.breeze.metadata.IEntityType;
 import com.breeze.metadata.Metadata;
-import com.breeze.metadata.MetadataAdapter;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.query.EntityQuery;
 import com.breeze.query.ExpandClause;
@@ -22,14 +20,12 @@ import com.breeze.query.QueryResult;
 public class QueryService {
     public static final Logger log = Logger.getLogger(QueryService.class);
     private SessionFactory _sessionFactory;
-    private MetadataAdapter _metadataAdapter;
+    private Metadata _metadata;
 
-    public QueryService(SessionFactory sessionFactory) {
+    public QueryService(SessionFactory sessionFactory, Metadata metadata) {
         this._sessionFactory = sessionFactory;
 
-        MetadataBuilder mb = new MetadataBuilder(sessionFactory);
-        Metadata metadata = mb.buildMetadata();
-        this._metadataAdapter = new MetadataAdapter(metadata);
+        _metadata = metadata;
     }
 
     public QueryResult executeQuery(String resourceName, String json) {
@@ -50,12 +46,12 @@ public class QueryService {
     }
     
     public QueryResult executeQuery(String resourceName, EntityQuery entityQuery) {
-        IEntityType entityType = _metadataAdapter.getEntityTypeForResourceName(resourceName);
+        IEntityType entityType = _metadata.getEntityTypeForResourceName(resourceName);
         return executeQuery(entityType, entityQuery);
     }
 
     public QueryResult executeQuery(Class clazz, EntityQuery entityQuery) {
-        IEntityType entityType = _metadataAdapter.getEntityTypeForClass(clazz);
+        IEntityType entityType = _metadata.getEntityTypeForClass(clazz);
         return executeQuery(entityType, entityQuery);
     }
 
