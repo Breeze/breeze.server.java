@@ -1,18 +1,15 @@
-package com.breeze.hib;
+package com.breeze.test;
 
 import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
 
-
-
-
 import com.breeze.hib.MetadataBuilder;
 import com.breeze.metadata.Metadata;
 import com.breeze.metadata.RawMetadata;
-import com.breeze.hib.Serializer;
 import com.breeze.util.JsonGson;
+import com.breeze.test.Serializer;
 
 import junit.framework.TestCase;
 

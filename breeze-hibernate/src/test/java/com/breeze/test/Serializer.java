@@ -1,4 +1,4 @@
-package com.breeze.hib;
+package com.breeze.test;
 
 import java.io.File;
 import java.io.FileInputStream;
