@@ -59,7 +59,7 @@ public class QueryService {
             
         entityQuery.validate(entityType);
 
-        Class<?> clazz = MetadataHelper.lookupEntityType(entityType.getName());
+        Class<?> clazz = MetadataHelper.lookupClass(entityType.getName());
 
         QueryResult qr;
         Session session = _sessionFactory.openSession();

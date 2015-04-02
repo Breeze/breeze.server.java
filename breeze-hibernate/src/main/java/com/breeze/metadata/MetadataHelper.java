@@ -24,7 +24,7 @@ public class MetadataHelper {
 	 * @param entityTypeName
 	 * @return
 	 */
-	public static Class lookupEntityType(String entityTypeName) {
+	public static Class lookupClass(String entityTypeName) {
 		String[] parts = entityTypeName.split(":#", 2);
 		String className = parts[1] + '.' + parts[0];
 		

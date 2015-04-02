@@ -39,7 +39,7 @@ public class JsonGson {
      * 
      * @param obj
      *            - root object
-     * @param isGraph
+     * @param includesBreezeEntities
      *            - whether to add the $id and $ref and $type properties with
      *            each object
      * @return

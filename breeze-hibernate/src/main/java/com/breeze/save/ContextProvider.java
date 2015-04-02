@@ -13,7 +13,7 @@ public class ContextProvider {
         _metadata = metadata;
     }
     
-    protected Metadata getMetadata() {
+    public Metadata getMetadata() {
         return _metadata;
     }
     
@@ -23,13 +23,13 @@ public class ContextProvider {
 	 * @param saveOptions
 	 */
 	public SaveResult saveChanges(SaveWorkState saveWorkState) {
-		saveWorkState.contextProvider = this;
+		saveWorkState.setContextProvider(this);
 		try {
 			saveWorkState.beforeSave();
 			saveChangesCore(saveWorkState);
 			saveWorkState.afterSave();
 		} catch (EntityErrorsException e) {
-			saveWorkState.entityErrors = e.entityErrors;
+			saveWorkState.setEntityErrors(e.entityErrors);
 		} catch (Exception e) {
 			if (!saveWorkState.handleException(e)) {
 				throw e;
