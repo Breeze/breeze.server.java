@@ -16,7 +16,7 @@
 		<scope>provided</scope>
 		<version>3.0.1</version>
 	</dependency>
-	
+
 	<dependency>
 		<groupId>org.hibernate</groupId>
 		<artifactId>hibernate-core</artifactId>
@@ -28,11 +28,11 @@
 		<artifactId>breeze-hibernate</artifactId>
 		<version>0.1a</version>
 	</dependency>
-	
+
     <dependency>
 		<groupId>northwind</groupId>
 		<artifactId>breeze-northwind</artifactId>
-		<version>0.1a</version> 
+		<version>0.1a</version>
 	</dependency>
 
     <dependency>
@@ -41,10 +41,22 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    
+
   </dependencies>
   <build>
     <finalName>breeze-webtest</finalName>
+
+    <resources>
+      <resource>
+        <!-- copy test files from neighboring breeze.js directory -->
+        <targetPath>${basedir}/target/breeze-webtest</targetPath>
+        <filtering>false</filtering>
+        <directory>../../breeze.js/test</directory>
+        <excludes>
+          <exclude>.gitignore</exclude>
+        </excludes>
+      </resource>
+    </resources>
 
     <plugins>
       <plugin>
