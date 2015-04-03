@@ -662,7 +662,7 @@ public class MetadataBuilder {
                 sb.append(delim);
             sb.append(unBracket(s));
         }
-        return sb.toString().toLowerCase();
+        return sb.toString(); //.toLowerCase();
     }
 
     /**
