@@ -258,9 +258,7 @@ public class MetadataBuilder {
 
                     Type propType = compType.getSubtypes()[i];
                     if (!propType.isAssociationType()) {
-                        Property property = persistentClass.getProperty(compName);
-                        ArrayList<Selectable> propColumns = getColumns(property);
-                        Column col = (Column) propColumns.get(0);
+                        Column col = getColumn(persistentClass, compName);
                         HashMap<String, Object> dmap = makeDataProperty(compName, propType, col,
                                 compType.getPropertyNullability()[i], true, false);
                         dataArrayList.add(0, dmap);
@@ -321,6 +319,17 @@ public class MetadataBuilder {
         while (iter.hasNext())
             list.add((Selectable) iter.next());
         return list;
+    }
+    
+    Column getColumn(PersistentClass persistentClass, String propName) {
+        try {
+            Property property = persistentClass.getProperty(propName);
+            ArrayList<Selectable> propColumns = getColumns(property);
+            Column col = (Column) propColumns.get(0);
+            return col;
+        } catch (MappingException mex) {
+            return null;
+        }
     }
 
     boolean contains(int[] array, int x) {
