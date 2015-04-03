@@ -36,12 +36,17 @@
     <load-on-startup>1</load-on-startup>
   </servlet>
   
-<!--     <servlet>
+  <servlet>
     <servlet-name>TestHarness</servlet-name>
     <servlet-class>northwind.service.TestHarnessServlet</servlet-class>
+    <init-param>
+      <param-name>testCaseDir</param-name>
+      <!-- full path to breeze.js/test directory will be inserted by maven build -->
+      <param-value>${env.BREEZEJS_TEST}</param-value>
+    </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
- -->  
+  
 
   
   <servlet-mapping>
@@ -49,12 +54,10 @@
     <url-pattern>/northwind/*</url-pattern>
   </servlet-mapping>
   
-<!--   <servlet-mapping>
+  <servlet-mapping>
     <servlet-name>TestHarness</servlet-name>
-    <url-pattern>/breezeTests/*</url-pattern>
-    <url-pattern>*.js</url-pattern>
-    <url-pattern>*.css</url-pattern>
+    <url-pattern>/test/*</url-pattern>
   </servlet-mapping>
- -->  
+  
 
 </web-app>

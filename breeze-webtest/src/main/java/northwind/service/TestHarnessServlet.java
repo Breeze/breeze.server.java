@@ -1,72 +1,86 @@
 package northwind.service;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLDecoder;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import northwind.model.Customer;
-
-import com.breeze.webtest.BreezeControllerServlet;
 import com.breeze.webtest.ControllerServlet;
-import com.breeze.query.QueryResult;
 
 public class TestHarnessServlet extends ControllerServlet {
-	
-	@Override
-	public void init() {
+    private static final long serialVersionUID = 1L;
+    private static final int BUFFER_SIZE = 4096;
+    private String _testCaseDir;
+
+    @Override
+	public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        _testCaseDir = config.getInitParameter("testCaseDir");
 	}
 	
 
 	@Override
 	protected void handleRequest(HttpServletRequest request, HttpServletResponse response) {
-
-		String testCaseDir = "C:\\GitHub\\breeze.js\\test\\";
-		String servletPath = request.getServletPath();
-		 
-		String fullFileName;
-		if (servletPath.startsWith("/breezeTests")) {
-			fullFileName = testCaseDir + "index.hibernate.html";
-			response.setContentType("text/html");
-		} else {
-			String fileName = servletPath.substring(1);
-			fullFileName = testCaseDir + fileName;
-			if (fileName.endsWith(".js")) {
-				response.setContentType("text/javascript");
-			} else if (fileName.endsWith(".css")) {
-				response.setContentType("text/css");
-			}
-		}
+		String pathInfo = request.getPathInfo();
 		
-	    writeFileTo(fullFileName, response);
+		if (pathInfo == null || "/".equals(pathInfo)) pathInfo = "Index.hibernate.html";
+		
+		writeFileTo(pathInfo, response);
 	}
 
 
     private void writeFileTo(String fileName, HttpServletResponse response) {
-        File srcFile = new File(fileName);
 		
-	    FileInputStream fileIn;
+	    FileInputStream fileIn = null;
+	    ServletOutputStream out = null;
 		try {
-			fileIn = new FileInputStream(srcFile);
-			ServletOutputStream out = response.getOutputStream();
+		    
+	        File file = new File(_testCaseDir, URLDecoder.decode(fileName, "UTF-8"));
+	        if (!file.exists()) {
+	            response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
+	            return;
+	        }		    
+	        String contentType = getServletContext().getMimeType(file.getName());
+	        if (contentType == null) {
+	            contentType = "application/octet-stream";
+	        }
+	        response.setBufferSize(BUFFER_SIZE);
+	        response.setContentType(contentType);
+	        response.setHeader("Content-Length", String.valueOf(file.length()));
+	        
+			fileIn = new FileInputStream(file);
+			out = response.getOutputStream();
 	     
-		    byte[] outputByte = new byte[4096];
+		    byte[] outputByte = new byte[BUFFER_SIZE];
 		    int x;
 
-		    while((x = fileIn.read(outputByte, 0, 4096)) != -1) 	    {
+		    while((x = fileIn.read(outputByte, 0, BUFFER_SIZE)) != -1) 	    {
 		    	out.write(outputByte, 0, x);
 		    }
-		    fileIn.close();
 		    out.flush();
-		    out.close();
 		} catch (Exception e) {
-			throw new RuntimeException("Unable to read: " + fileName);
+			throw new RuntimeException("Unable to read: " + fileName, e);
+		} finally {
+		    close(fileIn);
+		    close(out);
 		}
     }
+    
+    private static void close(Closeable resource) {
+        if (resource != null) {
+            try {
+                resource.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }    
 	
 }

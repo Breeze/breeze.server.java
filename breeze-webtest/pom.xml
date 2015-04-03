@@ -46,18 +46,6 @@
   <build>
     <finalName>breeze-webtest</finalName>
 
-    <resources>
-      <resource>
-        <!-- copy test files from neighboring breeze.js directory -->
-        <targetPath>${basedir}/target/breeze-webtest</targetPath>
-        <filtering>false</filtering>
-        <directory>../../breeze.js/test</directory>
-        <excludes>
-          <exclude>.gitignore</exclude>
-        </excludes>
-      </resource>
-    </resources>
-
     <plugins>
       <plugin>
       	<!-- `mvn assembly:single` to include dependencies in the target -->
@@ -74,7 +62,14 @@
           </descriptors>
         </configuration>
        </plugin>
-     </plugins>
 
+	  <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>

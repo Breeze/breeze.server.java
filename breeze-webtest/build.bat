@@ -1,3 +1,4 @@
+call setenv.bat
 cd ..\breeze-hibernate
 call build.bat
 cd ..\breeze-webtest

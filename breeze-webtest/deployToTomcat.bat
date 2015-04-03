@@ -1,7 +1,8 @@
-set TCDIR=C:\Java\apache-tomcat-7.0.59-windows-x64\apache-tomcat-7.0.59
-rmdir %TCDIR%\webapps\breeze-webtest /S /Q 
-copy target\breeze-webtest.war %TCDIR%\webapps
-pushd %TCDIR%\bin
+:: Copy the WAR to tomcat's webapps dir, and start tomcat
+call setenv.bat
+rmdir %CATALINA_HOME%\webapps\breeze-webtest /S /Q 
+copy target\breeze-webtest.war %CATALINA_HOME%\webapps
+pushd %CATALINA_HOME%\bin
 call catalina jpda start
 popd
 
