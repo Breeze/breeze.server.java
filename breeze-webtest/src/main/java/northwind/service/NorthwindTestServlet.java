@@ -520,7 +520,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             public boolean beforeSaveEntity(EntityInfo entityInfo) {
                 String unmappedValue = (String) entityInfo.unmappedValuesMap
-                        .get("MyUnmappedProperty");
+                        .get("myUnmappedProperty");
 
                 if (!unmappedValue.equals("anything22")) {
                     throw new RuntimeException(
