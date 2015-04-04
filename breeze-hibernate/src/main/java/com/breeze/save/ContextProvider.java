@@ -29,7 +29,7 @@ public class ContextProvider {
 			saveChangesCore(saveWorkState);
 			saveWorkState.afterSave();
 		} catch (EntityErrorsException e) {
-			saveWorkState.setEntityErrors(e.entityErrors);
+            saveWorkState.setEntityErrors(e);
 		} catch (Exception e) {
 			if (!saveWorkState.handleException(e)) {
 				throw e;

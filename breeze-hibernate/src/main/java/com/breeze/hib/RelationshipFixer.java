@@ -63,7 +63,7 @@ public class RelationshipFixer {
 	/**
 	 * Connect the related entities in the saveMap to other entities.  If the related entities
 	 * are not in the saveMap, they are loaded from the session.
-	 * @return The list of entities in the order they should be save, according to their relationships.
+	 * @return The list of entities in the order they should be saved, according to their relationships.
 	 */
     public List<EntityInfo> fixupRelationships()
     {

@@ -86,7 +86,7 @@ public class HibernateContext extends ContextProvider {
 				tx.rollback();
 			_entityErrors.add(new EntityError("PropertyValueException", pve.getEntityName(), null,
 					pve.getPropertyName(), pve.getMessage()));
-			saveWorkState.setEntityErrors(_entityErrors);
+			saveWorkState.setEntityErrors(new EntityErrorsException(null, _entityErrors));
 		} catch (Exception ex) {
 			if (tx.isActive()) tx.rollback();
 			if (ex instanceof JDBCException) {
