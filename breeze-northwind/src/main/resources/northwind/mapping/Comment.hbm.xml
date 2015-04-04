@@ -1,6 +1,5 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
-<!--TODO- metadataBuilder does not yet support this class -->
 <hibernate-mapping package="northwind.model">
 	<class name="Comment" table="`Comment`" dynamic-update="true" optimistic-lock="dirty">
 		<!--TODO- composite keys are a BAD IDEA -->

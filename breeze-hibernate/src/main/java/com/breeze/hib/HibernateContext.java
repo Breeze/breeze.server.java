@@ -1,8 +1,6 @@
 package com.breeze.hib;
 
-
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,17 +18,8 @@ import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.ComponentType;
 import org.hibernate.type.Type;
 
-
-
-
-
-
-
-
-
 import com.breeze.metadata.DataType;
 import com.breeze.metadata.Metadata;
-import com.breeze.metadata.RawMetadata;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.save.*;
 
@@ -269,10 +258,16 @@ public class HibernateContext extends ContextProvider {
 	 * @param saveMap
 	 */
 	protected void refreshFromSession(Map<Class, List<EntityInfo>> saveMap) {
+        SessionFactory sf = _session.getSessionFactory();
     	for (Entry<Class, List<EntityInfo>> entry : saveMap.entrySet()) {
-            for (EntityInfo entityInfo : entry.getValue()) {
-                if (entityInfo.entityState == EntityState.Added || entityInfo.entityState == EntityState.Modified)
-                    _session.refresh(entityInfo.entity);
+            ClassMetadata classMeta = sf.getClassMetadata(entry.getKey());
+            // we don't have to check hasIdentifierProperty in NH 3.3, why here?
+            if (classMeta.hasIdentifierProperty()) {
+                for (EntityInfo entityInfo : entry.getValue()) {
+                    if (entityInfo.entityState == EntityState.Added || entityInfo.entityState == EntityState.Modified) {
+                        _session.refresh(entityInfo.entity);
+                    }
+                }
             }
         }    	
 		

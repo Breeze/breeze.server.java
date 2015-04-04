@@ -3,7 +3,6 @@ package northwind.model;
 import java.io.Serializable;
 import java.util.Date;
 
-// TODO- metadataBuilder does not yet support this class  
 public class Comment implements Serializable {
     private static final long serialVersionUID = 1L;
     private Date createdOn;
