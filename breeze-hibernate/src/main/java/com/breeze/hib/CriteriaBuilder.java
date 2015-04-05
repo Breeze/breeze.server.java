@@ -106,7 +106,6 @@ public class CriteriaBuilder {
             String propertyName = _aliasBuilder.getPropertyName(crit,
                     propertyPath);
             projList.add(Projections.property(propertyName).as(propertyPath));
-
         }
         crit.setProjection(projList);
         crit.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);

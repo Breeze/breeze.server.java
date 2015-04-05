@@ -36,14 +36,26 @@ class CriteriaAliasBuilder  {
 			}
 			String lastPropName = propNames[propNames.length - 1];
 			if (isNavPath) {
-				// do not assign to nextAlias;
-				String alias = getAlias(crit, nextPropName, lastPropName);
-				// HACK - because we can't get NavProperties to Eagerly load
-				// when they are the 'projected' item.
-				_containsNavPropertyProxy = true;
-				// TODO: AARGH.... doesn't seem to do anything...
-				crit.setFetchMode(alias, FetchMode.JOIN);
-				crit.setFetchMode(lastPropName, FetchMode.JOIN);
+			    INavigationProperty navProp = (INavigationProperty) property;
+			    if (navProp.isScalar()) {
+    				// do not assign to nextAlias;
+    				String alias = getAlias(crit, nextPropName, lastPropName);
+    				// HACK - because we can't get NavProperties to Eagerly load
+    				// when they are the 'projected' item.
+    				_containsNavPropertyProxy = true;
+    				// TODO: AARGH.... doesn't seem to do anything...
+    				crit.setFetchMode(alias, FetchMode.JOIN);
+    				crit.setFetchMode(lastPropName, FetchMode.JOIN);
+			    } else {
+//	                String alias = getAlias(crit, nextPropName, lastPropName);
+//                    // HACK - because we can't get NavProperties to Eagerly load
+//                    // when they are the 'projected' item.
+//                    _containsNavPropertyProxy = true;
+//                    // TODO: AARGH.... doesn't seem to do anything...
+//                    crit.setFetchMode(alias, FetchMode.JOIN);
+//                    crit.setFetchMode(lastPropName, FetchMode.JOIN);
+			        throw new RuntimeException("Hibernate does not provide a mechanism to project entity collections");
+			    }
 			} 
 			nextPropName = nextAlias == "" ? lastPropName : nextAlias + "." + lastPropName;
 			return nextPropName;

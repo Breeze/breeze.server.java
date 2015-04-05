@@ -19,6 +19,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import northwind.model.Comment;
 import northwind.model.Customer;
 import northwind.model.Employee;
 import northwind.model.Order;
@@ -328,6 +329,8 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
 
     public void CompanyInfoAndOrders(HttpServletRequest request,
             HttpServletResponse response) {
+        // TODO: right now this will fail because we don't know
+        // how to make hibernate project collections.
         EntityQuery eq = this.extractEntityQuery(request);
         eq = eq.select("companyName", "customerID", "orders");
         QueryResult qr = this.executeQuery(Customer.class, eq);
@@ -388,61 +391,6 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
     }
 
     // Saves
-    @Override
-    public SaveWorkState createSaveWorkState(Map saveBundle) {
-        SaveWorkState sws = new SaveWorkState(saveBundle) {
-            public boolean beforeSaveEntity(EntityInfo entityInfo) {
-                String tag = (String) this.getSaveOptions().tag;
-                if (tag != null && tag.equals("addProdOnServer")) {
-//                    //  adds cannot be performed here yet... ( see beforeSaveEntities instead). 
-//                    Supplier supplier = (Supplier) entityInfo.entity;
-//                    Product product = new Product();
-//                    product.setProductName("Product added on server");
-//                    supplier.getProducts().add(product);
-//                    return true;
-                } 
-                
-                if (entityInfo.entity instanceof Region && entityInfo.entityState == EntityState.Added) {
-                    Region region = (Region) entityInfo.entity;
-                    // prohibit any additions of entities of type 'Region'
-                    if (region.getRegionDescription().toLowerCase().startsWith("error")) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }
-                return true;
-            }
-
-            public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) {
-                String tag = (String) this.getSaveOptions().tag;
-                if (tag == null) return saveMap;
-                if (tag.equals("addProdOnServer")) {
-                    List<EntityInfo> entityInfos = saveMap.get(Supplier.class);
-                    if (entityInfos.size() > 0) {
-                        for (EntityInfo ei : entityInfos) {
-                            Supplier supplier = (Supplier) ei.entity;
-                            Product product = new Product();
-                            product.setProductName("Product added on server");
-                            product.setSupplier(supplier);
-                            
-                            // TODO: need to figure out how to do this...
-                            // not sure why or if this is needed, but...
-                            // product.setSupplierID(supplier.getSupplierID());
-                            EntityInfo prodInfo = createEntityInfoForEntity(product, EntityState.Added);
-                            addToSaveMap(prodInfo);
-                            // Code above does not work correctly so ...
-                            throw new RuntimeException("Steve: need to figure out how to add related entities on the server during save interception" +
-                              " -- see the beforeSaveEntities method in NorthwindTestServlet");
-                                    
-                        }
-                    }
-                }
-                return saveMap;
-            }
-        };
-        return sws;
-    }
 
     public void SaveWithFreight(HttpServletRequest request,
             HttpServletResponse response) {
@@ -541,5 +489,146 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         SaveResult sr = saveChanges(sws);
         writeSaveResponse(response, sr);
     }
+
+    public void SaveWithDbTransaction(HttpServletRequest request,
+            HttpServletResponse response) {
+        // same code as regular saveChanges
+        Map saveBundle = extractSaveBundle(request);
+        SaveWorkState sws = createSaveWorkState(saveBundle);
+        SaveResult sr = saveChanges(sws);
+        writeSaveResponse(response, sr);
+    }
+
+    @Override
+    public SaveWorkState createSaveWorkState(Map saveBundle) {
+        SaveWorkState sws = new SaveWorkState(saveBundle) {
+            public boolean beforeSaveEntity(EntityInfo entityInfo) {
+                String tag = (String) this.getSaveOptions().tag;
+                if (tag != null && tag.equals("addProdOnServer")) {
+                    // // adds cannot be performed here yet... ( see
+                    // beforeSaveEntities instead).
+                    // Supplier supplier = (Supplier) entityInfo.entity;
+                    // Product product = new Product();
+                    // product.setProductName("Product added on server");
+                    // supplier.getProducts().add(product);
+                    // return true;
+                }
+
+                if (entityInfo.entity instanceof Region && entityInfo.entityState == EntityState.Added) {
+                    Region region = (Region) entityInfo.entity;
+                    // prohibit any additions of entities of type 'Region'
+                    if (region.getRegionDescription().toLowerCase().startsWith("error")) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+                return true;
+            }
+
+            public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) {
+                String tag = (String) this.getSaveOptions().tag;
+                if (tag == null) return saveMap;
+                if (tag.equals("addProdOnServer")) {
+                    List<EntityInfo> entityInfos = saveMap.get(Supplier.class);
+                    if (entityInfos.size() > 0) {
+                        for (EntityInfo ei : entityInfos) {
+                            Supplier supplier = (Supplier) ei.entity;
+                            Product product = new Product();
+                            product.setProductName("Product added on server");
+                            product.setSupplier(supplier);
+
+                            // TODO: need to figure out how to do this...
+                            // not sure why or if this is needed, but...
+                            // product.setSupplierID(supplier.getSupplierID());
+                            EntityInfo prodInfo = createEntityInfoForEntity(product, EntityState.Added);
+                            addToSaveMap(prodInfo);
+                            // Code above does not work correctly so ...
+                            throw new RuntimeException(
+                                    "Steve: need to figure out how to add related entities on the server during save interception" +
+                                            " -- see the beforeSaveEntities method in NorthwindTestServlet");
+
+                        }
+                    }
+                } else if (tag.equals("CommentOrderShipAddress.Before")) {
+                    List<EntityInfo> orderInfos = saveMap.get(Order.class);
+                    byte seqNum = 1;
+                    for (EntityInfo oi : orderInfos) {
+                        Order order = (Order) oi.entity;
+                        Comment comment = new Comment();
+                        comment.setComment1(order.getShipAddress());
+                        comment.setSeqNum(seqNum++);
+                        comment.setCreatedOn(new Date());
+                        EntityInfo commentInfo = createEntityInfoForEntity(comment, EntityState.Added);
+                        addToSaveMap(commentInfo);
+                    }
+                }
+                return saveMap;
+            }
+
+            public void AfterSaveEntities(Map<Class, List<EntityInfo>> saveMap, List<KeyMapping> keyMappings) {
+                // not yet implemented
+            }
+        };
+        return sws;
+    }
+
+    // BeforeSaveEntities/AfterSaveEntities logic copied from .NET tests
+    /*
+     * if (tag == "CommentOrderShipAddress.Before") { var orderInfos =
+     * saveMap[typeof(Order)]; byte seq = 1; foreach (var info in orderInfos) {
+     * var order = (Order)info.Entity; AddComment(order.ShipAddress, seq++); } }
+     * else if (tag == "UpdateProduceShipAddress.Before") { var orderInfos =
+     * saveMap[typeof(Order)]; var order = (Order)orderInfos[0].Entity;
+     * UpdateProduceDescription(order.ShipAddress); } else if (tag ==
+     * "LookupEmployeeInSeparateContext.Before") {
+     * LookupEmployeeInSeparateContext(false); } else if (tag ==
+     * "LookupEmployeeInSeparateContext.SameConnection.Before") {
+     * LookupEmployeeInSeparateContext(true); } else if (tag ==
+     * "ValidationError.Before") { foreach (var type in saveMap.Keys) { var list
+     * = saveMap[type]; foreach (var entityInfo in list) { var entity =
+     * entityInfo.Entity; var entityError = new EntityError() { EntityTypeName =
+     * type.Name, ErrorMessage = "Error message for " + type.Name, ErrorName =
+     * "Server-Side Validation", }; if (entity is Order) { var order =
+     * (Order)entity; entityError.KeyValues = new object[] { order.OrderID };
+     * entityError.PropertyName = "OrderDate"; }
+     * 
+     * } } } else if (tag == "increaseProductPrice") { Dictionary<Type,
+     * List<EntityInfo>> saveMapAdditions = new Dictionary<Type,
+     * List<EntityInfo>>(); foreach (var type in saveMap.Keys) { if (type ==
+     * typeof(Category)) { foreach (var entityInfo in saveMap[type]) { if
+     * (entityInfo.EntityState == EntityState.Modified) { Category category =
+     * (entityInfo.Entity as Category); var products =
+     * this.Context.Products.Where(p => p.CategoryID == category.CategoryID);
+     * foreach (var product in products) { if
+     * (!saveMapAdditions.ContainsKey(typeof(Product)))
+     * saveMapAdditions[typeof(Product)] = new List<EntityInfo>();
+     * 
+     * var ei = this.CreateEntityInfo(product, EntityState.Modified);
+     * ei.ForceUpdate = true; var incr = (Convert.ToInt64(product.UnitPrice) %
+     * 2) == 0 ? 1 : -1; product.UnitPrice += incr;
+     * saveMapAdditions[typeof(Product)].Add(ei); } } } } } foreach (var type in
+     * saveMapAdditions.Keys) { if (!saveMap.ContainsKey(type)) { saveMap[type]
+     * = new List<EntityInfo>(); } foreach (var enInfo in
+     * saveMapAdditions[type]) { saveMap[type].Add(enInfo); } } }
+     * 
+     * protected override void AfterSaveEntities(Dictionary<Type,
+     * List<EntityInfo>> saveMap, List<KeyMapping> keyMappings) { var tag =
+     * (string)SaveOptions.Tag; if (tag == "CommentKeyMappings.After") {
+     * 
+     * foreach (var km in keyMappings) { var realint =
+     * Convert.ToInt32(km.RealValue); byte seq = (byte)(realint % 512);
+     * AddComment(km.EntityTypeName + ':' + km.RealValue, seq); } } else if (tag
+     * == "UpdateProduceKeyMapping.After") { if (!keyMappings.Any()) throw new
+     * Exception("UpdateProduce.After: No key mappings available"); var km =
+     * keyMappings[0]; UpdateProduceDescription(km.EntityTypeName + ':' +
+     * km.RealValue);
+     * 
+     * } else if (tag == "LookupEmployeeInSeparateContext.After") {
+     * LookupEmployeeInSeparateContext(false); } else if (tag ==
+     * "LookupEmployeeInSeparateContext.SameConnection.After") {
+     * LookupEmployeeInSeparateContext(true); } base.AfterSaveEntities(saveMap,
+     * keyMappings); }
+     */
 
 }
