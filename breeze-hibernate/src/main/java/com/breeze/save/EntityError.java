@@ -6,7 +6,8 @@ public class EntityError {
     private Object[] keyValues;
     private String propertyName;
     private String errorMessage;
-	public EntityError(String errorName, String entityTypeName,
+
+    public EntityError(String errorName, String entityTypeName,
 			Object[] keyValues, String propertyName, String errorMessage) {
 		super();
 		this.setErrorName(errorName);

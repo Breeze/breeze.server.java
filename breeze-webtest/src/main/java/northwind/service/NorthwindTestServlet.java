@@ -13,12 +13,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import northwind.model.Category;
 import northwind.model.Comment;
 import northwind.model.Customer;
 import northwind.model.Employee;
@@ -489,6 +491,65 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         SaveResult sr = saveChanges(sws);
         writeSaveResponse(response, sr);
     }
+    
+    public void SaveCheckUnmappedPropertySuppressed(HttpServletRequest request,
+            HttpServletResponse response) {
+
+        Map saveBundle = extractSaveBundle(request);
+        SaveWorkState sws = new SaveWorkState(saveBundle) {
+            public boolean beforeSaveEntity(EntityInfo entityInfo) {
+                Map map = entityInfo.unmappedValuesMap;
+                if (map != null) {
+                    throw new RuntimeException("unmapped properties should have been suppressed");
+                }
+                
+                return false;
+            }
+        };
+
+        SaveResult sr = saveChanges(sws);
+        writeSaveResponse(response, sr);
+    }
+
+    public void SaveCheckUnmappedPropertySerialized(HttpServletRequest request,
+            HttpServletResponse response) {
+
+        Map saveBundle = extractSaveBundle(request);
+        SaveWorkState sws = new SaveWorkState(saveBundle) {
+            public boolean beforeSaveEntity(EntityInfo entityInfo) {
+                Map map = entityInfo.unmappedValuesMap;
+                String unmappedValue = (String) map.get("myUnmappedProperty");
+
+                if (!unmappedValue.equals("ANYTHING22")) {
+                    throw new RuntimeException("wrong value for unmapped property:  " + unmappedValue);
+                }
+
+                Map anotherOne = (Map) map.get("anotherOne");
+                
+                List zs = (List) anotherOne.get("z");
+                Map map2 = (Map) zs.get(5);
+                Double fooValue = (Double) map2.get("foo");
+                if (fooValue != 4.0) {
+                    throw new RuntimeException("wrong value for 'anotherOne.z[5].foo'");
+                }
+
+                Double extra = (Double) anotherOne.get("extra");
+                if (extra != 666.0) {
+                    throw new RuntimeException("wrong value for 'anotherOne.extra'");
+                }               
+
+                Customer cust = (Customer) entityInfo.entity;
+                if (!cust.getCompanyName().toUpperCase().equals(cust.getCompanyName())) {
+                    throw new RuntimeException("Uppercasing of company name did not occur");
+                }
+                return false;
+            }
+        };
+
+        SaveResult sr = saveChanges(sws);
+        writeSaveResponse(response, sr);
+    }
+
 
     public void SaveWithDbTransaction(HttpServletRequest request,
             HttpServletResponse response) {
@@ -498,11 +559,45 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         SaveResult sr = saveChanges(sws);
         writeSaveResponse(response, sr);
     }
+    
+    public void SaveWithComment(HttpServletRequest request,
+            HttpServletResponse response) {
+        Map saveBundle = extractSaveBundle(request);
+        SaveWorkState sws = new SaveWorkState(saveBundle) {
+            public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) {
+                Comment comment = new Comment();
+                String tag = (String) this.getSaveOptions().tag;
+                
+                comment.setComment1((tag == null) ? "Generic comment" : tag);
+                comment.setCreatedOn(new Date());
+                comment.setSeqNum((byte) 1);
+                EntityInfo commentInfo = createEntityInfoForEntity(comment, EntityState.Added);
+                addToSaveMap(commentInfo);
+                return saveMap;
+            }
+        };
+
+        SaveResult sr = saveChanges(sws);
+        writeSaveResponse(response, sr);
+
+    }
 
     @Override
     public SaveWorkState createSaveWorkState(Map saveBundle) {
         SaveWorkState sws = new SaveWorkState(saveBundle) {
-            public boolean beforeSaveEntity(EntityInfo entityInfo) {
+            public boolean beforeSaveEntity(EntityInfo entityInfo) throws EntityErrorsException {
+                if (entityInfo.entity instanceof Customer) {
+                    Customer c = (Customer) entityInfo.entity;
+                    if (c.getCompanyName().toLowerCase().equals("error")) {
+                        Object[] key = new Object[] { c.getCustomerID() };
+                        EntityError err = new EntityError("WrongMethod",
+                                MetadataHelper.getEntityTypeName(Customer.class),
+                                key, "companyName",
+                                "This customer is not valid!");
+                        throw new EntityErrorsException(err);
+                    }
+                }
+
                 String tag = (String) this.getSaveOptions().tag;
                 if (tag != null && tag.equals("addProdOnServer")) {
                     // // adds cannot be performed here yet... ( see
@@ -562,8 +657,30 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
                         EntityInfo commentInfo = createEntityInfoForEntity(comment, EntityState.Added);
                         addToSaveMap(commentInfo);
                     }
+                } else if (tag.equals("increaseProductPrice")) {
+                    List<EntityInfo> categoryInfos = saveMap.get(Category.class);
+                    for (EntityInfo ci : categoryInfos) {
+                        Category category = (Category) ci.entity;
+                        // need to get all of the products associated with this category
+                        // add up their price by $1.
+                        // TODO: but category.getProducts (below) returns null
+                        // so how do I force load the products.
+                        Set<Product> products = category.getProducts();
+                        for (Product p : products) {
+                            BigDecimal unitPrice = p.getUnitPrice();
+                            unitPrice = unitPrice.add(new BigDecimal(1.0));
+                            p.setUnitPrice(unitPrice);
+                            EntityInfo productInfo = createEntityInfoForEntity(p, EntityState.Modified);
+                            addToSaveMap(productInfo);
+                        }
+                    }
                 }
+               
                 return saveMap;
+            }
+            
+            public List<EntityInfo> beforeSaveEntityGraph(List<EntityInfo> entitiesToPersist)  {
+                return entitiesToPersist;
             }
 
             public void AfterSaveEntities(Map<Class, List<EntityInfo>> saveMap, List<KeyMapping> keyMappings) {
@@ -572,63 +689,77 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         };
         return sws;
     }
-
     // BeforeSaveEntities/AfterSaveEntities logic copied from .NET tests
     /*
-     * if (tag == "CommentOrderShipAddress.Before") { var orderInfos =
-     * saveMap[typeof(Order)]; byte seq = 1; foreach (var info in orderInfos) {
-     * var order = (Order)info.Entity; AddComment(order.ShipAddress, seq++); } }
-     * else if (tag == "UpdateProduceShipAddress.Before") { var orderInfos =
-     * saveMap[typeof(Order)]; var order = (Order)orderInfos[0].Entity;
-     * UpdateProduceDescription(order.ShipAddress); } else if (tag ==
-     * "LookupEmployeeInSeparateContext.Before") {
-     * LookupEmployeeInSeparateContext(false); } else if (tag ==
-     * "LookupEmployeeInSeparateContext.SameConnection.Before") {
-     * LookupEmployeeInSeparateContext(true); } else if (tag ==
-     * "ValidationError.Before") { foreach (var type in saveMap.Keys) { var list
-     * = saveMap[type]; foreach (var entityInfo in list) { var entity =
-     * entityInfo.Entity; var entityError = new EntityError() { EntityTypeName =
-     * type.Name, ErrorMessage = "Error message for " + type.Name, ErrorName =
-     * "Server-Side Validation", }; if (entity is Order) { var order =
-     * (Order)entity; entityError.KeyValues = new object[] { order.OrderID };
-     * entityError.PropertyName = "OrderDate"; }
-     * 
-     * } } } else if (tag == "increaseProductPrice") { Dictionary<Type,
-     * List<EntityInfo>> saveMapAdditions = new Dictionary<Type,
-     * List<EntityInfo>>(); foreach (var type in saveMap.Keys) { if (type ==
-     * typeof(Category)) { foreach (var entityInfo in saveMap[type]) { if
-     * (entityInfo.EntityState == EntityState.Modified) { Category category =
-     * (entityInfo.Entity as Category); var products =
-     * this.Context.Products.Where(p => p.CategoryID == category.CategoryID);
-     * foreach (var product in products) { if
-     * (!saveMapAdditions.ContainsKey(typeof(Product)))
-     * saveMapAdditions[typeof(Product)] = new List<EntityInfo>();
-     * 
-     * var ei = this.CreateEntityInfo(product, EntityState.Modified);
-     * ei.ForceUpdate = true; var incr = (Convert.ToInt64(product.UnitPrice) %
-     * 2) == 0 ? 1 : -1; product.UnitPrice += incr;
-     * saveMapAdditions[typeof(Product)].Add(ei); } } } } } foreach (var type in
-     * saveMapAdditions.Keys) { if (!saveMap.ContainsKey(type)) { saveMap[type]
-     * = new List<EntityInfo>(); } foreach (var enInfo in
-     * saveMapAdditions[type]) { saveMap[type].Add(enInfo); } } }
-     * 
-     * protected override void AfterSaveEntities(Dictionary<Type,
-     * List<EntityInfo>> saveMap, List<KeyMapping> keyMappings) { var tag =
-     * (string)SaveOptions.Tag; if (tag == "CommentKeyMappings.After") {
-     * 
-     * foreach (var km in keyMappings) { var realint =
-     * Convert.ToInt32(km.RealValue); byte seq = (byte)(realint % 512);
-     * AddComment(km.EntityTypeName + ':' + km.RealValue, seq); } } else if (tag
-     * == "UpdateProduceKeyMapping.After") { if (!keyMappings.Any()) throw new
-     * Exception("UpdateProduce.After: No key mappings available"); var km =
-     * keyMappings[0]; UpdateProduceDescription(km.EntityTypeName + ':' +
-     * km.RealValue);
-     * 
-     * } else if (tag == "LookupEmployeeInSeparateContext.After") {
-     * LookupEmployeeInSeparateContext(false); } else if (tag ==
-     * "LookupEmployeeInSeparateContext.SameConnection.After") {
-     * LookupEmployeeInSeparateContext(true); } base.AfterSaveEntities(saveMap,
-     * keyMappings); }
+    protected override Dictionary<Type, List<EntityInfo>> BeforeSaveEntities(Dictionary<Type, List<EntityInfo>> saveMap) {
+
+      var tag = (string)SaveOptions.Tag;
+
+      if (tag == "CommentOrderShipAddress.Before") {
+        var orderInfos = saveMap[typeof(Order)];
+        byte seq = 1;
+        foreach (var info in orderInfos) {
+          var order = (Order)info.Entity;
+          AddComment(order.ShipAddress, seq++);
+        }
+      } else if (tag == "UpdateProduceShipAddress.Before") {
+        var orderInfos = saveMap[typeof(Order)];
+        var order = (Order)orderInfos[0].Entity;
+        UpdateProduceDescription(order.ShipAddress);
+      } else if (tag == "LookupEmployeeInSeparateContext.Before") {
+        LookupEmployeeInSeparateContext(false);
+      } else if (tag == "LookupEmployeeInSeparateContext.SameConnection.Before") {
+        LookupEmployeeInSeparateContext(true);
+      } else if (tag == "ValidationError.Before") {
+        foreach (var type in saveMap.Keys) {
+          var list = saveMap[type];
+          foreach (var entityInfo in list) {
+            var entity = entityInfo.Entity;
+            var entityError = new EntityError() {
+              EntityTypeName = type.Name,
+              ErrorMessage = "Error message for " + type.Name,
+              ErrorName = "Server-Side Validation",
+            };
+            if (entity is Order) {
+              var order = (Order)entity;
+              entityError.KeyValues = new object[] { order.OrderID };
+              entityError.PropertyName = "OrderDate";
+            }
+
+          }
+        }
+      } else if (tag == "increaseProductPrice") {
+        Dictionary<Type, List<EntityInfo>> saveMapAdditions = new Dictionary<Type, List<EntityInfo>>();
+        foreach (var type in saveMap.Keys) {
+          if (type == typeof(Category)) {
+            foreach (var entityInfo in saveMap[type]) {
+              if (entityInfo.EntityState == EntityState.Modified) {
+                Category category = (entityInfo.Entity as Category);
+                var products = this.Context.Products.Where(p => p.CategoryID == category.CategoryID);
+                foreach (var product in products) {
+                  if (!saveMapAdditions.ContainsKey(typeof(Product)))
+                    saveMapAdditions[typeof(Product)] = new List<EntityInfo>();
+
+                  var ei = this.CreateEntityInfo(product, EntityState.Modified);
+                  ei.ForceUpdate = true;
+                  var incr = (Convert.ToInt64(product.UnitPrice) % 2) == 0 ? 1 : -1;
+                  product.UnitPrice += incr;
+                  saveMapAdditions[typeof(Product)].Add(ei);
+                }
+              }
+            }
+          }
+        }
+        foreach (var type in saveMapAdditions.Keys) {
+          if (!saveMap.ContainsKey(type)) {
+            saveMap[type] = new List<EntityInfo>();
+          }
+          foreach (var enInfo in saveMapAdditions[type]) {
+            saveMap[type].Add(enInfo);
+          }
+        }
+      }
+    
      */
 
 }
