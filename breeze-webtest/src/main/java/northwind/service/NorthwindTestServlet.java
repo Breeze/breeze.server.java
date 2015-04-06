@@ -579,8 +579,26 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
 
         SaveResult sr = saveChanges(sws);
         writeSaveResponse(response, sr);
-
     }
+    
+    public void SaveCheckInitializer(HttpServletRequest request,
+            HttpServletResponse response) {
+        Map saveBundle = extractSaveBundle(request);
+        SaveWorkState sws = new SaveWorkState(saveBundle) {
+            public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) {
+                // Create and add a new order.
+                Order order = new Order();
+                order.setOrderDate(new Date());
+                EntityInfo orderInfo = createEntityInfoForEntity(order, EntityState.Added);
+                addToSaveMap(orderInfo);
+                return saveMap;
+            }
+        };
+
+        SaveResult sr = saveChanges(sws);
+        writeSaveResponse(response, sr);
+    }
+
 
     @Override
     public SaveWorkState createSaveWorkState(Map saveBundle) {
