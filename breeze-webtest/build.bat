@@ -4,8 +4,9 @@ call build.bat
 cd ..\breeze-webtest
 echo Building breeze-webtest
 echo --------
+call mvn clean
 call mvn package
-call mvn assembly:single
+rem call mvn assembly:single
 echo Deploying to Tomcat
 echo -----------
 call deployToTomcat.bat
