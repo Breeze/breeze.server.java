@@ -63,10 +63,14 @@ public abstract class ControllerServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
+
+    protected void writeError(HttpServletResponse response, int status, String message) {
+        writeError(response, status, message, null);
+    }
 	
-	protected void writeError(HttpServletResponse response, int status, String message) {
+	protected void writeError(HttpServletResponse response, int status, String message, String stack) {
 		try {
-			HttpErrorInfo err = new HttpErrorInfo(status, message);
+			HttpErrorInfo err = new HttpErrorInfo(status, message, stack);
 			String errMsg = JsonGson.toJson(err);
 			response.setContentType("application/json;charset=UTF-8");
 			response.setStatus(status);
