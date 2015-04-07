@@ -1,11 +1,13 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="northwind.model">
-	<class name="Customer" table="`Customer`" dynamic-update="true">
+	<class name="Customer" table="`Customer`" dynamic-update="true" persister="northwind.service.NullableVersionEntityPersister">
 		<id name="customerID" column="`CustomerID`" type="uuid-char">
 			<generator class="uuid2" />
 		</id>
-		<version name="rowVersion" type="int" />
+		<version name="rowVersion" type="northwind.service.NullableIntVersionType">
+			<column name="rowVersion" not-null="false" />
+		</version>
 		<property name="customerID_OLD" column="`CustomerID_OLD`"
 			type="string" length="5" />
 		<property name="companyName" type="string" length="40"
