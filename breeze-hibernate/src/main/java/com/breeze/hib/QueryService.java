@@ -65,9 +65,9 @@ public class QueryService {
         Session session = _sessionFactory.openSession();
         try {
             session.beginTransaction();
-            Criteria crit = session.createCriteria(clazz);
+            Criteria crit = session.createCriteria(clazz, "root");
             CriteriaBuilder builder = new CriteriaBuilder(entityType);
-            builder.updateCriteria(crit, entityQuery);
+             builder.updateCriteria(crit, entityQuery);
             // execute the query
             List result = crit.list();
 

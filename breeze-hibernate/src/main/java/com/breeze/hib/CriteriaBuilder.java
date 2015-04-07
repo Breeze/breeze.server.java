@@ -6,19 +6,26 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.CriteriaImpl.OrderEntry;
 import org.hibernate.transform.Transformers;
 
+import com.breeze.metadata.IDataProperty;
 import com.breeze.metadata.IEntityType;
+import com.breeze.metadata.INavigationProperty;
+import com.breeze.metadata.IProperty;
+import com.breeze.metadata.MetadataHelper;
 import com.breeze.query.AndOrPredicate;
 import com.breeze.query.AnyAllPredicate;
+import com.breeze.query.BinaryOperator;
 import com.breeze.query.BinaryPredicate;
 import com.breeze.query.EntityQuery;
 import com.breeze.query.Expression;
@@ -35,7 +42,7 @@ import com.breeze.query.UnaryPredicate;
  * Converts EntityQuery into Hibernate Criteria.
  * 
  * @author Jay
- * @see http 
+ * @see http
  *      ://docs.jboss.org/hibernate/core/3.6/javadocs/org/hibernate/Criteria.
  *      html
  */
@@ -43,9 +50,13 @@ public class CriteriaBuilder {
 
     private CriteriaAliasBuilder _aliasBuilder;
     private EntityQuery _entityQuery;
+    private IEntityType _entityType;
+    private int _subqCount = 0;
 
     public CriteriaBuilder(IEntityType entityType) {
+        _entityType = entityType;
         _aliasBuilder = new CriteriaAliasBuilder(entityType);
+
     }
 
     // TODO: handle 'All'
@@ -187,7 +198,7 @@ public class CriteriaBuilder {
             Criterion cr = toCriterion(crit, subPred, contextAlias);
             junction.add(cr);
         }
-        
+
         return junction;
     }
 
@@ -198,34 +209,65 @@ public class CriteriaBuilder {
         // May need additional Metadata for this. In order to construct
         // an EXISTS subquery we need to have the join columns.
         Operator op = pred.getOperator();
+        //        if (op == Operator.Any) {
+
+        //            PropExpression pexpr = pred.getExpr();
+        //            Predicate nextPred = pred.getPredicate();
+        //            // TODO: should check that propertyPath below is not nested - i.e. a
+        //            // simple navigation propertyName
+        //            String propertyPath = pexpr.getPropertyPath();
+        //            String nextContextAlias = _aliasBuilder.getSimpleAlias(crit, propertyPath);
+        //            Criterion cr = toCriterion(crit, nextPred, nextContextAlias);
+        //            return cr;
+        //        }
         if (op == Operator.Any) {
             PropExpression pexpr = pred.getExpr();
             Predicate nextPred = pred.getPredicate();
             // TODO: should check that propertyPath below is not nested - i.e. a
             // simple navigation propertyName
             String propertyPath = pexpr.getPropertyPath();
-            String nextContextAlias = _aliasBuilder.getSimpleAlias(crit, propertyPath);
-            Criterion cr = toCriterion(crit, nextPred, nextContextAlias);
+            INavigationProperty navProp = (INavigationProperty) MetadataHelper.getPropertyFromPath(propertyPath, _entityType);
+            String[] subtypeFkNames = navProp.getInvForeignKeyNames();
+            IEntityType subtype = navProp.getEntityType();
+            List<IDataProperty> rootKeyProperties = _entityType.getKeyProperties();
+            List<IDataProperty> subtypeKeyProperties = subtype.getKeyProperties();
+
+            Class subqueryClass = MetadataHelper.lookupClass(subtype.getName());
+            String subqAlias = "subq" + _subqCount++;
+            DetachedCriteria detCrit = DetachedCriteria.forClass(subqueryClass, subqAlias);
+
+            Criterion subCrit = toCriterion(crit, nextPred, subqAlias);
+            detCrit.add(subCrit);
+            Criterion joinCrit = new PropertyExpression(subqAlias + "." + subtypeFkNames[0], "root."
+                    + rootKeyProperties.get(0).getName(), "=");
+            detCrit.add(joinCrit);
+            detCrit.setProjection(Projections.property(subqAlias + "." + subtypeKeyProperties.get(0).getName()));
+            Criterion cr = Subqueries.exists(detCrit);
             return cr;
         }
 
         throw new RuntimeException("'All' predicates are not yet supported.");
-        // Criteria cdCriteria = session.createCriteria(CD.class, "cd");
+
+        // Criteria criteria = session.createCriteria(CD.class, "cd");
         // criteria.createAlias("cd.tracks", "track");
         // criteria.add(Restrictions.eq("track.title", "someTitle"));
-        // criteria.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
 
-        // need join columns
+        // IF USING exists then we need join columns
+
+        // Criteria criteria = session.createCriteria(CD.class, "cd");
+        // DetachedCriteria trackCriteria = DetachedCriteria.forClass(Track.class, "track");
+        // trackCriteria.add(Restrictions.eq("track.title", "SomeTitle"));
+        // trackCriteria.add(Restrictions.propertyEq("track.cd.id", "cd.id"));
+        // trackCriteria.setProjection(Projections.property("track.title"));
+        // criteria.add(Subqueries.exists(trackCriteria));
+
+        // exists need join columns
         // DetachedCriteria subquery = DetachedCriteria.forClass(Bar.class, "b")
         // .add(Property.forName("b.a_id").eqProperty("a.id"))
         //
         // Criteria criteria = session.createCriteria(Foo.class, "a")
         // .add(Subqueries.notExists(subquery);
 
-        // DetachedCriteria.forClass( Enrolment.class, "e" )
-        // + .setProjection( Projections.id() )
-        // + .add( Restrictions.sqlRestriction(
-        // "{c}.coursecode = {e}.coursecode" ) ) )
     }
 
     private Criterion createCriterion(Criteria crit, UnaryPredicate pred,

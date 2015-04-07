@@ -1,5 +1,6 @@
 package com.breeze.metadata;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,7 @@ public class Metadata  {
 		
 		private String _entityTypeName;
 		private Map<String, IProperty> _propertyMap = new HashMap<String, IProperty>();
+		private List<IDataProperty> _keyProperties = new ArrayList<IDataProperty>();
 
 		public EntityType(Map<String, Object> entityMap, Metadata metadata) {
 			_entityMap = entityMap;
@@ -71,6 +73,9 @@ public class Metadata  {
 			properties = (List<HashMap<String, Object>>) _entityMap.get("dataProperties");
 			for (HashMap<String, Object> p: properties) {
 				IDataProperty prop = new DataProperty(this, p, metadata);
+				if (prop.isKeyProperty()) {
+				    _keyProperties.add(prop);
+				}
 				_propertyMap.put(prop.getName(), prop);
 			}
 			properties = (List<HashMap<String, Object>>) _entityMap.get("navigationProperties");
@@ -90,6 +95,10 @@ public class Metadata  {
 		@Override
 		public IProperty getProperty(String propertyName) {
 			return _propertyMap.get(propertyName);
+		}
+		
+		public List<IDataProperty> getKeyProperties() {
+		    return _keyProperties;
 		}
 		
 		public boolean isComplexType() {
@@ -120,6 +129,11 @@ public class Metadata  {
 		@Override
 		public String getName() {
 			return (String) _dpMap.get("nameOnServer");
+		}
+		
+		public boolean isKeyProperty() {
+		    Boolean isKey = (Boolean) _dpMap.get("isPartOfKey");
+            return isKey == null ? false : isKey.booleanValue();
 		}
 
 		@Override
@@ -154,7 +168,7 @@ public class Metadata  {
 		public String getName() {
 			return (String) _npMap.get("nameOnServer");
 		}
-
+		
 		@Override
 		public IEntityType getEntityType() {
 			String entityTypeName = (String) _npMap.get("entityTypeName");
@@ -169,6 +183,11 @@ public class Metadata  {
 		@Override
 		public boolean isScalar() {
 			return (boolean) _npMap.get("isScalar");
+		}
+		
+		public String[] getInvForeignKeyNames() {
+		    Object invFkNames = _npMap.get("invForeignKeyNamesOnServer");
+		    return (String[]) invFkNames;
 		}
 		
 	}

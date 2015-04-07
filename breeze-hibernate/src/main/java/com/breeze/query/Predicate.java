@@ -83,10 +83,12 @@ public abstract class Predicate {
 	
 	private static Predicate predicateFromObject(Object source) {
 		List<Predicate> preds = predicatesFromObject(source);
-		if (preds.size() > 1) {
-			throw new RuntimeException("should only contain a single item");
-		}
-		return preds.get(0);
+		return createCompoundPredicate(preds);
+//		if (preds.size() > 1) {
+//			throw new RuntimeException("predicateFromObject: should only contain a single item");
+//		} else {
+//		    return preds.get(0);
+//		}
 	}
 
 	private static List<Predicate> predicatesFromObject(Object source) {
