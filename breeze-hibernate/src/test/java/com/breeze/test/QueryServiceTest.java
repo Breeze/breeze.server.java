@@ -684,6 +684,26 @@ public class QueryServiceTest extends TestCase {
             Customer c = (Customer) o;
         }
     }
+    
+    // currently fails not + any do not work correct YET
+    public void testNotAny() {
+        String json = "{ where: { not: { orders: { any: { or: [ { freight: { lt: 500} }, { freight: { eq: null}} ] } } } }, expand: 'orders' }";
+        QueryResult qr = _qe.executeQuery(Customer.class, json);
+        Collection results = qr.getResults();
+        String rJson = qr.toJson();
+        // assertTrue(results.size() < 5);
+        for (Object o : results) {
+            Customer c = (Customer) o;
+            Collection<Order> orders = c.getOrders();
+            boolean isOk = true;
+            for (Order order : orders) {
+                if (order.getFreight().doubleValue() < 500) {
+                    isOk = false;
+                }
+            }
+            assertTrue(isOk);
+        }
+    }
 
     public void testAnyWithExpand() {
         String json = "{ where: { orders: { any: { freight: { gt: 950.0 } } } }, expand: 'orders' }";

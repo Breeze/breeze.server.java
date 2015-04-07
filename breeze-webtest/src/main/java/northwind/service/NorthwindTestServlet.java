@@ -400,25 +400,52 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             public boolean beforeSaveEntity(EntityInfo entityInfo) {
                 String tag = (String) this.getSaveOptions().tag;
-                Order order = (Order) entityInfo.entity;
-                if (tag.equals("freight update")) {
-                    order.setFreight(order.getFreight()
-                            .add(new BigDecimal(1.0)));
-                } else if (tag.equals("freight update-ov")) {
-                    order.setFreight(order.getFreight()
-                            .add(new BigDecimal(1.0)));
-                    entityInfo.originalValuesMap.put("freight", null);
-                } else if (tag.equals("freight update-force")) {
-                    order.setFreight(order.getFreight()
-                            .add(new BigDecimal(1.0)));
-                    entityInfo.forceUpdate = true;
-                }
+                CheckFreight(entityInfo, tag);
                 return true;
             }
         };
 
         SaveResult sr = saveChanges(sws);
         writeSaveResponse(response, sr);
+    }
+    
+    public void SaveWithFreight2(HttpServletRequest request,
+            HttpServletResponse response) {
+        Map saveBundle = extractSaveBundle(request);
+        SaveWorkState sws = new SaveWorkState(saveBundle) {
+            public Map<Class, List<EntityInfo>> beforeSaveEntities(
+                    Map<Class, List<EntityInfo>> saveMap)
+                    throws EntityErrorsException {
+                String tag = (String) this.getSaveOptions().tag;
+                List<EntityInfo> orderInfos = saveMap.get(Order.class);
+                if (orderInfos != null) {
+                    for (EntityInfo entityInfo : orderInfos) {
+                        CheckFreight(entityInfo, tag);
+                    }
+                }
+                return saveMap;
+            }
+        };
+
+        SaveResult sr = saveChanges(sws);
+        writeSaveResponse(response, sr);
+    }
+
+    
+    private void CheckFreight(EntityInfo entityInfo, String tag) {
+        Order order = (Order) entityInfo.entity;
+        if (tag.equals("freight update")) {
+            order.setFreight(order.getFreight()
+                    .add(new BigDecimal(1.0)));
+        } else if (tag.equals("freight update-ov")) {
+            order.setFreight(order.getFreight()
+                    .add(new BigDecimal(1.0)));
+            entityInfo.originalValuesMap.put("freight", null);
+        } else if (tag.equals("freight update-force")) {
+            order.setFreight(order.getFreight()
+                    .add(new BigDecimal(1.0)));
+            entityInfo.forceUpdate = true;
+        }
     }
 
     public void SaveWithExit(HttpServletRequest request,
