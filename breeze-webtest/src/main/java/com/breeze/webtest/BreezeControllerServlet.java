@@ -77,8 +77,14 @@ public class BreezeControllerServlet extends ControllerServlet {
 
         } catch (Throwable ex) {
             writeError(response, HttpServletResponse.SC_BAD_REQUEST,
-                    ex.getMessage());
+                    ex.getMessage(), getStackTrace(ex));
         }
+    }
+    
+    protected String getStackTrace(Throwable e) {
+        java.io.StringWriter sw = new java.io.StringWriter();
+        e.printStackTrace(new java.io.PrintWriter(sw));
+        return sw.toString();
     }
 
     protected String getMetadata() {

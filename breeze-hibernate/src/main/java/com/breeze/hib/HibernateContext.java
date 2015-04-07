@@ -28,6 +28,7 @@ public class HibernateContext extends ContextProvider {
 	private Session _session;
 	private List<EntityError> _entityErrors = new ArrayList<EntityError>();
     private Map<EntityInfo, KeyMapping> _entityKeyMapping = new HashMap<EntityInfo, KeyMapping>();
+    private List<String> _possibleErrors = new ArrayList<String>();
 
 	/**
 	 * @param session Hibernate session to be used for saving
@@ -78,12 +79,12 @@ public class HibernateContext extends ContextProvider {
 			saveWorkState.setEntityErrors(new EntityErrorsException(null, _entityErrors));
 		} catch (Exception ex) {
 			if (tx.isActive()) tx.rollback();
+			String msg = (_possibleErrors.size() > 0) ? _possibleErrors.toString() : ""; 
 			if (ex instanceof JDBCException) {
-				JDBCException jdbcEx = (JDBCException) ex;
-				throw new RuntimeException("SQLException: " + jdbcEx.getSQLException().getMessage());
-			} else {
-				throw ex;
+			    msg = msg + "SQLException: " + ((JDBCException) ex).getSQLException().getMessage();
 			}
+			msg = "Error performing save: " + msg;
+			throw new RuntimeException(msg, ex);
 		} finally {
 			//          if (!hasExistingTransaction) tx.Dispose();
 		}
@@ -218,14 +219,13 @@ public class HibernateContext extends ContextProvider {
 			return;
 		int vcol = classMeta.getVersionProperty();
 		String vname = classMeta.getPropertyNames()[vcol];
-		Object oldVersion = entityInfo.originalValuesMap.get(vname);
-		if (oldVersion != null) {
-			Object entity = entityInfo.entity;
-			//        Class vtype = classMeta.getPropertyTypes()[vcol].getReturnedClass();
-			//        if (vtype != oldVersion.getClass()) {
-			//        	// because JsonConvert makes all integers Int64
-			//        	oldVersion = vtype.getConstructor(oldVersion.getClass()).newInstance(oldVersion);
-			//        } 
+		if (entityInfo.originalValuesMap.containsKey(vname)) {
+	        Object oldVersion = entityInfo.originalValuesMap.get(vname);
+            Object entity = entityInfo.entity;
+	        if (oldVersion == null) {
+	            _possibleErrors.add("Hibernate does not support 'null' version properties. " +
+	                   "Entity: " + entity + ", Property: " + vname);
+	        }
 			Class versionClazz = classMeta.getPropertyTypes()[vcol].getReturnedClass();
 			DataType dataType = DataType.fromClass(versionClazz);
 			Object oldValue = DataType.coerceData(oldVersion, dataType);
