@@ -10,13 +10,19 @@ import com.breeze.metadata.MetadataHelper;
 public class PropExpression extends Expression {
 	private String _propertyPath;
 	private IProperty _property; 
+	private IEntityType _entityType;
 	
 	public PropExpression(String propertyPath, IEntityType entityType) {
+	    _entityType = entityType;
 		_propertyPath = propertyPath;
 		_property = MetadataHelper.getPropertyFromPath(_propertyPath, entityType);
 		if (_property == null) {
 			throw new RuntimeException("Unable to validate propertyPath: " + _propertyPath + " on EntityType: " + entityType.getName());
 		}
+	}
+	
+	public IEntityType getEntityType() {
+	    return _entityType;
 	}
 	
 	public String getPropertyPath() {

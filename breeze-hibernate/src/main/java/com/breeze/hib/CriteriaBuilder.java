@@ -55,7 +55,7 @@ public class CriteriaBuilder {
 
     public CriteriaBuilder(IEntityType entityType) {
         _entityType = entityType;
-        _aliasBuilder = new CriteriaAliasBuilder(entityType);
+        _aliasBuilder = new CriteriaAliasBuilder();
 
     }
 
@@ -105,16 +105,17 @@ public class CriteriaBuilder {
 
     private void addWhere(Criteria crit, Predicate wherePred) {
         if (wherePred == null) return;
-        Criterion cr = toCriterion(crit, wherePred, null);
+        CriteriaWrapper critWrapper = new CriteriaWrapper(crit, _entityType);
+        Criterion cr = toCriterion(critWrapper, wherePred, null);
         crit.add(cr);
     }
 
     private void addSelect(Criteria crit, SelectClause selectClause) {
         if (selectClause == null) return;
         ProjectionList projList = Projections.projectionList();
-
+        CriteriaWrapper critWrapper = new CriteriaWrapper(crit, _entityType);
         for (String propertyPath : selectClause.getPropertyPaths()) {
-            String propertyName = _aliasBuilder.getPropertyName(crit,
+            String propertyName = _aliasBuilder.getPropertyName(critWrapper,
                     propertyPath);
             projList.add(Projections.property(propertyName).as(propertyPath));
         }
@@ -131,9 +132,9 @@ public class CriteriaBuilder {
      */
     private void addOrderBy(Criteria crit, OrderByClause obc) {
         if (obc == null) return;
-
+        CriteriaWrapper critWrapper = new CriteriaWrapper(crit, _entityType);
         for (OrderByItem item : obc.getOrderByItems()) {
-            String propertyName = _aliasBuilder.getPropertyName(crit,
+            String propertyName = _aliasBuilder.getPropertyName(critWrapper,
                     item.getPropertyPath());
             Order order = item.isDesc() ? Order.desc(propertyName) : Order
                     .asc(propertyName);
@@ -163,7 +164,9 @@ public class CriteriaBuilder {
         return crit;
     }
 
-    private Criterion toCriterion(Criteria crit, Predicate pred,
+    // crit is cast as Object because it can be either a Criteria or a DetachedCriteria
+    // and these two classes do not share any useful interfaces.
+    private Criterion toCriterion(CriteriaWrapper crit, Predicate pred,
             String contextAlias) {
 
         if (pred instanceof AndOrPredicate) {
@@ -188,7 +191,7 @@ public class CriteriaBuilder {
     // .add(Restrictions.eq(e.lastName, 'smith')
     // .add(Restrictions.eq(freight, 100);
 
-    private Criterion createCriterion(Criteria crit, AndOrPredicate pred,
+    private Criterion createCriterion(CriteriaWrapper crit, AndOrPredicate pred,
             String contextAlias) {
         Operator op = pred.getOperator();
         Junction junction = (op == Operator.And) ? Restrictions.conjunction()
@@ -202,7 +205,7 @@ public class CriteriaBuilder {
         return junction;
     }
 
-    private Criterion createCriterion(Criteria crit, AnyAllPredicate pred,
+    private Criterion createCriterion(CriteriaWrapper crit, AnyAllPredicate pred,
             String contextAlias) {
         // throw new
         // RuntimeException("Any/All predicates are not yet supported.");
@@ -223,23 +226,29 @@ public class CriteriaBuilder {
         if (op == Operator.Any) {
             PropExpression pexpr = pred.getExpr();
             Predicate nextPred = pred.getPredicate();
-            // TODO: should check that propertyPath below is not nested - i.e. a
-            // simple navigation propertyName
+            // TODO: should check that propertyPath below is not nested - 
+            // i.e. should be a simple navigation propertyName
+
+            IEntityType parentType = pexpr.getEntityType();
+            List<IDataProperty> rootKeyProperties = parentType.getKeyProperties();
+
             String propertyPath = pexpr.getPropertyPath();
-            INavigationProperty navProp = (INavigationProperty) MetadataHelper.getPropertyFromPath(propertyPath, _entityType);
+            INavigationProperty navProp = (INavigationProperty) MetadataHelper.getPropertyFromPath(propertyPath, parentType);
             String[] subtypeFkNames = navProp.getInvForeignKeyNames();
             IEntityType subtype = navProp.getEntityType();
-            List<IDataProperty> rootKeyProperties = _entityType.getKeyProperties();
             List<IDataProperty> subtypeKeyProperties = subtype.getKeyProperties();
 
             Class subqueryClass = MetadataHelper.lookupClass(subtype.getName());
             String subqAlias = "subq" + _subqCount++;
             DetachedCriteria detCrit = DetachedCriteria.forClass(subqueryClass, subqAlias);
-
-            Criterion subCrit = toCriterion(crit, nextPred, subqAlias);
+            CriteriaWrapper detWrapper = new CriteriaWrapper(detCrit, subtype);
+            // Criterion subCrit = toCriterion(detWrapper, nextPred, subqAlias);
+            Criterion subCrit = toCriterion(detWrapper, nextPred, null);
             detCrit.add(subCrit);
-            Criterion joinCrit = new PropertyExpression(subqAlias + "." + subtypeFkNames[0], "root."
-                    + rootKeyProperties.get(0).getName(), "=");
+            Criterion joinCrit = new PropertyExpression(
+                    subqAlias + "." + subtypeFkNames[0], 
+                    crit.getAlias() + "." + rootKeyProperties.get(0).getName(),
+                    "=");
             detCrit.add(joinCrit);
             detCrit.setProjection(Projections.property(subqAlias + "." + subtypeKeyProperties.get(0).getName()));
             Criterion cr = Subqueries.exists(detCrit);
@@ -269,14 +278,16 @@ public class CriteriaBuilder {
         // .add(Subqueries.notExists(subquery);
 
     }
+    
 
-    private Criterion createCriterion(Criteria crit, UnaryPredicate pred,
+
+    private Criterion createCriterion(CriteriaWrapper crit, UnaryPredicate pred,
             String contextAlias) {
         Criterion cr = toCriterion(crit, pred.getPredicate(), contextAlias);
         return Restrictions.not(cr);
     }
 
-    private Criterion createCriterion(Criteria crit, BinaryPredicate pred,
+    private Criterion createCriterion(CriteriaWrapper crit, BinaryPredicate pred,
             String contextAlias) {
         Operator op = pred.getOperator();
         String symbol = _operatorMap.get(op.getName());
