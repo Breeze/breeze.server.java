@@ -86,9 +86,8 @@ public class RelationshipFixer {
      * Add the relationship to the dependencyGraph
      * @param child Entity that depends on parent (e.g. has a many-to-one relationship to parent)
      * @param parent Entity that child depends on (e.g. one parent has one-to-many children)
-     * @param removeReverse True to find and remove the reverse relationship.  Used for handling one-to-ones.
      */
-    private void addToGraph(EntityInfo child, EntityInfo parent, boolean removeReverse)
+    private void addToGraph(EntityInfo child, EntityInfo parent)
     {
         List<EntityInfo> list = dependencyGraph.get(child);
         if (list == null) {
@@ -97,12 +96,12 @@ public class RelationshipFixer {
         }
         if (parent != null) list.add(parent);
 
-        if (removeReverse) {
-            List<EntityInfo> parentList = dependencyGraph.get(parent);
-            if (parentList != null) {
-                parentList.remove(child);
-            }
-        }
+//        if (removeReverse) {
+//            List<EntityInfo> parentList = dependencyGraph.get(parent);
+//            if (parentList != null) {
+//                parentList.remove(child);
+//            }
+//        }
     }
 
     /**
@@ -156,7 +155,7 @@ public class RelationshipFixer {
 
             for (EntityInfo entityInfo : entry.getValue())
             {
-                addToGraph(entityInfo, null, false); // make sure every entity is in the graph
+                addToGraph(entityInfo, null); // make sure every entity is in the graph
                 fixupRelationships(entityInfo, classMeta);
             }
         }    	
@@ -305,8 +304,9 @@ public class RelationshipFixer {
                     relatedEntity = session.load(relatedEntityName, (Serializable) id, LockOptions.NONE);
             	}
             } else {
-            	boolean removeReverseRelationship = propType.useLHSPrimaryKey();
-                addToGraph(entityInfo, relatedEntityInfo, removeReverseRelationship);
+            	if (!(propType.isOneToOne() && propType.useLHSPrimaryKey() && (propType.getForeignKeyDirection() == ForeignKeyDirection.FOREIGN_KEY_TO_PARENT))) {
+                    addToGraph(entityInfo, relatedEntityInfo);
+            	}
                 relatedEntity = relatedEntityInfo.entity;
             }
         }
@@ -351,7 +351,7 @@ public class RelationshipFixer {
     {
         Object entity = entityInfo.entity;
         Object id = null;
-        if (foreignKeyName == meta.getIdentifierPropertyName())
+        if (foreignKeyName.equalsIgnoreCase(meta.getIdentifierPropertyName()))
             id = meta.getIdentifier(entity, null);
         else if (Arrays.asList(meta.getPropertyNames()).contains(foreignKeyName))
             id = meta.getPropertyValue(entity, foreignKeyName);

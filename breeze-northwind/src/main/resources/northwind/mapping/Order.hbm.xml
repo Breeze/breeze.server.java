@@ -22,7 +22,7 @@
     <property name="shipPostalCode" type="string" length="10" />
     <property name="shipCountry" type="string" length="15" />
     <!--Foreign key to InternationalOrder (InternationalOrder)-->
-    <one-to-one name="internationalOrder" class="InternationalOrder" cascade="delete" fetch="join"/>
+    <one-to-one name="internationalOrder" class="InternationalOrder" cascade="delete,refresh" fetch="join" />
     <!--Foreign key to OrderDetail (OrderDetail)-->
     <set name="orderDetails" table="`OrderDetail`" schema="`dbo`" cascade="all-delete-orphan" inverse="true">
       <key column="`OrderID`" foreign-key="FK_OrderDetail_Order" />

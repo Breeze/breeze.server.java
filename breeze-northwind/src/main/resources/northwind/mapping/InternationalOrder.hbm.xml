@@ -4,7 +4,7 @@
   <class name="InternationalOrder" table="`InternationalOrder`" dynamic-update="true">
     <id name="orderID" column="`OrderID`" type="int" unsaved-value="0">
       <generator class="foreign">
-        <param name="property">Order</param>
+        <param name="property">order</param>
       </generator>
     </id>
     <version name="rowVersion" type="int" />
