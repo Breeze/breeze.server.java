@@ -79,9 +79,11 @@ public class HibernateContext extends ContextProvider {
 			saveWorkState.setEntityErrors(new EntityErrorsException(null, _entityErrors));
 		} catch (Exception ex) {
 			if (tx.isActive()) tx.rollback();
-			String msg = (_possibleErrors.size() > 0) ? _possibleErrors.toString() : ""; 
+			String msg = (_possibleErrors.size() > 0) ? _possibleErrors.toString() + " " : ""; 
 			if (ex instanceof JDBCException) {
 			    msg = msg + "SQLException: " + ((JDBCException) ex).getSQLException().getMessage();
+			} else {
+			    msg = msg + ex.toString();
 			}
 			msg = "Error performing save: " + msg;
 			throw new RuntimeException(msg, ex);
@@ -258,15 +260,10 @@ public class HibernateContext extends ContextProvider {
 	 * @param saveMap
 	 */
 	protected void refreshFromSession(Map<Class, List<EntityInfo>> saveMap) {
-        SessionFactory sf = _session.getSessionFactory();
     	for (Entry<Class, List<EntityInfo>> entry : saveMap.entrySet()) {
-            ClassMetadata classMeta = sf.getClassMetadata(entry.getKey());
-            // we don't have to check hasIdentifierProperty in NH 3.3, why here?
-            if (classMeta.hasIdentifierProperty()) {
-                for (EntityInfo entityInfo : entry.getValue()) {
-                    if (entityInfo.entityState == EntityState.Added || entityInfo.entityState == EntityState.Modified) {
-                        _session.refresh(entityInfo.entity);
-                    }
+            for (EntityInfo entityInfo : entry.getValue()) {
+                if (entityInfo.entityState == EntityState.Added || entityInfo.entityState == EntityState.Modified) {
+                    _session.refresh(entityInfo.entity);
                 }
             }
         }    	
