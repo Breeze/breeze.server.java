@@ -40,9 +40,7 @@ import com.breeze.query.UnaryPredicate;
  * Converts EntityQuery into Hibernate Criteria.
  * 
  * @author Jay
- * @see http
- *      ://docs.jboss.org/hibernate/core/3.6/javadocs/org/hibernate/Criteria.
- *      html
+ * @see http://docs.jboss.org/hibernate/core/3.6/javadocs/org/hibernate/Criteria.html
  */
 public class CriteriaBuilder {
 
@@ -58,7 +56,6 @@ public class CriteriaBuilder {
 
     }
 
-    // TODO: handle 'All'
     // TODO: fix select with nonscalar nav props.
 
     private static final HashMap<String, String> _operatorMap = new HashMap<String, String>();
@@ -246,12 +243,10 @@ public class CriteriaBuilder {
         // trackCriteria.setProjection(Projections.property("track.id"));
         // criteria.add(Subqueries.exists(trackCriteria));
 
-
-
     }
 
     private DetachedCriteria makeSubcrit(CriteriaWrapper crit, AnyAllPredicate pred) {
-        
+
         PropExpression pexpr = pred.getExpr();
         Predicate nextPred = pred.getPredicate();
         if (pred.getOperator() == Operator.All) {
@@ -276,16 +271,14 @@ public class CriteriaBuilder {
         Criterion subCrit = toCriterion(detWrapper, nextPred, null);
         detCrit.add(subCrit);
         Criterion joinCrit = new PropertyExpression(
-                subqAlias + "." + subtypeFkNames[0], 
+                subqAlias + "." + subtypeFkNames[0],
                 crit.getAlias() + "." + rootKeyProperties.get(0).getName(),
                 "=");
         detCrit.add(joinCrit);
         detCrit.setProjection(Projections.property(subqAlias + "." + subtypeKeyProperties.get(0).getName()));
         return detCrit;
-        
-    }
-    
 
+    }
 
     private Criterion createCriterion(CriteriaWrapper crit, UnaryPredicate pred,
             String contextAlias) {
