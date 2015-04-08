@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.breeze</groupId>
-  <artifactId>breeze-webtest</artifactId>
-  <packaging>war</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>Breeze Integration Test Webapp</name>
+  <artifactId>breeze-webserver</artifactId>
+  <packaging>jar</packaging>
+  <version>0.1a</version>
+  <name>breeze-webserver</name>
   <url>http://breezejs.com</url>
 
   <dependencies>
@@ -28,18 +28,6 @@
 		<artifactId>breeze-hibernate</artifactId>
 		<version>0.1a</version>
 	</dependency>
-  
- 	<dependency>
-		<groupId>com.breeze</groupId>
-		<artifactId>breeze-webserver</artifactId>
-		<version>0.1a</version>
-	</dependency>
-
-    <dependency>
-		<groupId>northwind</groupId>
-		<artifactId>breeze-northwind</artifactId>
-		<version>0.1a</version>
-	</dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -49,33 +37,32 @@
     </dependency>
 
   </dependencies>
-  <build>
-    <finalName>breeze-webtest</finalName>
-
+ 	<build>
     <plugins>
       <plugin>
-      	<!-- `mvn assembly:single` to include dependencies in the target -->
+        <!-- `mvn assembly:single` to include dependencies in the target -->
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.4</version>
         <configuration>
           <descriptorRefs>
-          	<!-- a massive jar with all dependencies -->
-            <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+            <!-- a massive jar with all dependencies -->
+            <!--<descriptorRef>jar-with-dependencies</descriptorRef> -->
           </descriptorRefs>
           <descriptors>
             <!-- a directory containing all the dependent jars -->
             <descriptor>src/main/assembly/lib.xml</descriptor>
           </descriptors>
         </configuration>
-       </plugin>
 
-	  <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.6</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.2</version>
         <configuration>
-          <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+          <source>1.7</source>
+          <target>1.7</target>
         </configuration>
       </plugin>
     </plugins>
-  </build>
+	</build>
 </project>

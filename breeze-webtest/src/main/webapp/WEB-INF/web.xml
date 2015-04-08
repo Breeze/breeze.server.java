@@ -13,7 +13,7 @@
 
     <!-- Initialize the app configuration upon startup -->
     <listener>
-      <listener-class>com.breeze.webtest.AppContextListener</listener-class>
+      <listener-class>com.breeze.webserver.AppContextListener</listener-class>
     </listener>  
     
 <!--

@@ -12,7 +12,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.breeze.webtest.ControllerServlet;
+import com.breeze.webserver.ControllerServlet;
 
 public class TestHarnessServlet extends ControllerServlet {
     private static final long serialVersionUID = 1L;

@@ -1,4 +1,4 @@
-package com.breeze.webtest;
+package com.breeze.webserver;
 
 public class HttpErrorInfo {
 	public String message;
