@@ -1,10 +1,6 @@
 package com.breeze.save;
 
-import java.util.List;
-import java.util.Map;
-
 import com.breeze.metadata.Metadata;
-import com.breeze.util.JsonGson;
 
 public class ContextProvider {
     private Metadata _metadata;

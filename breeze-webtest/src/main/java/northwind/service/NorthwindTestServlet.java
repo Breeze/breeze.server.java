@@ -1,12 +1,6 @@
 package northwind.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URLDecoder;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,9 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,10 +28,7 @@ import com.breeze.save.EntityState;
 import com.breeze.save.KeyMapping;
 import com.breeze.save.SaveResult;
 import com.breeze.save.SaveWorkState;
-import com.breeze.util.JsonGson;
 import com.breeze.webtest.BreezeControllerServlet;
-import com.breeze.metadata.DataType;
-import com.breeze.metadata.IEntityType;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.query.AndOrPredicate;
 import com.breeze.query.BinaryPredicate;
@@ -48,7 +37,9 @@ import com.breeze.query.Operator;
 import com.breeze.query.Predicate;
 import com.breeze.query.QueryResult;
 
+@SuppressWarnings( {"unused", "unchecked"})
 public class NorthwindTestServlet extends BreezeControllerServlet {
+    private static final long serialVersionUID = 1L;
 
     public void customersInBrazil(HttpServletRequest request,
             HttpServletResponse response) {
@@ -199,8 +190,8 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         QueryResult cresult = executeQuery(Customer.class, new EntityQuery());
         QueryResult presult = executeQuery(Product.class, new EntityQuery());
         List<CustomersAndProductsBundle> list = new ArrayList<CustomersAndProductsBundle>();
-        list.add(new CustomersAndProductsBundle((List<Customer>) (cresult
-                .getResults()), (List<Product>) (presult.getResults())));
+        list.add(new CustomersAndProductsBundle((cresult
+                .getResults()), (presult.getResults())));
 
         QueryResult qr = new QueryResult(list);
         writeQueryResponse(response, qr);
@@ -271,7 +262,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         eq = eq.expand("orders");
         eq = eq.take(1);
         QueryResult qr = this.executeQuery(Customer.class, eq);
-        List<Customer> custResults = (List<Customer>) qr.getResults();
+        List<Customer> custResults = qr.getResults();
         List<Integer> results = new ArrayList<Integer>();
         if (custResults.size() > 0) {
             Customer cust = (Customer) qr.getResults().get(0);
@@ -398,6 +389,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
             HttpServletResponse response) {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
+            @Override
             public boolean beforeSaveEntity(EntityInfo entityInfo) {
                 String tag = (String) this.getSaveOptions().tag;
                 CheckFreight(entityInfo, tag);
@@ -413,6 +405,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
             HttpServletResponse response) {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
+            @Override
             public Map<Class, List<EntityInfo>> beforeSaveEntities(
                     Map<Class, List<EntityInfo>> saveMap)
                     throws EntityErrorsException {
@@ -469,6 +462,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
 
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
+            @Override
             public Map<Class, List<EntityInfo>> beforeSaveEntities(
                     Map<Class, List<EntityInfo>> saveMap)
                     throws EntityErrorsException {
@@ -501,6 +495,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
 
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
+            @Override
             public boolean beforeSaveEntity(EntityInfo entityInfo) {
                 String unmappedValue = (String) entityInfo.unmappedValuesMap
                         .get("myUnmappedProperty");
@@ -524,6 +519,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
 
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
+            @Override
             public boolean beforeSaveEntity(EntityInfo entityInfo) {
                 Map map = entityInfo.unmappedValuesMap;
                 if (map != null) {
@@ -543,6 +539,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
 
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
+            @Override
             public boolean beforeSaveEntity(EntityInfo entityInfo) {
                 Map map = entityInfo.unmappedValuesMap;
                 String unmappedValue = (String) map.get("myUnmappedProperty");
@@ -591,6 +588,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
             HttpServletResponse response) {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
+            @Override
             public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) {
                 Comment comment = new Comment();
                 String tag = (String) this.getSaveOptions().tag;
@@ -612,6 +610,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
             HttpServletResponse response) {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
+            @Override
             public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) {
                 // Create and add a new order.
                 Order order = new Order();
@@ -630,6 +629,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
     @Override
     public SaveWorkState createSaveWorkState(Map saveBundle) {
         SaveWorkState sws = new SaveWorkState(saveBundle) {
+            @Override
             public boolean beforeSaveEntity(EntityInfo entityInfo) throws EntityErrorsException {
                 if (entityInfo.entity instanceof Customer) {
                     Customer c = (Customer) entityInfo.entity;
@@ -666,6 +666,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
                 return true;
             }
 
+            @Override
             public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) {
                 String tag = (String) this.getSaveOptions().tag;
                 if (tag == null) return saveMap;
@@ -724,6 +725,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
                 return saveMap;
             }
             
+            @Override
             public List<EntityInfo> beforeSaveEntityGraph(List<EntityInfo> entitiesToPersist)  {
                 return entitiesToPersist;
             }

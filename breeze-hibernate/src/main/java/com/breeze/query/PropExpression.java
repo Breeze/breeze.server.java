@@ -3,7 +3,6 @@ package com.breeze.query;
 import com.breeze.metadata.DataType;
 import com.breeze.metadata.IDataProperty;
 import com.breeze.metadata.IEntityType;
-import com.breeze.metadata.INavigationProperty;
 import com.breeze.metadata.IProperty;
 import com.breeze.metadata.MetadataHelper;
 
@@ -33,7 +32,8 @@ public class PropExpression extends Expression {
 		return _property;
 	}
 	
-	public DataType getDataType() {
+	@Override
+    public DataType getDataType() {
 		if (!(_property instanceof IDataProperty )) {
 			throw new RuntimeException("This property expression returns a NavigationProperty not a DataProperty");
 		}

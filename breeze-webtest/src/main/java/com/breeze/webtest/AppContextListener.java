@@ -9,7 +9,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import com.breeze.metadata.Metadata;
-import com.breeze.metadata.RawMetadata;
 import com.breeze.hib.MetadataBuilder;
 
 @WebListener

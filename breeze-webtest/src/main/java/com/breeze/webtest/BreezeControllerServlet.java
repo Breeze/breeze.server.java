@@ -2,9 +2,6 @@ package com.breeze.webtest;
 
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -16,10 +13,8 @@ import org.hibernate.SessionFactory;
 import com.breeze.hib.QueryService;
 import com.breeze.hib.SaveService;
 import com.breeze.metadata.Metadata;
-import com.breeze.metadata.RawMetadata;
 import com.breeze.query.EntityQuery;
 import com.breeze.query.QueryResult;
-import com.breeze.save.EntityInfo;
 import com.breeze.save.SaveResult;
 import com.breeze.save.SaveWorkState;
 import com.breeze.util.JsonGson;
@@ -139,12 +134,16 @@ public class BreezeControllerServlet extends ControllerServlet {
 
     protected EntityQuery extractEntityQuery(HttpServletRequest request) {
         String qs = request.getQueryString();
-        qs = (qs != null) ? URLDecoder.decode(qs) : null;
+        try {
+            qs = (qs != null) ? URLDecoder.decode(qs, "UTF-8") : null;
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to decode: " + qs, e);
+        }
         Map<String, String[]> map = request.getParameterMap();
         String json = null;
         for (Map.Entry<String, String[]> entry : map.entrySet()) {
             String parameterName = entry.getKey();
-            String[] value = entry.getValue();
+            // String[] value = entry.getValue();
 
             if (qs.indexOf("&" + parameterName) == -1) {
                 json = parameterName;
@@ -169,7 +168,7 @@ public class BreezeControllerServlet extends ControllerServlet {
     protected Map extractSaveBundle(HttpServletRequest request) {
         String saveBundleString = readPostData(request);
 
-        Map saveBundle = (Map) JsonGson.fromJson(saveBundleString);
+        Map saveBundle = JsonGson.fromJson(saveBundleString);
         return saveBundle;
     }
     

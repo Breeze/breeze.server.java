@@ -1,12 +1,12 @@
 package com.breeze.test;
 
 import java.util.List;
-import java.util.Map;
+
 
 import com.breeze.query.EntityQuery;
 import com.breeze.query.OrderByClause;
 import com.breeze.query.OrderByClause.OrderByItem;
-import com.breeze.util.JsonGson;
+
 
 import junit.framework.TestCase;
 

@@ -21,11 +21,9 @@ import org.hibernate.transform.Transformers;
 import com.breeze.metadata.IDataProperty;
 import com.breeze.metadata.IEntityType;
 import com.breeze.metadata.INavigationProperty;
-import com.breeze.metadata.IProperty;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.query.AndOrPredicate;
 import com.breeze.query.AnyAllPredicate;
-import com.breeze.query.BinaryOperator;
 import com.breeze.query.BinaryPredicate;
 import com.breeze.query.EntityQuery;
 import com.breeze.query.Expression;
@@ -49,6 +47,7 @@ import com.breeze.query.UnaryPredicate;
 public class CriteriaBuilder {
 
     private CriteriaAliasBuilder _aliasBuilder;
+    @SuppressWarnings("unused")
     private EntityQuery _entityQuery;
     private IEntityType _entityType;
     private int _subqCount = 0;

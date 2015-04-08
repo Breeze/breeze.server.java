@@ -168,7 +168,8 @@ public class PredicateTest extends TestCase {
 		 assertTrue(expr2.getValue().equals("'"));
 	}
 	
-	public void testBinaryExplicitDate() {
+	@SuppressWarnings("deprecation")
+    public void testBinaryExplicitDate() {
 		 String pJson = "{ shippedDate: { value: '2015-02-09T00:00:00', dataType: 'DateTime' }}";
 		 Map map = JsonGson.fromJson(pJson);
 		 Predicate pred = Predicate.predicateFromMap(map);

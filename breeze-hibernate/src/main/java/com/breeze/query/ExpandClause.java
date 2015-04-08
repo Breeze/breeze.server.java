@@ -3,7 +3,6 @@ package com.breeze.query;
 
 import java.util.List;
 
-import com.breeze.util.StringFns;
 
 public class ExpandClause {
 	private List<String> _propertyPaths;

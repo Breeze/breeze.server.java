@@ -81,7 +81,7 @@ public class EntityQuery {
             eq._wherePredicate = predicate;
         } else if (eq._wherePredicate.getOperator() == Operator.And) {
             AndOrPredicate andOrPred = (AndOrPredicate) eq._wherePredicate;
-            List<Predicate> preds = new ArrayList(andOrPred.getPredicates());
+            List<Predicate> preds = new ArrayList<Predicate>(andOrPred.getPredicates());
             preds.add(predicate);
             eq._wherePredicate = new AndOrPredicate(Operator.And, preds);
         } else {
@@ -157,6 +157,7 @@ public class EntityQuery {
         return eq;
     }
 
+    @SuppressWarnings("unchecked")
     private List<String> toStringList(Object src) {
         if (src == null)
             return null;

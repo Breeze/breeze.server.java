@@ -2,7 +2,6 @@ package com.breeze.webtest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.StringTokenizer;
@@ -15,12 +14,15 @@ import javax.servlet.http.HttpServletResponse;
 import com.breeze.util.JsonGson;
 
 public abstract class ControllerServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response) {
+	@Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		doGetOrPost(request, response);
 	}
 
-	public void doPost(HttpServletRequest request, HttpServletResponse response) {
+	@Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		doGetOrPost(request, response);
 	}
 
@@ -106,8 +108,9 @@ public abstract class ControllerServlet extends HttpServlet {
 	protected abstract void handleRequest(HttpServletRequest request, HttpServletResponse response);
 
 	class ControllerException extends ServletException {
+        private static final long serialVersionUID = 1L;
 
-		ControllerException(String reason) {
+        ControllerException(String reason) {
 			super(reason);
 		}
 

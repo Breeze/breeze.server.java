@@ -13,6 +13,7 @@ import com.breeze.test.Serializer;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings("unused")
 public class MetadataBuilderTest extends TestCase {
 
 	public static final String NORTHWINDIB_METADATA_SER = "src/test/resources/northwindib_metadata.ser";

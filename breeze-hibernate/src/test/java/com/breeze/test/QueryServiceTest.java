@@ -1,7 +1,6 @@
 package com.breeze.test;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.hibernate.SessionFactory;
 
@@ -33,11 +30,13 @@ import com.breeze.util.JsonGson;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings( {"unused", "unchecked"}) 
 public class QueryServiceTest extends TestCase {
 
     private QueryService _qe;
 
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         // then populate the database with test data...?
@@ -763,6 +762,7 @@ public class QueryServiceTest extends TestCase {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private Date toDate(int yr, int month, int day) {
         int y = yr - 1900;
         int m = month - 1;

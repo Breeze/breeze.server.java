@@ -5,8 +5,10 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 
+
 import com.breeze.util.JsonGson;
 
+@SuppressWarnings("unused")
 public class JsonTest extends TestCase {
 	
 	protected void setUp() throws Exception {

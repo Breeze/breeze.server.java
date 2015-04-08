@@ -3,7 +3,8 @@ package com.breeze.query;
 import com.breeze.metadata.DataType;
 
 public class LitExpression extends Expression {
-	private Object _initialValue;
+	@SuppressWarnings("unused")
+    private Object _initialValue;
 	private Object _coercedValue; 
 	private DataType _dataType;
 

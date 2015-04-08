@@ -13,6 +13,7 @@ import com.breeze.metadata.IProperty;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.util.JsonGson;
 
+@SuppressWarnings("unchecked")
 public class Metadata  {
 	private HashMap<String, Object> _resourceEntityTypeMap;
 	private HashMap<String, IEntityType> _entityTypeMap = new HashMap<String, IEntityType>();
@@ -90,6 +91,10 @@ public class Metadata  {
 		@Override
 		public String getName() {
 			return _entityTypeName;
+		}
+		
+		public Metadata getMetadata() {
+		    return _metadata;
 		}
 
 		@Override

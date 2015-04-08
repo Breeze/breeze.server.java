@@ -395,6 +395,7 @@ public class RelationshipFixer {
      * @param entityId Key value of the entity
      * @return The entity, or null if not found
      */
+    @SuppressWarnings("unchecked")
     private EntityInfo findInSaveMap(Class entityType, Object entityId)
     {
         String entityIdString = entityId.toString();

@@ -1,7 +1,5 @@
 package com.breeze.query;
 
-import java.util.List;
-
 import com.breeze.metadata.IEntityType;
 import com.breeze.metadata.INavigationProperty;
 import com.breeze.metadata.IProperty;

@@ -4,8 +4,6 @@ import java.util.HashMap;
 
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.sql.JoinType;
 
 import com.breeze.metadata.IEntityType;
 import com.breeze.metadata.INavigationProperty;

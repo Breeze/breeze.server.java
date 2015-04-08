@@ -1,9 +1,5 @@
 package com.breeze.metadata;
 
-import java.util.List;
-
-import com.breeze.util.StringFns;
-
 public class MetadataHelper {
 	
 	 /**

@@ -6,7 +6,6 @@ import java.util.List;
 import com.breeze.metadata.IEntityType;
 import com.breeze.metadata.IProperty;
 import com.breeze.metadata.MetadataHelper;
-import com.breeze.util.StringFns;
 
 public class SelectClause {
 	private List<String> _propertyPaths;

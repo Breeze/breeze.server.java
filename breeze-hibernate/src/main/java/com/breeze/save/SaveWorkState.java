@@ -10,6 +10,7 @@ import com.breeze.metadata.Metadata;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.util.JsonGson;
 
+@SuppressWarnings("unchecked")
 public class SaveWorkState {
 
     // input

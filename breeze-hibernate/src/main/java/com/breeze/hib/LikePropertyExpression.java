@@ -18,6 +18,7 @@ import org.hibernate.internal.util.StringHelper;
  * 
  */
 public class LikePropertyExpression implements Criterion {
+    private static final long serialVersionUID = 1L;
 	private static final TypedValue[] NO_TYPED_VALUES = new TypedValue[0];
 
 	private final String propertyName;
