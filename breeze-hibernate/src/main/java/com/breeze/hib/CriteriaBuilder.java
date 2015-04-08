@@ -207,13 +207,21 @@ public class CriteriaBuilder {
 
     private Criterion createCriterion(CriteriaWrapper crit, AnyAllPredicate pred,
             String contextAlias) {
-        // throw new
-        // RuntimeException("Any/All predicates are not yet supported.");
-        // May need additional Metadata for this. In order to construct
-        // an EXISTS subquery we need to have the join columns.
-        Operator op = pred.getOperator();
-        //        if (op == Operator.Any) {
 
+        Operator op = pred.getOperator();
+
+        if (op == Operator.Any) {
+            DetachedCriteria detCrit = makeSubcrit(crit, pred);
+            Criterion cr = Subqueries.exists(detCrit);
+            return cr;
+        } else if (op == Operator.All) {
+            DetachedCriteria detCrit = makeSubcrit(crit, pred);
+            Criterion cr = Subqueries.notExists(detCrit);
+            return cr;
+        }
+
+        //   OLD logic using joins - cannot be 'inverted' to make an 'any' into an 'all though
+        //        if (op == Operator.Any) {
         //            PropExpression pexpr = pred.getExpr();
         //            Predicate nextPred = pred.getPredicate();
         //            // TODO: should check that propertyPath below is not nested - i.e. a
@@ -223,37 +231,6 @@ public class CriteriaBuilder {
         //            Criterion cr = toCriterion(crit, nextPred, nextContextAlias);
         //            return cr;
         //        }
-        if (op == Operator.Any) {
-            PropExpression pexpr = pred.getExpr();
-            Predicate nextPred = pred.getPredicate();
-            // TODO: should check that propertyPath below is not nested - 
-            // i.e. should be a simple navigation propertyName
-
-            IEntityType parentType = pexpr.getEntityType();
-            List<IDataProperty> rootKeyProperties = parentType.getKeyProperties();
-
-            String propertyPath = pexpr.getPropertyPath();
-            INavigationProperty navProp = (INavigationProperty) MetadataHelper.getPropertyFromPath(propertyPath, parentType);
-            String[] subtypeFkNames = navProp.getInvForeignKeyNames();
-            IEntityType subtype = navProp.getEntityType();
-            List<IDataProperty> subtypeKeyProperties = subtype.getKeyProperties();
-
-            Class subqueryClass = MetadataHelper.lookupClass(subtype.getName());
-            String subqAlias = "subq" + _subqCount++;
-            DetachedCriteria detCrit = DetachedCriteria.forClass(subqueryClass, subqAlias);
-            CriteriaWrapper detWrapper = new CriteriaWrapper(detCrit, subtype);
-            // Criterion subCrit = toCriterion(detWrapper, nextPred, subqAlias);
-            Criterion subCrit = toCriterion(detWrapper, nextPred, null);
-            detCrit.add(subCrit);
-            Criterion joinCrit = new PropertyExpression(
-                    subqAlias + "." + subtypeFkNames[0], 
-                    crit.getAlias() + "." + rootKeyProperties.get(0).getName(),
-                    "=");
-            detCrit.add(joinCrit);
-            detCrit.setProjection(Projections.property(subqAlias + "." + subtypeKeyProperties.get(0).getName()));
-            Criterion cr = Subqueries.exists(detCrit);
-            return cr;
-        }
 
         throw new RuntimeException("'All' predicates are not yet supported.");
 
@@ -266,17 +243,47 @@ public class CriteriaBuilder {
         // Criteria criteria = session.createCriteria(CD.class, "cd");
         // DetachedCriteria trackCriteria = DetachedCriteria.forClass(Track.class, "track");
         // trackCriteria.add(Restrictions.eq("track.title", "SomeTitle"));
-        // trackCriteria.add(Restrictions.propertyEq("track.cd.id", "cd.id"));
-        // trackCriteria.setProjection(Projections.property("track.title"));
+        // trackCriteria.add(Restrictions.propertyEq("track.cd_id", "cd.id"));
+        // trackCriteria.setProjection(Projections.property("track.id"));
         // criteria.add(Subqueries.exists(trackCriteria));
 
-        // exists need join columns
-        // DetachedCriteria subquery = DetachedCriteria.forClass(Bar.class, "b")
-        // .add(Property.forName("b.a_id").eqProperty("a.id"))
-        //
-        // Criteria criteria = session.createCriteria(Foo.class, "a")
-        // .add(Subqueries.notExists(subquery);
 
+
+    }
+
+    private DetachedCriteria makeSubcrit(CriteriaWrapper crit, AnyAllPredicate pred) {
+        
+        PropExpression pexpr = pred.getExpr();
+        Predicate nextPred = pred.getPredicate();
+        if (pred.getOperator() == Operator.All) {
+            nextPred = new UnaryPredicate(Operator.Not, nextPred);
+        }
+
+        // TODO: should check that propertyPath below is not nested - 
+        // i.e. should be a simple navigation propertyName
+        IEntityType parentType = pexpr.getEntityType();
+        List<IDataProperty> rootKeyProperties = parentType.getKeyProperties();
+
+        String propertyPath = pexpr.getPropertyPath();
+        INavigationProperty navProp = (INavigationProperty) MetadataHelper.getPropertyFromPath(propertyPath, parentType);
+        String[] subtypeFkNames = navProp.getInvForeignKeyNames();
+        IEntityType subtype = navProp.getEntityType();
+        List<IDataProperty> subtypeKeyProperties = subtype.getKeyProperties();
+
+        Class subqueryClass = MetadataHelper.lookupClass(subtype.getName());
+        String subqAlias = "subq" + _subqCount++;
+        DetachedCriteria detCrit = DetachedCriteria.forClass(subqueryClass, subqAlias);
+        CriteriaWrapper detWrapper = new CriteriaWrapper(detCrit, subtype);
+        Criterion subCrit = toCriterion(detWrapper, nextPred, null);
+        detCrit.add(subCrit);
+        Criterion joinCrit = new PropertyExpression(
+                subqAlias + "." + subtypeFkNames[0], 
+                crit.getAlias() + "." + rootKeyProperties.get(0).getName(),
+                "=");
+        detCrit.add(joinCrit);
+        detCrit.setProjection(Projections.property(subqAlias + "." + subtypeKeyProperties.get(0).getName()));
+        return detCrit;
+        
     }
     
 
