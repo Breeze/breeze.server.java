@@ -79,13 +79,15 @@ public class HibernateContext extends ContextProvider {
 			saveWorkState.setEntityErrors(new EntityErrorsException(null, _entityErrors));
 		} catch (Exception ex) {
 			if (tx.isActive()) tx.rollback();
-			String msg = (_possibleErrors.size() > 0) ? _possibleErrors.toString() + " " : ""; 
-			if (ex instanceof JDBCException) {
-			    msg = msg + "SQLException: " + ((JDBCException) ex).getSQLException().getMessage();
-			} else {
-			    msg = msg + ex.toString();
+			String msg = "Save exception: ";
+	        if (ex instanceof JDBCException) {
+                msg += "SQLException: " + ((JDBCException) ex).getSQLException().getMessage();
+            } else {
+                msg += ex.getMessage(); // most hibernate exceptions appear here
+            }
+			if (_possibleErrors.size() > 0) {
+                msg += ". Possible errors: " + _possibleErrors.toString() + " ";
 			}
-			msg = "Error performing save: " + msg;
 			throw new RuntimeException(msg, ex);
 		} finally {
 			//          if (!hasExistingTransaction) tx.Dispose();
