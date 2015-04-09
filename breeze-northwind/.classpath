@@ -3,5 +3,9 @@
 	<classpathentry kind="src" path="src/main/java" />
 	<classpathentry kind="con"
 		path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7" />
+	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-core/4.3.0.Final/hibernate-core-4.3.0.Final.jar"/>
+    <classpathentry kind="var" path="M2_REPO/org/hibernate/common/hibernate-commons-annotations/4.0.4.Final/hibernate-commons-annotations-4.0.4.Final.jar"/>
+    <classpathentry kind="var" path="M2_REPO/org/hibernate/javax/persistence/hibernate-jpa-2.1-api/1.0.0.Final/hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
+    <classpathentry kind="var" path="M2_REPO/dom4j/dom4j/1.6.1/dom4j-1.6.1.jar"/>
 	<classpathentry kind="output" path="bin" />
 </classpath>

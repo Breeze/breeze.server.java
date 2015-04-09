@@ -42,6 +42,7 @@ public class Role {
 		this.ts = ts;
 	}
 
+	 
 	public RoleType getRoleType() {
 		return roleType;
 	}

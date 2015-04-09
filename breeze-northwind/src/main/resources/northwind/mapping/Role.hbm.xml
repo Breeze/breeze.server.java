@@ -12,7 +12,14 @@
 		<version name="ts" column="`Ts`" type="timestamp" />
 		<property name="name" type="string" length="50" not-null="true" />
 		<property name="description" type="string" length="2000" />
-		<property name="roleType" type="northwind.model.RoleType" />
+  		<property name="roleType" type="northwind.model.RoleType" />  
+<!-- 		<property name='roleType'>   -->
+<!--     		<type name="EnumUserType">   -->
+<!--       			<param name="enumClassName">northwind.model.RoleType</param> -->
+<!--     		    <param name="useNamed">true</param>      -->
+<!--     		</type>   -->
+<!--   		</property> -->
+
 		<!--Foreign key to UserRole (UserRole) -->
 		<set name="userRoles" table="`UserRole`" cascade="all-delete-orphan"
 			inverse="true">
