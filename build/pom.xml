@@ -9,10 +9,10 @@
   <url>http://breezejs.com</url>
 
   <modules>
-  	<module>breeze-northwind</module>
-  	<module>breeze-hibernate</module>
-  	<module>breeze-webserver</module>
-  	<module>breeze-webtest</module>
+  	<module>../breeze-northwind</module>
+  	<module>../breeze-hibernate</module>
+  	<module>../breeze-webserver</module>
+  	<module>../breeze-webtest</module>
   </modules>
 
 </project>
