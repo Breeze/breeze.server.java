@@ -19,5 +19,6 @@
   <classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.3.1/gson-2.3.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/mysql/mysql-connector-java/5.1.30/mysql-connector-java-5.1.30.jar"/>
-  <classpathentry kind="var" path="M2_REPO/northwind/breeze-northwind/0.1a/breeze-northwind-0.1a.jar"/>
+  
+  <classpathentry combineaccessrules="false" kind="src" path="/breeze-northwind"/>
 </classpath>
