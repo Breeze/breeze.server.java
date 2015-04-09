@@ -158,6 +158,15 @@ public class Metadata  {
 		public IEntityType getParentType() {
 			return _parentType;
 		}
+		
+		public Class getEnumType() {
+		    String enumTypeName = (String) _dpMap.get("enumType");
+		    try {
+		        return enumTypeName == null ? null : Class.forName(enumTypeName);
+		    } catch (ClassNotFoundException e) {
+		        return null;
+		    }
+		}
 	}
 	
 	public class NavigationProperty implements INavigationProperty {

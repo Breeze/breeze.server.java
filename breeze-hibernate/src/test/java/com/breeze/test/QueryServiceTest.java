@@ -19,6 +19,8 @@ import northwind.model.Location;
 import northwind.model.Order;
 import northwind.model.OrderDetail;
 import northwind.model.Product;
+import northwind.model.Role;
+import northwind.model.RoleType;
 import northwind.model.Supplier;
 
 import com.breeze.hib.MetadataBuilder;
@@ -56,6 +58,37 @@ public class QueryServiceTest extends TestCase {
         for (Object o : results) {
             Employee emp = (Employee) o;
             Date birthDt = emp.getBirthDate();
+            
+        }
+    }
+    
+    public void testEnumQuery() {
+        String json = "{ where: { id: { lt: 10} } }";
+        EntityQuery eq = new EntityQuery(json);
+        QueryResult qr = _qe.executeQuery(Role.class, eq);
+        Collection results = qr.getResults();
+        String rJson = qr.toJson();
+        assertTrue(results.size() > 0);
+        for (Object o : results) {
+            Role role = (Role) o;
+            String description  = role.getDescription();
+            RoleType rt = role.getRoleType();
+            
+        }
+    }
+    
+    public void testEnumQueryFilter() {
+        String json = "{ where: { roleType: 'Restricted' } }";
+        EntityQuery eq = new EntityQuery(json);
+        QueryResult qr = _qe.executeQuery(Role.class, eq);
+        Collection results = qr.getResults();
+        String rJson = qr.toJson();
+        assertTrue(results.size() > 0);
+        for (Object o : results) {
+            Role role = (Role) o;
+            String description  = role.getDescription();
+            RoleType rt = role.getRoleType();
+            assertTrue(rt == RoleType.Restricted);
             
         }
     }

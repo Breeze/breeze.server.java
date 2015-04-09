@@ -67,7 +67,7 @@ public class DataType {
 	
 	public static Object coerceData(Object value, DataType dataType) {
 
-		if (value == null || value.getClass() == dataType.getJavaClass()) {
+		if (value == null || dataType == null || value.getClass() == dataType.getJavaClass()) {
 			return value;
 		} else if (value instanceof List) {
 			// this occurs with an 'In' clause

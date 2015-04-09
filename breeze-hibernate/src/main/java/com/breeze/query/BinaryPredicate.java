@@ -2,7 +2,10 @@ package com.breeze.query;
 
 import java.util.List;
 
+import com.breeze.metadata.DataType;
 import com.breeze.metadata.IEntityType;
+import com.breeze.metadata.IProperty;
+import com.breeze.metadata.Metadata.DataProperty;
 
 public class BinaryPredicate extends Predicate {
 	private Operator _op;
@@ -48,7 +51,26 @@ public class BinaryPredicate extends Predicate {
 			throw new RuntimeException("The 'in' operator requires that its right hand argument be an array");
 		}
 		
-		this._expr2 = Expression.createRHSExpression(_expr2Source, entityType, this._expr1.getDataType());
+		// Special purpose Enum handling
+		Class enumType = getEnumType(this._expr1);
+        if (enumType != null) {
+            Enum expr2Enum = Enum.valueOf(enumType, (String) _expr2Source);
+            this._expr2 = Expression.createRHSExpression(expr2Enum, entityType,  null);
+        } else {
+            this._expr2 = Expression.createRHSExpression(_expr2Source, entityType, this._expr1.getDataType());
+        }
+	}
+	
+	private Class getEnumType(Expression expr) {
+       if (expr instanceof PropExpression) {
+            PropExpression pExpr = (PropExpression) expr;
+            IProperty prop = pExpr.getProperty();
+            if (prop instanceof DataProperty) {
+                DataProperty dprop = (DataProperty) prop;
+                return dprop.getEnumType();
+            }
+       }
+       return null;
 	}
 
 }

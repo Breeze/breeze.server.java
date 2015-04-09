@@ -30,7 +30,10 @@ public class BreezeTypeAdapterFactory implements TypeAdapterFactory {
 
 	public final <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
 		
-		String name = type.getRawType().getCanonicalName();
+	    Class rawType = type.getRawType();
+	    // eliminate enums
+	    if (rawType.isEnum()) return null;
+		String name = rawType.getCanonicalName();
 		// eliminate all simple types
 	    if ((name.indexOf('.') == -1) || name.startsWith("java.")) {
 	    	return null;

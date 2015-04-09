@@ -94,6 +94,10 @@ public abstract class Expression {
 			// right now this pretty much implies the values on an 'in' clause
 			return new LitExpression(exprSource, otherExprDataType);
 		}
+		
+		if (exprSource instanceof Enum) {
+		    return new LitExpression(exprSource, otherExprDataType);
+		}
 
 		throw new RuntimeException(
 				"Unable to parse the right hand side of this BinaryExpression: "

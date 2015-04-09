@@ -265,7 +265,7 @@ public class MetadataBuilder {
                     } else {
                         HashMap<String, Object> assProp = makeAssociationProperty(persister, (AssociationType) propType, compName,
                                 dataArrayList, true);
-                        
+
                         navArrayList.add(assProp);
                     }
                 }
@@ -320,7 +320,7 @@ public class MetadataBuilder {
             list.add((Selectable) iter.next());
         return list;
     }
-    
+
     Column getColumn(PersistentClass persistentClass, String propName) {
         try {
             Property property = persistentClass.getProperty(propName);
@@ -427,6 +427,10 @@ public class MetadataBuilder {
 
         HashMap<String, Object> dmap = new LinkedHashMap<String, Object>();
         dmap.put("nameOnServer", propName);
+        if (typeName == "org.hibernate.type.EnumType") {
+            typeName = "String";
+            dmap.put("enumType", type.getReturnedClass().getName());
+        }
         dmap.put("dataType", typeName);
         dmap.put("isNullable", isNullable);
 
@@ -493,7 +497,8 @@ public class MetadataBuilder {
      * @param isKey
      * @return association property definition
      */
-    private HashMap<String, Object> makeAssociationProperty(AbstractEntityPersister containingPersister, AssociationType propType, String propName,
+    private HashMap<String, Object> makeAssociationProperty(AbstractEntityPersister containingPersister, AssociationType propType,
+            String propName,
             ArrayList<HashMap<String, Object>> dataProperties, boolean isKey) {
         HashMap<String, Object> nmap = new LinkedHashMap<String, Object>();
         nmap.put("nameOnServer", propName);
@@ -520,7 +525,7 @@ public class MetadataBuilder {
                 if (elementPersister != null) {
                     fkNames = getPropertyNamesForColumns(elementPersister, columnNames);
                     if (fkNames != null) {
-                        nmap.put("invForeignKeyNamesOnServer", fkNames );
+                        nmap.put("invForeignKeyNamesOnServer", fkNames);
                     }
                 }
             }
@@ -541,7 +546,7 @@ public class MetadataBuilder {
                 // For many-to-one and one-to-one associations, save the relationship in _fkMap 
                 // for re-establishing relationships during save
                 _fkMap.put(entityRelationship, catColumnNames(fkNames, ','));
-                
+
                 if (isKey) {
                     for (String fkName : fkNames) {
                         HashMap<String, Object> relatedDataProperty = findPropertyByName(dataProperties, fkName);
@@ -550,15 +555,15 @@ public class MetadataBuilder {
                         }
                     }
                 }
-            
-            } 
+
+            }
             else if (fkNames == null) {
                 nmap.put("foreignKeyNamesOnServer", columnNames);
                 nmap.put("ERROR", "Could not find matching fk for property " + entityRelationship);
                 _fkMap.put(entityRelationship, catColumnNames(columnNames, ','));
                 throw new IllegalArgumentException("Could not find matching fk for property " + entityRelationship);
             }
-        } 
+        }
 
         return nmap;
     }
@@ -596,7 +601,7 @@ public class MetadataBuilder {
         {
             propColumnNames = new String[] { propertyName };
         }
-        
+
         return unBracket(propColumnNames);
     }
 
@@ -609,12 +614,12 @@ public class MetadataBuilder {
     static String[] getPropertyNamesForColumns(AbstractEntityPersister persister, String[] columnNames) {
         String[] propNames = persister.getPropertyNames();
         Type[] propTypes = persister.getPropertyTypes();
-        
+
         for (int i = 0; i < propNames.length; i++) {
             String propName = propNames[i];
             Type propType = propTypes[i];
             if (propType.isAssociationType()) continue;
-            
+
             String[] columnArray = persister.getPropertyColumnNames(i);
             if (namesEqual(columnArray, columnNames)) return new String[] { propName };
         }
@@ -629,7 +634,7 @@ public class MetadataBuilder {
             }
             if (persister.getIdentifierType().isComponentType())
             {
-                ComponentType compType = (ComponentType)persister.getIdentifierType();
+                ComponentType compType = (ComponentType) persister.getIdentifierType();
                 return compType.getPropertyNames();
             }
         }
@@ -643,13 +648,13 @@ public class MetadataBuilder {
             for (int i = 0; i < columnNames.length; i++)
             {
                 prop[0] = columnNames[i];
-                String[] names = getPropertyNamesForColumns(persister, prop);  // recursive call
+                String[] names = getPropertyNamesForColumns(persister, prop); // recursive call
                 if (names != null) propList.addAll(Arrays.asList(names));
             }
             if (propList.size() > 0) return (String[]) propList.toArray();
         }
         return null;
-        
+
     }
 
     /**
@@ -675,13 +680,13 @@ public class MetadataBuilder {
     static boolean namesEqual(String[] a, String[] b)
     {
         if (a.length != b.length) return false;
-        for (int i=0; i<a.length; i++)
+        for (int i = 0; i < a.length; i++)
         {
             if (!unBracket(a[i]).equalsIgnoreCase(unBracket(b[i]))) return false;
         }
         return true;
     }
-    
+
     /**
      * Get the column name without square brackets or quotes around it. E.g. "[OrderID]" -> OrderID
      * Because sometimes Hibernate gives us brackets, and sometimes it doesn't. Double-quotes happen
@@ -693,7 +698,7 @@ public class MetadataBuilder {
         name = (name.charAt(0) == '`') ? name.substring(1, name.length() - 1) : name;
         return name;
     }
-    
+
     /**
      * @return a new array containing the unbracketed names
      */
@@ -724,7 +729,7 @@ public class MetadataBuilder {
         }
         return null;
     }
-    
+
     /**
      * Get the Breeze name of the entity type. For collections, Breeze expects the name of the
      * element type.
