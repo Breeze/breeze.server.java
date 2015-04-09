@@ -8,6 +8,10 @@
   <name>Breeze Integration Test Webapp</name>
   <url>http://breezejs.com</url>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <dependencies>
 
 	<dependency>
@@ -28,7 +32,7 @@
 		<artifactId>breeze-hibernate</artifactId>
 		<version>0.1a</version>
 	</dependency>
-  
+
  	<dependency>
 		<groupId>com.breeze</groupId>
 		<artifactId>breeze-webserver</artifactId>
@@ -53,22 +57,6 @@
     <finalName>breeze-webtest</finalName>
 
     <plugins>
-      <plugin>
-      	<!-- `mvn assembly:single` to include dependencies in the target -->
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <descriptorRefs>
-          	<!-- a massive jar with all dependencies -->
-            <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
-          </descriptorRefs>
-          <descriptors>
-            <!-- a directory containing all the dependent jars -->
-            <descriptor>src/main/assembly/lib.xml</descriptor>
-          </descriptors>
-        </configuration>
-       </plugin>
-
 	  <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>2.6</version>
