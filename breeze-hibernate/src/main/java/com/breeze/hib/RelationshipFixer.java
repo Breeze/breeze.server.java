@@ -156,7 +156,7 @@ public class RelationshipFixer {
             for (EntityInfo entityInfo : entry.getValue())
             {
                 addToGraph(entityInfo, null); // make sure every entity is in the graph
-                fixupRelationships(entityInfo, classMeta);
+                processRelationships(entityInfo, classMeta);
             }
         }    	
     }
@@ -167,35 +167,35 @@ public class RelationshipFixer {
      * @param entityInfo Entity that will be saved
      * @param meta Metadata about the entity type
      */
-    private void fixupRelationships(EntityInfo entityInfo, ClassMetadata meta)
+    private void processRelationships(EntityInfo entityInfo, ClassMetadata meta)
     {
         String[] propNames = meta.getPropertyNames();
         Type[] propTypes = meta.getPropertyTypes();
         
         Type propType = meta.getIdentifierType();
-        if (propType != null)
-        {
-            if (propType.isAssociationType() && propType.isEntityType())
-            {
-                fixupRelationship(meta.getIdentifierPropertyName(), (EntityType)propType, entityInfo, meta);
-            }
-            else if (propType.isComponentType())
-            {
-                fixupComponentRelationships(meta.getIdentifierPropertyName(), (ComponentType)propType, entityInfo, meta);
-            }
+        if (propType != null) {
+            processRelationship(meta.getIdentifierPropertyName(), propType, entityInfo, meta);
         }
 
-        for (int i = 0; i < propNames.length; i++)
-        {
-            propType = propTypes[i];
-            if (propType.isAssociationType() && propType.isEntityType())
-            {
-                fixupRelationship(propNames[i], (EntityType)propTypes[i], entityInfo, meta);
-            }
-            else if (propType.isComponentType())
-            {
-                fixupComponentRelationships(propNames[i], (ComponentType)propType, entityInfo, meta);
-            }
+        for (int i = 0; i < propNames.length; i++){
+            processRelationship(propNames[i], propTypes[i], entityInfo, meta);
+        }
+    }
+    
+    /**
+     * Handle a specific property if it is a Association or Component relationship.
+     * @param propName
+     * @param propType
+     * @param entityInfo
+     * @param meta
+     */
+    private void processRelationship(String propName, Type propType, EntityInfo entityInfo, ClassMetadata meta) 
+    {
+        if (propType.isAssociationType() && propType.isEntityType()) {
+            fixupRelationship(propName, (EntityType)propType, entityInfo, meta);
+        }
+        else if (propType.isComponentType()) {
+            fixupComponentRelationships(propName, (ComponentType)propType, entityInfo, meta);
         }
     }
     
@@ -266,7 +266,12 @@ public class RelationshipFixer {
             return;
         }
         Object relatedEntity = getPropertyValue(meta, entity, propName);
-        if (relatedEntity != null) return;    // entities are already connected
+        if (relatedEntity != null) {
+            // entities are already connected - still need to add to dependency graph
+            EntityInfo relatedEntityInfo = findInSaveMapByEntity(propType.getReturnedClass(), relatedEntity);
+            maybeAddToGraph(entityInfo, relatedEntityInfo, propType);
+            return;
+        }
 
         relatedEntity = getRelatedEntity(propName, propType, entityInfo, meta);
 
@@ -293,7 +298,7 @@ public class RelationshipFixer {
 
         if (id != null)
         {
-            EntityInfo relatedEntityInfo = findInSaveMap(propType.getReturnedClass(), id);
+            EntityInfo relatedEntityInfo = findInSaveMapById(propType.getReturnedClass(), id);
 
             if (relatedEntityInfo == null) {
             	EntityState state = entityInfo.entityState;
@@ -304,13 +309,18 @@ public class RelationshipFixer {
                     relatedEntity = session.load(relatedEntityName, (Serializable) id, LockOptions.NONE);
             	}
             } else {
-            	if (!(propType.isOneToOne() && propType.useLHSPrimaryKey() && (propType.getForeignKeyDirection() == ForeignKeyDirection.FOREIGN_KEY_TO_PARENT))) {
-                    addToGraph(entityInfo, relatedEntityInfo);
-            	}
+                maybeAddToGraph(entityInfo, relatedEntityInfo, propType);
                 relatedEntity = relatedEntityInfo.entity;
             }
         }
         return relatedEntity;
+    }
+    
+    /** Add the parent-child relationship for certain propType conditions */
+    private void maybeAddToGraph(EntityInfo child, EntityInfo parent, EntityType propType) {
+        if (!(propType.isOneToOne() && propType.useLHSPrimaryKey() && (propType.getForeignKeyDirection() == ForeignKeyDirection.FOREIGN_KEY_TO_PARENT))) {
+            addToGraph(child, parent);
+        }
     }
     
     /**
@@ -389,30 +399,55 @@ public class RelationshipFixer {
             return meta.getPropertyValue(entity, propName);
     }
     
+
+    /** 
+     * Get the entityInfos from the saveMap for the given class.
+     * @param entityType - returned values have this class or a subclass
+     * @return EntityInfos - may be empty but never null 
+     */
+    @SuppressWarnings("unchecked")
+    private ArrayList<EntityInfo> getEntityInfoList(Class entityType) {
+        ArrayList<EntityInfo> entityInfoList = new ArrayList<EntityInfo>();
+        for (Class c : saveMap.keySet()) {
+            if (entityType.isAssignableFrom(c)) {
+                entityInfoList.addAll(saveMap.get(c));
+            }
+        }
+        return entityInfoList;
+    }
+    
     /**
      * Find the matching entity in the saveMap.  This is for relationship fixup.
      * @param entityType Type of entity, e.g. Order
      * @param entityId Key value of the entity
      * @return The entity, or null if not found
      */
-    @SuppressWarnings("unchecked")
-    private EntityInfo findInSaveMap(Class entityType, Object entityId)
+    private EntityInfo findInSaveMapById(Class entityType, Object entityId)
     {
         String entityIdString = entityId.toString();
-        ArrayList<EntityInfo> entityInfoList = new ArrayList<EntityInfo>();
-        for (Class c : saveMap.keySet()) {
-        	if (entityType.isAssignableFrom(c)) {
-        		entityInfoList.addAll(saveMap.get(c));
-        	}
-        }
-        if (entityInfoList != null && entityInfoList.size() != 0)
-        {
+        ArrayList<EntityInfo> entityInfoList = getEntityInfoList(entityType);
+        if (entityInfoList.size() != 0) {
             ClassMetadata meta = sessionFactory.getClassMetadata(entityType);
-            for (EntityInfo entityInfo : entityInfoList)
-            {
-                Object entity = entityInfo.entity;
-                Object id = meta.getIdentifier(entity, null);
+            for (EntityInfo entityInfo : entityInfoList) {
+                Object id = meta.getIdentifier(entityInfo.entity, null);
                 if (id != null && entityIdString.equals(id.toString())) return entityInfo;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find the matching entity in the saveMap.  This is for relationship fixup.
+     * @param entityType Type of entity, e.g. Order
+     * @param entity Entity to find
+     * @return The entity, or null if not found
+     */
+    private EntityInfo findInSaveMapByEntity(Class entityType, Object entity)
+    {
+        ArrayList<EntityInfo> entityInfoList = getEntityInfoList(entityType);
+        if (entityInfoList.size() != 0) {
+            for (EntityInfo entityInfo : entityInfoList) {
+                if (entityInfo.entity == entity) return entityInfo;
             }
         }
         return null;

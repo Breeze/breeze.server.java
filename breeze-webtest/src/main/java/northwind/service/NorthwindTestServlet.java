@@ -679,17 +679,10 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
                             Product product = new Product();
                             product.setProductName("Product added on server");
                             product.setSupplier(supplier);
-
-                            // TODO: need to figure out how to do this...
-                            // not sure why or if this is needed, but...
+                            // can do this instead; both work
                             // product.setSupplierID(supplier.getSupplierID());
                             EntityInfo prodInfo = createEntityInfoForEntity(product, EntityState.Added);
                             addToSaveMap(prodInfo);
-                            // Code above does not work correctly so ...
-                            throw new RuntimeException(
-                                    "Steve: need to figure out how to add related entities on the server during save interception" +
-                                            " -- see the beforeSaveEntities method in NorthwindTestServlet");
-
                         }
                     }
                 } else if (tag.equals("CommentOrderShipAddress.Before")) {
