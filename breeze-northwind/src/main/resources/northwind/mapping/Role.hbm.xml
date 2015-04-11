@@ -9,7 +9,8 @@
 		<!-- Should be able to use generated="always" with the timestamp column, 
 			but a bug in hibernate 4.3.0 prevents it https://hibernate.atlassian.net/browse/HHH-8784 
 			<version name="ts" column="`Ts`" type="timestamp" generated="always" /> -->
-		<version name="ts" column="`Ts`" type="timestamp" />
+<!-- 		<version name="ts" column="`Ts`" type="timestamp" /> -->
+	    <property name="ts" type="byte[]" />
 		<property name="name" type="string" length="50" not-null="true" />
 		<property name="description" type="string" length="2000" />
 <!--   		<property name="roleType" type="northwind.model.RoleType" />  -->  

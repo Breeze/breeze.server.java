@@ -33,7 +33,6 @@ public class JsonGson {
         return toJson(obj, false, false);
     }
 
-
     /**
      * Convert the object tree to JSON
      * 
@@ -49,15 +48,13 @@ public class JsonGson {
             GsonBuilder gsonBuilder = newGsonBuilder();
             if (includesBreezeEntities) {
                 gsonBuilder = gsonBuilder
-                        .registerTypeAdapterFactory(
-                                new BreezeTypeAdapterFactory());
+                        .registerTypeAdapterFactory(new BreezeTypeAdapterFactory());
             }
+
             if (isHibernate) {
                 gsonBuilder = gsonBuilder
-                        .registerTypeAdapterFactory(
-                                HibernateProxyTypeAdapter.FACTORY)
-                        .registerTypeAdapterFactory(
-                                HibernateCollectionTypeAdapter.FACTORY);
+                        .registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY)
+                        .registerTypeAdapterFactory(HibernateCollectionTypeAdapter.FACTORY);
 
             }
             Gson gson = gsonBuilder.create();
@@ -78,7 +75,6 @@ public class JsonGson {
             Gson gson = newGsonBuilder().create();
             LinkedTreeMap result = gson.fromJson(source, LinkedTreeMap.class);
             return result;
-
         } catch (Exception e) {
             throw new RuntimeException("Exception deserializing json: "
                     + source, e);
@@ -88,10 +84,8 @@ public class JsonGson {
     public static Map[] fromJsonArray(String source) {
         try {
             Gson gson = newGsonBuilder().create();
-            LinkedTreeMap[] result = gson.fromJson(source,
-                    LinkedTreeMap[].class);
+            LinkedTreeMap[] result = gson.fromJson(source, LinkedTreeMap[].class);
             return result;
-
         } catch (Exception e) {
             throw new RuntimeException("Exception deserializing " + source, e);
         }
@@ -105,31 +99,34 @@ public class JsonGson {
      * @return
      */
     public static Object fromMap(Class<?> clazz, Map map) {
+        String json = toJson(map);
+        return fromJson(clazz, json);
+    }
+
+    public static Object fromJson(Class<?> clazz, String json) {
         try {
-            String json = toJson(map);
-            
             Gson gson = newGsonBuilder().create();
             Object result = gson.fromJson(json, clazz);
             return result;
         } catch (Exception e) {
             throw new RuntimeException("Unable to populate " + clazz.getName()
-                    + " from " + map, e);
+                    + " from " + json, e);
         }
-
     }
 
     private static GsonBuilder newGsonBuilder() {
-        // setDateFormat in commented out line belows works fine for
+        // setDateFormat in commented out line below works fine for
         // deserialization but doesn't handle
         // serialization properly because of need for a TimeZone setting.
         // Hence the need for the DateTypeAdapter below.
         // return new GsonBuilder().setDateFormat(ISO8601_DATEFORMAT);
 
-        GsonBuilder gson = new GsonBuilder().registerTypeAdapter(Date.class,
-                new DateTypeAdapter());
+        GsonBuilder gson = new GsonBuilder()
+                .registerTypeAdapter(Date.class, new DateTypeAdapter());
+
         return gson;
     }
-    
+
     // Ugh....
     // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -138,8 +135,7 @@ public class JsonGson {
     // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ssX";
     private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-
-    private static class DateTypeAdapter implements 
+    private static class DateTypeAdapter implements
             JsonSerializer<Date>,
             JsonDeserializer<Date> {
         private final DateFormat _dateFormat;
@@ -165,4 +161,5 @@ public class JsonGson {
             }
         }
     }
+
 }

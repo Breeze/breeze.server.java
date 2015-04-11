@@ -2,7 +2,9 @@ package com.breeze.test;
 
 import java.util.Map;
 
+import northwind.model.Role;
 import junit.framework.TestCase;
+
 
 
 
@@ -14,6 +16,12 @@ public class JsonTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
  
+	}
+	
+	public void testDeserializeEnum() {
+	    String json = "{ id:-1.0, ts:null, name:'TEMPb5hbK', roleType:'Restricted'}";
+	    Object roleObj =  JsonGson.fromJson(Role.class, json);
+	    Role role = (Role) roleObj;
 	}
 
 	public void testDeserializeMap() {

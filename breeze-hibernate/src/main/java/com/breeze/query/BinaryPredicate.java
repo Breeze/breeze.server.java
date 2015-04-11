@@ -52,7 +52,7 @@ public class BinaryPredicate extends Predicate {
 		
 		// Special purpose Enum handling
 		Class enumType = getEnumType(this._expr1);
-        if (enumType != null) {
+        if (enumType != null && _expr2Source != null) {
             @SuppressWarnings("unchecked")
             Enum expr2Enum = Enum.valueOf(enumType, (String) _expr2Source);
             this._expr2 = Expression.createRHSExpression(expr2Enum, entityType,  null);
