@@ -42,7 +42,13 @@ import com.breeze.query.UnaryPredicate;
  * @author Jay
  * @see http://docs.jboss.org/hibernate/core/3.6/javadocs/org/hibernate/Criteria.html
  */
+/**
+ * @author Jay
+ *
+ */
 public class CriteriaBuilder {
+    
+    // TODO: fix select (projection) with nonscalar nav props.  So far no idea how to do this... 
 
     private CriteriaAliasBuilder _aliasBuilder;
     @SuppressWarnings("unused")
@@ -50,26 +56,27 @@ public class CriteriaBuilder {
     private IEntityType _entityType;
     private int _subqCount = 0;
 
-    public CriteriaBuilder(IEntityType entityType) {
+    
+    private CriteriaBuilder() {
+
+    }
+    
+    public static CriteriaBuilder create(Criteria crit, IEntityType entityType, EntityQuery entityQuery) {
+        CriteriaBuilder critBuilder = new CriteriaBuilder();
+        critBuilder.updateCriteria(crit, entityType, entityQuery);
+        return critBuilder;
+    }
+
+    /**
+     * @param crit
+     *      a Criteria object that will be updated to match the entityQuery
+     * @param entityQuery
+     *      the EntityQuery object from which the criteria should be updated. 
+     */
+    private void updateCriteria(Criteria crit, IEntityType entityType, EntityQuery entityQuery) {
         _entityType = entityType;
-        _aliasBuilder = new CriteriaAliasBuilder();
-
-    }
-
-    // TODO: fix select with nonscalar nav props.
-
-    private static final HashMap<String, String> _operatorMap = new HashMap<String, String>();
-    static {
-        _operatorMap.put("eq", "=");
-        _operatorMap.put("ne", "<>");
-        _operatorMap.put("gt", ">");
-        _operatorMap.put("ge", ">=");
-        _operatorMap.put("lt", "<");
-        _operatorMap.put("le", "<=");
-    }
-
-    public void updateCriteria(Criteria crit, EntityQuery entityQuery) {
         _entityQuery = entityQuery;
+        _aliasBuilder = new CriteriaAliasBuilder();
         Integer takeCount = entityQuery.getTakeCount();
         if (takeCount != null && takeCount == 0) {
             // Hack because setMaxResults(0) returns all records instead of
@@ -92,9 +99,34 @@ public class CriteriaBuilder {
         addSelect(crit, entityQuery.getSelectClause());
 
         addOrderBy(crit, entityQuery.getOrderByClause());
-
+    }
+    
+    /**
+     * Apply the OData $inlinecount to the (already filtered) Criteria. Removes
+     * $skip and $top and $orderby operations and adds a rowCount projection.
+     * 
+     * @param crit
+     *            a Criteria object. Should already contain only filters that
+     *            affect the row count.
+     * @return the same Criteria that was passed in, with operations added.
+     */
+    public Criteria applyInlineCount(Criteria crit) {
+        crit.setMaxResults(0);
+        crit.setFirstResult(0);
+        CriteriaImpl impl = (CriteriaImpl) crit;
+        Iterator<OrderEntry> iter = impl.iterateOrderings();
+        while (iter.hasNext()) {
+            iter.next();
+            iter.remove();
+        }
+        crit.setProjection(Projections.rowCount());
+        return crit;
     }
 
+    
+    /**
+     * @return whether this 
+     */
     public boolean containsNavPropertyProxy() {
         return _aliasBuilder.containsNavPropertyProxy();
     }
@@ -138,27 +170,7 @@ public class CriteriaBuilder {
         }
     }
 
-    /**
-     * Apply the OData $inlinecount to the (already filtered) Criteria. Removes
-     * $skip and $top and $orderby operations and adds a rowCount projection.
-     * 
-     * @param crit
-     *            a Criteria object. Should already contain only filters that
-     *            affect the row count.
-     * @return the same Criteria that was passed in, with operations added.
-     */
-    public Criteria applyInlineCount(Criteria crit) {
-        crit.setMaxResults(0);
-        crit.setFirstResult(0);
-        CriteriaImpl impl = (CriteriaImpl) crit;
-        Iterator<OrderEntry> iter = impl.iterateOrderings();
-        while (iter.hasNext()) {
-            iter.next();
-            iter.remove();
-        }
-        crit.setProjection(Projections.rowCount());
-        return crit;
-    }
+
 
     // crit is cast as Object because it can be either a Criteria or a DetachedCriteria
     // and these two classes do not share any useful interfaces.
@@ -365,4 +377,13 @@ public class CriteriaBuilder {
 
     }
 
+    private static final HashMap<String, String> _operatorMap = new HashMap<String, String>();
+    static {
+        _operatorMap.put("eq", "=");
+        _operatorMap.put("ne", "<>");
+        _operatorMap.put("gt", ">");
+        _operatorMap.put("ge", ">=");
+        _operatorMap.put("lt", "<");
+        _operatorMap.put("le", "<=");
+    }
 }

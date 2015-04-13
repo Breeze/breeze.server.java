@@ -24,7 +24,6 @@ public class QueryService {
 
     public QueryService(SessionFactory sessionFactory, Metadata metadata) {
         this._sessionFactory = sessionFactory;
-
         _metadata = metadata;
     }
 
@@ -66,8 +65,7 @@ public class QueryService {
         try {
             session.beginTransaction();
             Criteria crit = session.createCriteria(clazz, "root");
-            CriteriaBuilder builder = new CriteriaBuilder(entityType);
-             builder.updateCriteria(crit, entityQuery);
+            CriteriaBuilder builder = CriteriaBuilder.create(crit, entityType, entityQuery);
             // execute the query
             List result = crit.list();
 
