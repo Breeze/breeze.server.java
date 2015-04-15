@@ -2,7 +2,7 @@ package com.breeze.save;
 
 import com.breeze.metadata.Metadata;
 
-public class ContextProvider {
+public abstract class ContextProvider {
     private Metadata _metadata;
     
     protected ContextProvider(Metadata metadata) {
@@ -12,6 +12,8 @@ public class ContextProvider {
     public Metadata getMetadata() {
         return _metadata;
     }
+    
+
     
 	/**
 	 * Build the SaveWorkState from the JSON, and use it to save the changes to the data store.
@@ -41,9 +43,11 @@ public class ContextProvider {
 	/**
 	 * Save the changes to the database.
 	 */
-	protected void saveChangesCore(SaveWorkState sw) throws EntityErrorsException {
-	}
+	protected abstract void saveChangesCore(SaveWorkState sw);
 	
-
+	// will be called during beforeSaveEntities call for any adds or removalls
+	public abstract void processRelationships(EntityInfo entityInfo, boolean removeMode);
+	
+    public abstract Object getIdentifier(EntityInfo entityInfo);
 	
 }

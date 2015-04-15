@@ -3,7 +3,7 @@ package com.breeze.save;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EntityErrorsException extends Exception {
+public class EntityErrorsException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	public int httpStatusCode;
 	public List<EntityError> entityErrors;

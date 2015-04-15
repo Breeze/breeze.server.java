@@ -1,7 +1,6 @@
 package northwind.service;
 
 import java.math.BigDecimal;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -407,17 +406,16 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             @Override
-            public Map<Class, List<EntityInfo>> beforeSaveEntities(
-                    Map<Class, List<EntityInfo>> saveMap)
+            public void beforeSaveEntities()       
                     throws EntityErrorsException {
                 String tag = (String) this.getSaveOptions().tag;
-                List<EntityInfo> orderInfos = saveMap.get(Order.class);
+                List<EntityInfo> orderInfos = this.getEntityInfos(Order.class);
                 if (orderInfos != null) {
                     for (EntityInfo entityInfo : orderInfos) {
                         CheckFreight(entityInfo, tag);
                     }
                 }
-                return saveMap;
+
             }
         };
 
@@ -464,10 +462,8 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             @Override
-            public Map<Class, List<EntityInfo>> beforeSaveEntities(
-                    Map<Class, List<EntityInfo>> saveMap)
-                    throws EntityErrorsException {
-                List<EntityInfo> orderInfos = saveMap.get(Order.class);
+            public void beforeSaveEntities()  throws EntityErrorsException {
+                List<EntityInfo> orderInfos = this.getEntityInfos(Order.class);
                 if (orderInfos != null) {
                     List<EntityError> errors = new ArrayList<EntityError>();
                     for (EntityInfo ei : orderInfos) {
@@ -483,7 +479,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
                             "test of custom exception message", errors);
                     throw ex;
                 }
-                return saveMap;
+                
             }
         };
 
@@ -590,16 +586,15 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             @Override
-            public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) {
+            public void beforeSaveEntities() {
                 Comment comment = new Comment();
                 String tag = (String) this.getSaveOptions().tag;
                 
                 comment.setComment1((tag == null) ? "Generic comment" : tag);
                 comment.setCreatedOn(new Date());
                 comment.setSeqNum((byte) 1);
-                EntityInfo commentInfo = createEntityInfoForEntity(comment, EntityState.Added);
-                addToSaveMap(commentInfo);
-                return saveMap;
+                this.addEntity(comment,  EntityState.Added);
+                
             }
         };
 
@@ -612,13 +607,11 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             @Override
-            public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) {
+            public void beforeSaveEntities() {
                 // Create and add a new order.
                 Order order = new Order();
                 order.setOrderDate(new Date());
-                EntityInfo orderInfo = createEntityInfoForEntity(order, EntityState.Added);
-                addToSaveMap(orderInfo);
-                return saveMap;
+                this.addEntity(order, EntityState.Added);
             }
         };
 
@@ -668,11 +661,11 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
             }
 
             @Override
-            public Map<Class, List<EntityInfo>> beforeSaveEntities(Map<Class, List<EntityInfo>> saveMap) {
+            public void beforeSaveEntities() {
                 String tag = (String) this.getSaveOptions().tag;
-                if (tag == null) return saveMap;
+                if (tag == null) return;
                 if (tag.equals("addProdOnServer")) {
-                    List<EntityInfo> entityInfos = saveMap.get(Supplier.class);
+                    List<EntityInfo> entityInfos = this.getEntityInfos(Supplier.class);
                     if (entityInfos.size() > 0) {
                         for (EntityInfo ei : entityInfos) {
                             Supplier supplier = (Supplier) ei.entity;
@@ -681,12 +674,11 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
                             product.setSupplier(supplier);
                             // can do this instead; both work
                             // product.setSupplierID(supplier.getSupplierID());
-                            EntityInfo prodInfo = createEntityInfoForEntity(product, EntityState.Added);
-                            addToSaveMap(prodInfo);
+                            this.addEntity(product, EntityState.Added);
                         }
                     }
                 } else if (tag.equals("CommentOrderShipAddress.Before")) {
-                    List<EntityInfo> orderInfos = saveMap.get(Order.class);
+                    List<EntityInfo> orderInfos = this.getEntityInfos(Order.class);
                     byte seqNum = 1;
                     for (EntityInfo oi : orderInfos) {
                         Order order = (Order) oi.entity;
@@ -694,11 +686,11 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
                         comment.setComment1(order.getShipAddress());
                         comment.setSeqNum(seqNum++);
                         comment.setCreatedOn(new Date());
-                        EntityInfo commentInfo = createEntityInfoForEntity(comment, EntityState.Added);
-                        addToSaveMap(commentInfo);
+                        this.addEntity(comment, EntityState.Added);
+
                     }
                 } else if (tag.equals("increaseProductPrice")) {
-                    List<EntityInfo> categoryInfos = saveMap.get(Category.class);
+                    List<EntityInfo> categoryInfos = this.getEntityInfos(Category.class);
                     for (EntityInfo ci : categoryInfos) {
                         Category category = (Category) ci.entity;
                         // need to get all of the products associated with this category
@@ -710,21 +702,17 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
                             BigDecimal unitPrice = p.getUnitPrice();
                             unitPrice = unitPrice.add(new BigDecimal(1.0));
                             p.setUnitPrice(unitPrice);
-                            EntityInfo productInfo = createEntityInfoForEntity(p, EntityState.Modified);
-                            addToSaveMap(productInfo);
+                            this.addEntity(p, EntityState.Modified);
                         }
                     }
                 }
                
-                return saveMap;
+                
             }
             
-            @Override
-            public List<EntityInfo> beforeSaveEntityGraph(List<EntityInfo> entitiesToPersist)  {
-                return entitiesToPersist;
-            }
 
-            public void AfterSaveEntities(Map<Class, List<EntityInfo>> saveMap, List<KeyMapping> keyMappings) {
+
+            public void AfterSaveEntities() {
                 // not yet implemented
             }
         };
