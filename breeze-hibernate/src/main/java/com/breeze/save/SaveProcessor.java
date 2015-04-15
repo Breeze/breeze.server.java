@@ -3,8 +3,7 @@ package com.breeze.save;
 import com.breeze.metadata.Metadata;
 
 public abstract class SaveProcessor {
-    protected Metadata _metadata;
-    protected SaveWorkState _saveWorkState;
+    private Metadata _metadata;
     
     protected SaveProcessor(Metadata metadata) {
         _metadata = metadata;
@@ -16,21 +15,20 @@ public abstract class SaveProcessor {
      * @param saveOptions
      */
     public SaveResult saveChanges(SaveWorkState saveWorkState) {
-        _saveWorkState = saveWorkState;
-        _saveWorkState.setSaveProcessor(this);
+        saveWorkState.setSaveProcessor(this);
         try {
-            _saveWorkState.beforeSave();
-            saveChangesCore();
-            _saveWorkState.afterSave();
+            saveWorkState.beforeSave();
+            saveChangesCore(saveWorkState);
+            saveWorkState.afterSave();
         } catch (EntityErrorsException e) {
-            _saveWorkState.setEntityErrors(e);
+            saveWorkState.setEntityErrors(e);
         } catch (Exception e) {
-            if (! _saveWorkState.handleException(e)) {
+            if (! saveWorkState.handleException(e)) {
                 throw e;
             }
         }
         
-        SaveResult sr = _saveWorkState.toSaveResult();
+        SaveResult sr = saveWorkState.toSaveResult();
         return sr;
     }
 
@@ -42,7 +40,7 @@ public abstract class SaveProcessor {
 	/**
 	 * Save the changes to the database.
 	 */
-	protected abstract void saveChangesCore();
+	protected abstract void saveChangesCore(SaveWorkState saveWorkState);
 	
 	// will be called during beforeSaveEntities call for any adds or removalls
 	public abstract void processRelationships(EntityInfo entityInfo, boolean removeMode);

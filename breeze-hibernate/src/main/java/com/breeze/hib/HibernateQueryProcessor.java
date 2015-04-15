@@ -30,13 +30,12 @@ public class HibernateQueryProcessor extends QueryProcessor {
     public QueryResult executeQuery(IEntityType entityType, EntityQuery entityQuery) {
             
         entityQuery.validate(entityType);
-
         Class<?> clazz = MetadataHelper.lookupClass(entityType.getName());
 
-        QueryResult qr;
         Session session = _sessionFactory.openSession();
         try {
             session.beginTransaction();
+            
             Criteria crit = session.createCriteria(clazz, "root");
             CriteriaBuilder builder = CriteriaBuilder.create(crit, entityType, entityQuery);
             // execute the query
@@ -62,7 +61,8 @@ public class HibernateQueryProcessor extends QueryProcessor {
                     }
                 }
             }
-
+            
+            QueryResult qr;
             if (entityQuery.isInlineCountEnabled()) {
                 builder.applyInlineCount(crit);
                 long countResult = (Long) crit.uniqueResult();

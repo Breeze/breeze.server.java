@@ -9,6 +9,7 @@ public abstract class QueryProcessor {
     protected QueryProcessor(Metadata metadata) {
         _metadata = metadata;
     }
+    
     public QueryResult executeQuery(String resourceName, String json) {
         EntityQuery entityQuery = new EntityQuery(json);
         return executeQuery(resourceName, entityQuery);

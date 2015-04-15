@@ -1,11 +1,10 @@
 package com.breeze.hib;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.hibernate.EntityMode;
+
 import org.hibernate.FlushMode;
 import org.hibernate.JDBCException;
 import org.hibernate.PropertyValueException;
@@ -13,8 +12,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.metadata.ClassMetadata;
-import org.hibernate.type.ComponentType;
-import org.hibernate.type.Type;
 
 import com.breeze.metadata.DataType;
 import com.breeze.metadata.Metadata;
@@ -22,15 +19,14 @@ import com.breeze.save.*;
 
 public class HibernateSaveProcessor extends SaveProcessor {
 
-    private Session _session;
     private SessionFactory _sessionFactory;
-    
-    private List<String> _possibleErrors = new ArrayList<String>();
+    private Session _session;
     private RelationshipFixer _fixer;
+    private List<String> _possibleErrors = new ArrayList<String>();
 
     /**
-     * @param session Hibernate session to be used for saving
-     * @param metadataMap metadata from MetadataBuilder
+     * @param metadata
+     * @param sessionFactory 
      */
     public HibernateSaveProcessor(Metadata metadata, SessionFactory sessionFactory) {
         super(metadata);
@@ -43,10 +39,9 @@ public class HibernateSaveProcessor extends SaveProcessor {
      * Assigns saveWorkState.KeyMappings, which map the temporary keys to their real generated keys.
      * Note that this method sets session.FlushMode = FlushMode.MANUAL, so manual flushes are required.
      * @param saveWorkState
-     * @throws Exception 
      */
     @Override
-    protected void saveChangesCore() {
+    protected void saveChangesCore(SaveWorkState saveWorkState) {
         _session = _sessionFactory.openSession();
         _session.setFlushMode(FlushMode.MANUAL);
         Transaction tx = _session.getTransaction();
@@ -54,12 +49,12 @@ public class HibernateSaveProcessor extends SaveProcessor {
         if (!hasExistingTransaction)  tx.begin();
         try {
             // Relate entities in the saveMap to other entities, so Hibernate can save the FK values.
-            _fixer = new RelationshipFixer(_saveWorkState, _session);
+            _fixer = new RelationshipFixer(saveWorkState, _session);
             _fixer.fixupRelationships();
             // At this point all entities are hooked up but are not yet in the session.
             
             // Allow subclass to process entities before we save them
-            _saveWorkState.beforeSaveEntities();
+            saveWorkState.beforeSaveEntities();
             List<EntityInfo> saveOrder = _fixer.sortDependencies();
             processSaves(saveOrder);
             // At this point all entities are hooked up and in the session.
@@ -68,7 +63,7 @@ public class HibernateSaveProcessor extends SaveProcessor {
             // saveWorkState.beforeSessionPersist(_session);
 
             _session.flush();
-            refreshFromSession(_saveWorkState);
+            refreshFromSession(saveWorkState);
             if (!hasExistingTransaction) tx.commit();
             // so that serialization of saveResult doesn't have issues.
             _fixer.removeRelationships();
@@ -110,6 +105,14 @@ public class HibernateSaveProcessor extends SaveProcessor {
         }
     }
     
+    // TODO: determine why this is different from getIdentifier commented out below. 
+    // May have to do with this method only getting called for single part keys.
+    @Override
+    public Object getIdentifier(Object entity) {
+        Object id = getClassMetadata(entity.getClass()).getIdentifier(entity, null);
+        return id != null ? id : null;
+    }
+
 
     /**
      * Persist the changes to the entities in the saveOrder.
@@ -148,46 +151,6 @@ public class HibernateSaveProcessor extends SaveProcessor {
         }
     }
 
-    // TODO: determine why this is different from getIdentifier below. Used by relationshipFixer
-    @Override
-    public Object getIdentifier(Object entity) {
-        Object id = getClassMetadata(entity.getClass()).getIdentifier(entity, null);
-        return id != null ? id : null;
-    }
-
-    /**
-     * Get the identifier value for the entity.  If the entity does not have an
-     * identifier property, or natural identifiers defined, then the entity itself is returned.
-     * @param entity
-     * @param meta
-     * @return
-     */
-    protected Object getIdentifier(Object entity, ClassMetadata meta) {
-        Class type = entity.getClass();
-        if (meta == null) {
-            meta = getClassMetadata(type);
-        }
-
-        Type idType = meta.getIdentifierType();
-        if (idType != null) {
-            Serializable id = meta.getIdentifier(entity, null);
-            if (idType.isComponentType()) {
-                ComponentType compType = (ComponentType) idType;
-                return compType.getPropertyValues(id, EntityMode.POJO);
-            } else {
-                return id;
-            }
-        } else if (meta.hasNaturalIdentifier()) {
-            int[] idprops = meta.getNaturalIdentifierProperties();
-            Object[] values = meta.getPropertyValues(entity);
-            Object[] idvalues = new Object[idprops.length];
-            for (int i = 0; i < idprops.length; i++) {
-                idvalues[i] = values[idprops[i]];
-            }
-            return idvalues;
-        }
-        return entity;
-    }
 
     /**
      * Restore the old value of the concurrency column so Hibernate will save the entity.
@@ -243,4 +206,38 @@ public class HibernateSaveProcessor extends SaveProcessor {
         }
         return _classMetadataCached;
     }
+    
+//  /**
+//  * Get the identifier value for the entity.  If the entity does not have an
+//  * identifier property, or natural identifiers defined, then the entity itself is returned.
+//  * @param entity
+//  * @param meta
+//  * @return
+//  */
+// protected Object getIdentifier(Object entity) {
+//     Class type = entity.getClass();
+//     meta = getClassMetadata(type);
+//
+//     Type idType = meta.getIdentifierType();
+//     if (idType != null) {
+//         Serializable id = meta.getIdentifier(entity, null);
+//         if (idType.isComponentType()) {
+//             ComponentType compType = (ComponentType) idType;
+//             return compType.getPropertyValues(id, EntityMode.POJO);
+//         } else {
+//             return id;
+//         }
+//     } else if (meta.hasNaturalIdentifier()) {
+//         int[] idprops = meta.getNaturalIdentifierProperties();
+//         Object[] values = meta.getPropertyValues(entity);
+//         Object[] idvalues = new Object[idprops.length];
+//         for (int i = 0; i < idprops.length; i++) {
+//             idvalues[i] = values[idprops[i]];
+//         }
+//         return idvalues;
+//     }
+//     return entity;
+// }
+
+    
 }
