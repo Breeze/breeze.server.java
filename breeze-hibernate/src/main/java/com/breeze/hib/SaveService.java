@@ -35,8 +35,8 @@ public class SaveService {
 		// log.debugv("saveChanges", "source={0}", source);
 		Session session = sessionFactory.openSession();
 		try {
-			ContextProvider context = new HibernateContextProvider(session, metadata);
-			SaveResult sr = context.saveChanges(saveWorkState);
+			ContextProvider context = new HibernateContextProvider(metadata, saveWorkState, session);
+			SaveResult sr = context.saveChanges();
 			return sr;
 		} catch (Exception e) {
     		// log.errorv(e, "saveChanges: source={0}", source);

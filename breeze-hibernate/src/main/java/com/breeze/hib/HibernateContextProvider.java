@@ -32,8 +32,8 @@ public class HibernateContextProvider extends ContextProvider {
      * @param session Hibernate session to be used for saving
      * @param metadataMap metadata from MetadataBuilder
      */
-    public HibernateContextProvider(Session session, Metadata metadata) {
-        super(metadata);
+    public HibernateContextProvider(Metadata metadata, SaveWorkState saveWorkState, Session session) {
+        super(metadata, saveWorkState);
         this._session = session;
         this._sessionFactory = session.getSessionFactory();
     }
@@ -47,7 +47,7 @@ public class HibernateContextProvider extends ContextProvider {
      * @throws Exception 
      */
     @Override
-    protected void saveChangesCore(SaveWorkState saveWorkState) {
+    protected void saveChangesCore() {
 
         _session.setFlushMode(FlushMode.MANUAL);
         Transaction tx = _session.getTransaction();
@@ -55,12 +55,12 @@ public class HibernateContextProvider extends ContextProvider {
         if (!hasExistingTransaction)  tx.begin();
         try {
             // Relate entities in the saveMap to other entities, so Hibernate can save the FK values.
-            _fixer = new RelationshipFixer(saveWorkState, _session);
+            _fixer = new RelationshipFixer(_saveWorkState, _session);
             _fixer.fixupRelationships();
             // At this point all entities are hooked up but are not yet in the session.
             
             // Allow subclass to process entities before we save them
-            saveWorkState.beforeSaveEntities();
+            _saveWorkState.beforeSaveEntities();
             List<EntityInfo> saveOrder = _fixer.sortDependencies();
             processSaves(saveOrder);
             // At this point all entities are hooked up and in the session.
@@ -69,7 +69,7 @@ public class HibernateContextProvider extends ContextProvider {
             // saveWorkState.beforeSessionPersist(_session);
 
             _session.flush();
-            refreshFromSession(saveWorkState);
+            refreshFromSession(_saveWorkState);
             if (!hasExistingTransaction) tx.commit();
             // so that serialization of saveResult doesn't have issues.
             _fixer.removeRelationships();
