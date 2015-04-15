@@ -48,6 +48,6 @@ public abstract class ContextProvider {
 	// will be called during beforeSaveEntities call for any adds or removalls
 	public abstract void processRelationships(EntityInfo entityInfo, boolean removeMode);
 	
-    public abstract Object getIdentifier(EntityInfo entityInfo);
+    public abstract Object getIdentifier(Object entity);
 	
 }

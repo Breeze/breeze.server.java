@@ -20,23 +20,19 @@ import com.breeze.metadata.DataType;
 import com.breeze.metadata.Metadata;
 import com.breeze.save.*;
 
-public class HibernateContext extends ContextProvider {
+public class HibernateContextProvider extends ContextProvider {
 
     private Session _session;
     private SessionFactory _sessionFactory;
-
-    private List<EntityError> _entityErrors = new ArrayList<EntityError>();
-    // private Map<EntityInfo, KeyMapping> _entityKeyMapping = new HashMap<EntityInfo, KeyMapping>();
+    
     private List<String> _possibleErrors = new ArrayList<String>();
     private RelationshipFixer _fixer;
-    private Class _classCached;
-    private ClassMetadata _classMetadataCached;
 
     /**
      * @param session Hibernate session to be used for saving
      * @param metadataMap metadata from MetadataBuilder
      */
-    public HibernateContext(Session session, Metadata metadata) {
+    public HibernateContextProvider(Session session, Metadata metadata) {
         super(metadata);
         this._session = session;
         this._sessionFactory = session.getSessionFactory();
@@ -56,36 +52,39 @@ public class HibernateContext extends ContextProvider {
         _session.setFlushMode(FlushMode.MANUAL);
         Transaction tx = _session.getTransaction();
         boolean hasExistingTransaction = tx.isActive();
-        if (!hasExistingTransaction)
-            tx.begin();
+        if (!hasExistingTransaction)  tx.begin();
         try {
             // Relate entities in the saveMap to other entities, so Hibernate can save the FK values.
             _fixer = new RelationshipFixer(saveWorkState, _session);
             _fixer.fixupRelationships();
+            // At this point all entities are hooked up but are not yet in the session.
+            
             // Allow subclass to process entities before we save them
             saveWorkState.beforeSaveEntities();
             List<EntityInfo> saveOrder = _fixer.sortDependencies();
             processSaves(saveOrder);
+            // At this point all entities are hooked up and in the session.
 
-            // saveContext = saveWorkState.beforeSessionPersist(saveContext, _session)
+            // problem here is that we don't want saveWorkState to know about session
+            // saveWorkState.beforeSessionPersist(_session);
 
             _session.flush();
             refreshFromSession(saveWorkState);
-            if (!hasExistingTransaction) {
-                tx.commit();
-            }
+            if (!hasExistingTransaction) tx.commit();
+            // so that serialization of saveResult doesn't have issues.
             _fixer.removeRelationships();
+        } catch (EntityErrorsException eee) {
+            if (tx.isActive()) tx.rollback();
+            throw eee;
         } catch (PropertyValueException pve) {
             // Hibernate can throw this
-            if (tx.isActive())        tx.rollback();
-            _entityErrors.add(new EntityError("PropertyValueException", pve.getEntityName(), null,
-                    pve.getPropertyName(), pve.getMessage()));
-            saveWorkState.setEntityErrors(new EntityErrorsException(null, _entityErrors));
+            if (tx.isActive()) tx.rollback();
+            EntityError entityError = new EntityError("PropertyValueException", 
+                    pve.getEntityName(), null,
+                    pve.getPropertyName(), pve.getMessage());
+            throw new EntityErrorsException(entityError);
         } catch (Exception ex) {
             if (tx.isActive()) tx.rollback();
-            if (ex instanceof EntityErrorsException) {
-                throw ex;
-            }
             String msg = "Save exception: ";
             if (ex instanceof JDBCException) {
                 msg += "SQLException: " + ((JDBCException) ex).getSQLException().getMessage();
@@ -114,27 +113,22 @@ public class HibernateContext extends ContextProvider {
 
     /**
      * Persist the changes to the entities in the saveOrder.
-     * @param _saveMap
+     * @param saveOrder
      */
     protected void processSaves(List<EntityInfo> saveOrder) {
-
         for (EntityInfo entityInfo : saveOrder) {
-            Class entityType = entityInfo.entity.getClass();
-            ClassMetadata classMeta = getClassMetadata(entityType);
-            // addKeyMapping(entityInfo, entityType, classMeta);
-            processEntity(entityInfo, classMeta);
+            processEntity(entityInfo);
         }
     }
-    
-    
 
     /**
      * Add, update, or delete the entity according to its EntityState.
      * @param entityInfo
      * @param classMeta
      */
-    protected void processEntity(EntityInfo entityInfo, ClassMetadata classMeta) {
+    protected void processEntity(EntityInfo entityInfo) {
         Object entity = entityInfo.entity;
+        ClassMetadata classMeta = getClassMetadata(entity.getClass());
         EntityState state = entityInfo.entityState;
 
         // Restore the old value of the concurrency column so Hibernate will be able to save the entity
@@ -156,8 +150,7 @@ public class HibernateContext extends ContextProvider {
 
     // TODO: determine why this is different from getIdentifier below. Used by relationshipFixer
     @Override
-    public Object getIdentifier(EntityInfo entityInfo) {
-        Object entity = entityInfo.entity;
+    public Object getIdentifier(Object entity) {
         Object id = getClassMetadata(entity.getClass()).getIdentifier(entity, null);
         return id != null ? id : null;
     }
@@ -194,21 +187,6 @@ public class HibernateContext extends ContextProvider {
             return idvalues;
         }
         return entity;
-    }
-
-    /**
-     * Get the identifier value for the entity as an object[].  This is needed for creating an EntityError.
-     * @param entity
-     * @param meta
-     * @return
-     */
-    protected Object[] getIdentifierAsArray(Object entity, ClassMetadata meta) {
-        Object value = getIdentifier(entity, meta);
-        if (value.getClass().isArray()) {
-            return (Object[]) value;
-        } else {
-            return new Object[] { value };
-        }
     }
 
     /**
@@ -252,8 +230,13 @@ public class HibernateContext extends ContextProvider {
         }
 
     }
+    
+    // perf 
+    private Class _classCached;
+    private ClassMetadata _classMetadataCached;
 
-    private ClassMetadata getClassMetadata(Class clazz) {
+    protected ClassMetadata getClassMetadata(Class clazz) {
+        // perf enhancement - this method gets called a lot in loops.
         if (clazz != _classCached) {
             _classCached = clazz;
             _classMetadataCached = _sessionFactory.getClassMetadata(clazz);

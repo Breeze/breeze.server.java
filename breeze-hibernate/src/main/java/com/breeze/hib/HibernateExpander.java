@@ -17,7 +17,7 @@ import com.breeze.util.TypeFns;
 
 /**
  * Initializes Hibernate proxies and collections prior to serialization.
- * This is used to implement the OData $expand operation.
+ * This is used to implement the expand operation.
  * 
  * Be sure to set the default_batch_fetch_size property in your Hibernate configuration, e.g.
  * 	<property name="default_batch_fetch_size">32</property>

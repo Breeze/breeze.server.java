@@ -69,7 +69,6 @@ public class RelationshipFixer {
     public void fixupRelationships() {
         this.removeMode = false;
         processRelationships();
-        
     }
 
     /**
