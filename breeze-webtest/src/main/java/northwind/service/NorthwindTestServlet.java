@@ -624,7 +624,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
     public SaveWorkState createSaveWorkState(Map saveBundle) {
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             @Override
-            public boolean beforeSaveEntity(EntityInfo entityInfo) throws EntityErrorsException {
+            public boolean beforeSaveEntity(EntityInfo entityInfo) {
                 if (entityInfo.entity instanceof Customer) {
                     Customer c = (Customer) entityInfo.entity;
                     if (c.getCompanyName().toLowerCase().equals("error")) {

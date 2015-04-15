@@ -24,7 +24,7 @@ import northwind.model.RoleType;
 import northwind.model.Supplier;
 
 import com.breeze.hib.MetadataBuilder;
-import com.breeze.hib.QueryService;
+import com.breeze.hib.HibernateQueryProcessor;
 import com.breeze.metadata.Metadata;
 import com.breeze.query.EntityQuery;
 import com.breeze.query.QueryResult;
@@ -35,7 +35,7 @@ import junit.framework.TestCase;
 @SuppressWarnings( {"unused", "unchecked"}) 
 public class QueryServiceTest extends TestCase {
 
-    private QueryService _qe;
+    private HibernateQueryProcessor _qe;
 
 
     @Override
@@ -45,7 +45,7 @@ public class QueryServiceTest extends TestCase {
         SessionFactory sf = StaticConfigurator.getSessionFactory();
         MetadataBuilder mb = new MetadataBuilder(sf);
         Metadata metadata = mb.buildMetadata();
-        _qe = new QueryService(sf, metadata);
+        _qe = new HibernateQueryProcessor(metadata, sf);
     }
     
     public void testFuncQuery() {

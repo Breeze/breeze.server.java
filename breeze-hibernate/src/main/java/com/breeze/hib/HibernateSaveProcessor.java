@@ -20,7 +20,7 @@ import com.breeze.metadata.DataType;
 import com.breeze.metadata.Metadata;
 import com.breeze.save.*;
 
-public class HibernateContextProvider extends ContextProvider {
+public class HibernateSaveProcessor extends SaveProcessor {
 
     private Session _session;
     private SessionFactory _sessionFactory;
@@ -32,15 +32,14 @@ public class HibernateContextProvider extends ContextProvider {
      * @param session Hibernate session to be used for saving
      * @param metadataMap metadata from MetadataBuilder
      */
-    public HibernateContextProvider(Metadata metadata, SaveWorkState saveWorkState, Session session) {
-        super(metadata, saveWorkState);
-        this._session = session;
-        this._sessionFactory = session.getSessionFactory();
+    public HibernateSaveProcessor(Metadata metadata, SessionFactory sessionFactory) {
+        super(metadata);
+        _sessionFactory = sessionFactory;
     }
 
     /**
      * Persist the changes to the entities in the saveMap.
-     * This implements the abstract method in ContextProvider.
+     * This implements the abstract method in SaveProcessor.
      * Assigns saveWorkState.KeyMappings, which map the temporary keys to their real generated keys.
      * Note that this method sets session.FlushMode = FlushMode.MANUAL, so manual flushes are required.
      * @param saveWorkState
@@ -48,7 +47,7 @@ public class HibernateContextProvider extends ContextProvider {
      */
     @Override
     protected void saveChangesCore() {
-
+        _session = _sessionFactory.openSession();
         _session.setFlushMode(FlushMode.MANUAL);
         Transaction tx = _session.getTransaction();
         boolean hasExistingTransaction = tx.isActive();
@@ -97,6 +96,7 @@ public class HibernateContextProvider extends ContextProvider {
             throw new RuntimeException(msg, ex);
         } finally {
             //          if (!hasExistingTransaction) tx.Dispose();
+            _session.close();
         }
 
     }

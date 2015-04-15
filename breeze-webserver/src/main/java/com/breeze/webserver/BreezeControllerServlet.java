@@ -10,11 +10,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.hibernate.SessionFactory;
 
-import com.breeze.hib.QueryService;
-import com.breeze.hib.SaveService;
+import com.breeze.hib.HibernateSaveProcessor;
+import com.breeze.hib.HibernateQueryProcessor;
 import com.breeze.metadata.Metadata;
 import com.breeze.query.EntityQuery;
+import com.breeze.query.QueryProcessor;
 import com.breeze.query.QueryResult;
+import com.breeze.save.SaveProcessor;
 import com.breeze.save.SaveResult;
 import com.breeze.save.SaveWorkState;
 import com.breeze.util.JsonGson;
@@ -22,8 +24,8 @@ import com.breeze.util.JsonGson;
 public class BreezeControllerServlet extends ControllerServlet {
     private static final long serialVersionUID = 1L;
 
-    protected QueryService _queryService;
-    protected SaveService _saveService;
+    protected HibernateQueryProcessor _queryService;
+    protected SessionFactory _sessionFactory;
     protected Metadata _metadata;
     protected String _metadataJson;
 
@@ -40,10 +42,12 @@ public class BreezeControllerServlet extends ControllerServlet {
     private void init(SessionFactory sessionFactory, Metadata metadata) {
         System.out.println("BreezeTests: sessionFactory=" + sessionFactory
                 + ", metadata=" + metadata);
-        this._queryService = new QueryService(sessionFactory, metadata);
-        this._saveService = new SaveService(sessionFactory, metadata);
-        this._metadata = metadata;
-        this._metadataJson = metadata.toJson();
+        _sessionFactory = sessionFactory;
+        _metadata = metadata;
+        _metadataJson = metadata.toJson();
+        _sessionFactory = sessionFactory;
+        
+        
     }
 
     @Override
@@ -97,22 +101,26 @@ public class BreezeControllerServlet extends ControllerServlet {
 
     protected QueryResult executeQuery(String resourceName, String json) {
         EntityQuery eq = new EntityQuery(json);
-        return this._queryService.executeQuery(resourceName, eq);
+        return createQueryProcessor().executeQuery(resourceName, eq);
     }
 
     protected QueryResult executeQuery(Class clazz, String json,
             HttpServletResponse response) {
         EntityQuery eq = new EntityQuery(json);
-        return this._queryService.executeQuery(clazz, eq);
+        return createQueryProcessor().executeQuery(clazz, eq);
     }
 
     protected QueryResult executeQuery(String resourceName,
             EntityQuery entityQuery) {
-        return this._queryService.executeQuery(resourceName, entityQuery);
+        return createQueryProcessor().executeQuery(resourceName, entityQuery);
     }
 
     protected QueryResult executeQuery(Class clazz, EntityQuery entityQuery) {
-        return this._queryService.executeQuery(clazz, entityQuery);
+        return createQueryProcessor().executeQuery(clazz, entityQuery);
+    }
+    
+    protected QueryProcessor createQueryProcessor() {
+        return new HibernateQueryProcessor(_metadata, _sessionFactory);
     }
 
     protected void saveChanges(HttpServletRequest request,
@@ -129,7 +137,8 @@ public class BreezeControllerServlet extends ControllerServlet {
     }
 
     protected SaveResult saveChanges(SaveWorkState saveWorkState) {
-        return _saveService.saveChanges(saveWorkState);
+        SaveProcessor processor = new HibernateSaveProcessor(_metadata, _sessionFactory);
+        return processor.saveChanges(saveWorkState);
     }
 
     protected EntityQuery extractEntityQuery(HttpServletRequest request) {

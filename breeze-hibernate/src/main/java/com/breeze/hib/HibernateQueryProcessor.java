@@ -15,43 +15,16 @@ import com.breeze.metadata.Metadata;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.query.EntityQuery;
 import com.breeze.query.ExpandClause;
+import com.breeze.query.QueryProcessor;
 import com.breeze.query.QueryResult;
 
-public class QueryService {
-    public static final Logger log = Logger.getLogger(QueryService.class);
+public class HibernateQueryProcessor extends QueryProcessor {
+    public static final Logger log = Logger.getLogger(HibernateQueryProcessor.class);
     private SessionFactory _sessionFactory;
-    private Metadata _metadata;
 
-    public QueryService(SessionFactory sessionFactory, Metadata metadata) {
-        this._sessionFactory = sessionFactory;
-        _metadata = metadata;
-    }
-
-    public QueryResult executeQuery(String resourceName, String json) {
-        EntityQuery entityQuery = new EntityQuery(json);
-        return executeQuery(resourceName, entityQuery);
-    }
-
-    public QueryResult executeQuery(Class clazz, String json) {
-        EntityQuery entityQuery = new EntityQuery(json);
-        return executeQuery(clazz, entityQuery);
-    }
-
-    public QueryResult executeQuery(EntityQuery entityQuery) {
-        String resourceName = entityQuery.getResourceName();
-        if (resourceName == null)
-            return null;
-        return executeQuery(resourceName, entityQuery);
-    }
-    
-    public QueryResult executeQuery(String resourceName, EntityQuery entityQuery) {
-        IEntityType entityType = _metadata.getEntityTypeForResourceName(resourceName);
-        return executeQuery(entityType, entityQuery);
-    }
-
-    public QueryResult executeQuery(Class clazz, EntityQuery entityQuery) {
-        IEntityType entityType = _metadata.getEntityTypeForClass(clazz);
-        return executeQuery(entityType, entityQuery);
+    public HibernateQueryProcessor(Metadata metadata, SessionFactory sessionFactory) {
+        super(metadata);
+        _sessionFactory = sessionFactory;
     }
 
     public QueryResult executeQuery(IEntityType entityType, EntityQuery entityQuery) {
