@@ -188,7 +188,7 @@ public class SaveWorkState {
     public EntityInfo findEntityInfoById(Class clazz, Object id) {
         for (Class nextClass : findSelfAndSubclasses(clazz)) {
             for (EntityInfo entityInfo : getEntityInfos(nextClass)) {
-                if (getIdentifier(entityInfo).equals(id)) return entityInfo;
+                if (getIdentifier(entityInfo).toString().equals(id.toString())) return entityInfo;
             }
         }
         return null;

@@ -285,7 +285,7 @@ public class RelationshipFixer {
 
         if (id != null) {
             Class returnEntityClass = propType.getReturnedClass();
-            EntityInfo relatedEntityInfo = saveWorkState.findEntityInfoById(returnEntityClass, id.toString());
+            EntityInfo relatedEntityInfo = saveWorkState.findEntityInfoById(returnEntityClass, id);
 
             if (relatedEntityInfo == null) {
                 EntityState state = entityInfo.entityState;

@@ -159,7 +159,7 @@ public class HibernateContext extends ContextProvider {
     public Object getIdentifier(EntityInfo entityInfo) {
         Object entity = entityInfo.entity;
         Object id = getClassMetadata(entity.getClass()).getIdentifier(entity, null);
-        return id != null ? id.toString() : null;
+        return id != null ? id : null;
     }
 
     /**
