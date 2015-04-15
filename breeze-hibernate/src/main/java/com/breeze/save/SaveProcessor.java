@@ -1,9 +1,18 @@
 package com.breeze.save;
 
+
 import com.breeze.metadata.Metadata;
 
 public abstract class SaveProcessor {
     private Metadata _metadata;
+    
+    protected SaveState _saveState;
+    
+    public enum SaveState {
+        BeforeFixup,
+        AfterFixup,
+        BeforeCommit
+    }
     
     protected SaveProcessor(Metadata metadata) {
         _metadata = metadata;
@@ -17,6 +26,7 @@ public abstract class SaveProcessor {
     public SaveResult saveChanges(SaveWorkState saveWorkState) {
         saveWorkState.setSaveProcessor(this);
         try {
+            _saveState = SaveState.BeforeFixup;
             saveWorkState.beforeSave();
             saveChangesCore(saveWorkState);
             saveWorkState.afterSave();

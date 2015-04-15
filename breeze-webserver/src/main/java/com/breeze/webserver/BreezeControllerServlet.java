@@ -24,7 +24,6 @@ import com.breeze.util.JsonGson;
 public class BreezeControllerServlet extends ControllerServlet {
     private static final long serialVersionUID = 1L;
 
-    protected HibernateQueryProcessor _queryService;
     protected SessionFactory _sessionFactory;
     protected Metadata _metadata;
     protected String _metadataJson;
@@ -33,9 +32,8 @@ public class BreezeControllerServlet extends ControllerServlet {
     @Override
     public void init() {
         ServletContext ctx = getServletContext();
-        init((SessionFactory) ctx
-                .getAttribute(AppContextListener.SESSIONFACTORY),
-                (Metadata) ctx.getAttribute(AppContextListener.METADATA));
+        init((SessionFactory) ctx.getAttribute(AppContextListener.SESSIONFACTORY),
+             (Metadata) ctx.getAttribute(AppContextListener.METADATA));
     }
 
     /** Create instance using provided sessionFactory and metadata. */
@@ -44,10 +42,7 @@ public class BreezeControllerServlet extends ControllerServlet {
                 + ", metadata=" + metadata);
         _sessionFactory = sessionFactory;
         _metadata = metadata;
-        _metadataJson = metadata.toJson();
-        _sessionFactory = sessionFactory;
-        
-        
+        _metadataJson = metadata.toJson();       
     }
 
     @Override

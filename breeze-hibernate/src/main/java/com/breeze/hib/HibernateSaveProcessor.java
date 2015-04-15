@@ -23,6 +23,7 @@ public class HibernateSaveProcessor extends SaveProcessor {
     private Session _session;
     private RelationshipFixer _fixer;
     private List<String> _possibleErrors = new ArrayList<String>();
+   
 
     /**
      * @param metadata
@@ -52,15 +53,19 @@ public class HibernateSaveProcessor extends SaveProcessor {
             _fixer = new RelationshipFixer(saveWorkState, _session);
             _fixer.fixupRelationships();
             // At this point all entities are hooked up but are not yet in the session.
-            
+            _saveState = SaveState.AfterFixup;
             // Allow subclass to process entities before we save them
             saveWorkState.beforeSaveEntities();
             List<EntityInfo> saveOrder = _fixer.sortDependencies();
             processSaves(saveOrder);
-            // At this point all entities are hooked up and in the session.
 
-            // problem here is that we don't want saveWorkState to know about session
-            // saveWorkState.beforeSessionPersist(_session);
+            // At this point all entities are hooked up and in the session, and
+            // all tempIds have been replaced with real ids.
+
+            // Final chance to process entities before we save them - all entities 
+            // have been added to the session.
+            _saveState = SaveState.BeforeCommit;
+            saveWorkState.beforeCommit(_session);
 
             _session.flush();
             refreshFromSession(saveWorkState);
@@ -100,8 +105,10 @@ public class HibernateSaveProcessor extends SaveProcessor {
     public void processRelationships(EntityInfo entityInfo, boolean removeMode) {
         // _fixer will not be initialized until just before beforeSaveEntities is called
         // so it will not be available for beforeSaveEntity calls.
-        if (_fixer != null) {
-            _fixer.processRelationships(entityInfo, removeMode);
+        if (_saveState == SaveState.BeforeFixup) return;
+        _fixer.processRelationships(entityInfo, removeMode);
+        if (_saveState == SaveState.BeforeCommit) {
+            processEntity(entityInfo);
         }
     }
     

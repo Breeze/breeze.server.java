@@ -88,11 +88,18 @@ public class SaveWorkState {
     }
 
     /**
-     * Allow subclasses to process the saveMap before the entities are saved.
-     * @param saveMap all entities that will be saved
-     * @return saveMap, which may have entities added, changed, or removed.
+     * Allow subclasses to process the entities after they have been hooked up to one another
+     * but before they have been added to the session.
      */
     public void beforeSaveEntities()  {
+        
+    }
+    
+    /**
+     * Allow subclasses to process the entities just before they are ready to be committed
+     * 
+     */
+    public void beforeCommit(Object context) {
         
     }
     

@@ -12,6 +12,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.hibernate.Hibernate;
+
 import northwind.model.Category;
 import northwind.model.Comment;
 import northwind.model.Customer;
@@ -406,8 +408,8 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             @Override
-            public void beforeSaveEntities()       
-                    throws EntityErrorsException {
+            // public void beforeSaveEntities() {       
+            public void beforeCommit(Object context) {
                 String tag = (String) this.getSaveOptions().tag;
                 List<EntityInfo> orderInfos = this.getEntityInfos(Order.class);
                 if (orderInfos != null) {
@@ -462,7 +464,11 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             @Override
-            public void beforeSaveEntities()  throws EntityErrorsException {
+            public void beforeSaveEntities() {
+            // can't call beforeCommit for this test because 
+            // we want to return 'temp' orderIds but they are 'real'
+            // ids by the time we get here.
+            // public void beforeCommit(Object context) {
                 List<EntityInfo> orderInfos = this.getEntityInfos(Order.class);
                 if (orderInfos != null) {
                     List<EntityError> errors = new ArrayList<EntityError>();
@@ -586,7 +592,8 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             @Override
-            public void beforeSaveEntities() {
+            // public void beforeSaveEntities() {
+            public void beforeCommit(Object context) {
                 Comment comment = new Comment();
                 String tag = (String) this.getSaveOptions().tag;
                 
@@ -607,7 +614,8 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
         Map saveBundle = extractSaveBundle(request);
         SaveWorkState sws = new SaveWorkState(saveBundle) {
             @Override
-            public void beforeSaveEntities() {
+            // public void beforeSaveEntities() {
+            public void beforeCommit(Object context) {
                 // Create and add a new order.
                 Order order = new Order();
                 order.setOrderDate(new Date());
@@ -661,7 +669,8 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
             }
 
             @Override
-            public void beforeSaveEntities() {
+            // public void beforeSaveEntities() {
+            public void beforeCommit(Object context) {
                 String tag = (String) this.getSaveOptions().tag;
                 if (tag == null) return;
                 if (tag.equals("addProdOnServer")) {
@@ -697,6 +706,7 @@ public class NorthwindTestServlet extends BreezeControllerServlet {
                         // add up their price by $1.
                         // TODO: but category.getProducts (below) returns null
                         // so how do I force load the products.
+                        Hibernate.initialize(category.getProducts());
                         Set<Product> products = category.getProducts();
                         for (Product p : products) {
                             BigDecimal unitPrice = p.getUnitPrice();
