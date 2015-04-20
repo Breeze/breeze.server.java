@@ -5,7 +5,7 @@ import org.hibernate.criterion.DetachedCriteria;
 
 import com.breeze.metadata.IEntityType;
 
-public class CriteriaWrapper {
+class CriteriaWrapper {
     
     public Object criteria;
     public IEntityType entityType;

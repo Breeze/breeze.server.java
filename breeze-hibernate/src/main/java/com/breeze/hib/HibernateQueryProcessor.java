@@ -18,15 +18,29 @@ import com.breeze.query.ExpandClause;
 import com.breeze.query.QueryProcessor;
 import com.breeze.query.QueryResult;
 
+/**
+ * Entry point for execution of an EntityQuery from a breezeJs client against
+ * a Hibernate entity model. 
+ * @author IdeaBlade
+ *
+ */
 public class HibernateQueryProcessor extends QueryProcessor {
-    public static final Logger log = Logger.getLogger(HibernateQueryProcessor.class);
+    private static final Logger log = Logger.getLogger(HibernateQueryProcessor.class);
     private SessionFactory _sessionFactory;
 
+    /**
+     * @param metadata Metadata for the Hibernate model.
+     * @param sessionFactory Hibernate SessionFactory instance.
+     */
     public HibernateQueryProcessor(Metadata metadata, SessionFactory sessionFactory) {
         super(metadata);
         _sessionFactory = sessionFactory;
     }
 
+    
+    /* (non-Javadoc)
+     * @see com.breeze.query.QueryProcessor#executeQuery(com.breeze.metadata.IEntityType, com.breeze.query.EntityQuery)
+     */
     public QueryResult executeQuery(IEntityType entityType, EntityQuery entityQuery) {
             
         entityQuery.validate(entityType);

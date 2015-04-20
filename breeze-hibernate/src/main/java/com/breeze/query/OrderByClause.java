@@ -8,6 +8,13 @@ import com.breeze.metadata.IEntityType;
 import com.breeze.metadata.IProperty;
 import com.breeze.metadata.MetadataHelper;
 
+/**
+ * Represents a single orderBy clause that will be part of an EntityQuery. An orderBy 
+ * clause represents either the name of a property or a path to the property of another entity via its navigation path 
+ * from the current EntityType for a given query. 
+ * @author IdeaBlade
+ *
+ */
 public class OrderByClause {
 
 	private List<OrderByItem> _orderByItems;

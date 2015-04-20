@@ -5,8 +5,8 @@ import java.util.List;
 import com.breeze.util.JsonGson;
 
 /**
- * Wrapper for results that have an InlineCount, to support paged result sets.
- * @author Steve
+ * Wrapper for the results of an EntityQuery.  The results may include an InlineCount, to support paged result sets.
+ * @author IdeaBlade
  */
 public class QueryResult {
 	private List<?> results;
@@ -35,6 +35,9 @@ public class QueryResult {
 		this.inlineCount = inlineCount;
 	}
 	
+	/**
+	 * @return This object as a json string. 
+	 */
 	public String toJson() {
 		if (inlineCount == null) {
 			return JsonGson.toJson(results, true, true);

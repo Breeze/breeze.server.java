@@ -34,7 +34,7 @@ import com.breeze.save.SaveWorkState;
  * around this problem, this class uses the IDs sent by Breeze to re-connect the related entities.
  * @author Steve
  */
-public class RelationshipFixer {
+class RelationshipFixer {
     private SaveWorkState saveWorkState;
     private Map<String, String> fkMap;
     private Session session;

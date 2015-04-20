@@ -7,6 +7,11 @@ import java.util.Map;
 import com.breeze.metadata.IEntityType;
 import com.breeze.util.TypeFns;
 
+/**
+ * Represents a single where clause.
+ * @author IdeaBlade
+ *
+ */
 public abstract class Predicate {
 	
 	public static List<Predicate> predicatesFromMap(Map map) {

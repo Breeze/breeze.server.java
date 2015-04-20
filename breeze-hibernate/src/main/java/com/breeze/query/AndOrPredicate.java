@@ -6,6 +6,10 @@ import java.util.List;
 
 import com.breeze.metadata.IEntityType;
 
+/**
+ * @author IdeaBlade
+ *
+ */
 public class AndOrPredicate extends Predicate {
 	private Operator _op;
 	private List<Predicate> _predicates;
@@ -22,6 +26,7 @@ public class AndOrPredicate extends Predicate {
 	public Operator getOperator() {
 		return _op;
 	}
+	
 	public List<Predicate> getPredicates() {
 		return Collections.unmodifiableList(_predicates);
 	}

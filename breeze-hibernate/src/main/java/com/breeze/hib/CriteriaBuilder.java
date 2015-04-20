@@ -46,7 +46,7 @@ import com.breeze.query.UnaryPredicate;
  * @author Jay
  *
  */
-public class CriteriaBuilder {
+class CriteriaBuilder {
     
     // TODO: fix select (projection) with nonscalar nav props.  So far no idea how to do this... 
 

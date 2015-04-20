@@ -6,6 +6,12 @@ import com.breeze.metadata.IEntityType;
 import com.breeze.metadata.IProperty;
 import com.breeze.metadata.Metadata.DataProperty;
 
+/**
+ * Represents a where clause that compares two values given a specified operator, the two values are either a property
+ * and a literal value, or two properties.  
+ * @author IdeaBlade
+ *
+ */
 public class BinaryPredicate extends Predicate {
 	private Operator _op;
 	private Object _expr1Source;

@@ -5,7 +5,7 @@ package com.breeze.hib;
  * @author Steve
  *
  */
-public class PropertyExpression extends org.hibernate.criterion.PropertyExpression {
+class PropertyExpression extends org.hibernate.criterion.PropertyExpression {
 	private static final long serialVersionUID = 1L;
 
 	public PropertyExpression(String propertyName, String otherPropertyName, String op) {

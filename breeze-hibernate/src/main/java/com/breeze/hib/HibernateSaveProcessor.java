@@ -35,9 +35,12 @@ public class HibernateSaveProcessor extends SaveProcessor {
     }
 
     /**
-     * Persist the changes to the entities in the saveMap.
+     * Persist the changes to the entities in the SaveWorkState that is passed in.
      * This implements the abstract method in SaveProcessor.
-     * Assigns saveWorkState.KeyMappings, which map the temporary keys to their real generated keys.
+     * After the completion of this method the saveWorkState.toSaveResult method may be called the will
+     * return a SaveResult instance.
+     * This method both persists the entities and creates the collection of KeyMappings, 
+     * which map the temporary keys to their real generated keys.
      * Note that this method sets session.FlushMode = FlushMode.MANUAL, so manual flushes are required.
      * @param saveWorkState
      */
@@ -53,7 +56,7 @@ public class HibernateSaveProcessor extends SaveProcessor {
             _fixer = new RelationshipFixer(saveWorkState, _session);
             _fixer.fixupRelationships();
             // At this point all entities are hooked up but are not yet in the session.
-            _saveState = SaveState.AfterFixup;
+            setSaveState(SaveState.AfterFixup);
             // Allow subclass to process entities before we save them
             saveWorkState.beforeSaveEntities();
             List<EntityInfo> saveOrder = _fixer.sortDependencies();
@@ -64,7 +67,7 @@ public class HibernateSaveProcessor extends SaveProcessor {
 
             // Final chance to process entities before we save them - all entities 
             // have been added to the session.
-            _saveState = SaveState.BeforeCommit;
+            setSaveState(SaveState.BeforeCommit);
             saveWorkState.beforeCommit(_session);
 
             _session.flush();
@@ -105,9 +108,10 @@ public class HibernateSaveProcessor extends SaveProcessor {
     public void processRelationships(EntityInfo entityInfo, boolean removeMode) {
         // _fixer will not be initialized until just before beforeSaveEntities is called
         // so it will not be available for beforeSaveEntity calls.
-        if (_saveState == SaveState.BeforeFixup) return;
+        SaveState saveState = getSaveState();
+        if (saveState == SaveState.BeforeFixup) return;
         _fixer.processRelationships(entityInfo, removeMode);
-        if (_saveState == SaveState.BeforeCommit) {
+        if (saveState == SaveState.BeforeCommit) {
             processEntity(entityInfo);
         }
     }
@@ -205,7 +209,7 @@ public class HibernateSaveProcessor extends SaveProcessor {
     private Class _classCached;
     private ClassMetadata _classMetadataCached;
 
-    protected ClassMetadata getClassMetadata(Class clazz) {
+    private ClassMetadata getClassMetadata(Class clazz) {
         // perf enhancement - this method gets called a lot in loops.
         if (clazz != _classCached) {
             _classCached = clazz;

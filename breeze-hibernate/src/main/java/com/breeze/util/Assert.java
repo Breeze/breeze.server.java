@@ -1,5 +1,10 @@
 package com.breeze.util;
 
+/**
+ * General purpose assertion utilities.
+ * @author IdeaBlade
+ *
+ */
 public class Assert {
 	public static void notNull(Object value, String name) {
 		if (value == null) {

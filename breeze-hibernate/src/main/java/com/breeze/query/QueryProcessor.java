@@ -3,6 +3,11 @@ package com.breeze.query;
 import com.breeze.metadata.IEntityType;
 import com.breeze.metadata.Metadata;
 
+/**
+ * Abstract base class for all query processing logic. 
+ * @author IdeaBlade
+ *
+ */
 public abstract class QueryProcessor {
     
     protected Metadata _metadata;

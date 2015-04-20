@@ -25,7 +25,7 @@ import com.breeze.util.TypeFns;
  * @author Steve
  *
  */
-public class HibernateExpander {
+class HibernateExpander {
 
 	/**
 	 * Cause initialization of properties on the objects in the collection.

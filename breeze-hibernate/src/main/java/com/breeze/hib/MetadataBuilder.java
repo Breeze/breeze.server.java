@@ -35,8 +35,8 @@ import com.breeze.metadata.RawMetadata;
 /**
  * Builds a data structure containing the metadata required by Breeze.
  * 
- * @see http://www.breeze.com/documentation/breeze-metadata-format
- * @author Steve
+ * @see <a href="http://www.breezejs.com/documentation/breeze-metadata-format">Breeze Metadata Doc</a>
+ * @author IdeaBlade
  *
  */
 @SuppressWarnings("rawtypes")
@@ -107,9 +107,7 @@ public class MetadataBuilder {
         return new Metadata(_rawMetadata);
     }
 
-    /**
-     * Populate the metadata header.
-     */
+    
     void initMap() {
         _rawMetadata = new RawMetadata();
         _typeList = new ArrayList<HashMap<String, Object>>();

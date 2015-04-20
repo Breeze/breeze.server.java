@@ -9,6 +9,15 @@ import com.breeze.metadata.IEntityType;
 import com.breeze.util.JsonGson;
 import com.breeze.util.StringFns;
 
+/**
+ * Represents a query against a strongly typed model.
+ * This query is designed to be easily converted into variety of persistence library  
+ * query languages via subclasses of the QueryProcessor class.  
+ * An EntityQuery is an immutable structure.  This means that mutation methods
+ * on an EntityQuery actually all return new EntityQuery instances. 
+ * @author IdeaBlade
+ *
+ */
 public class EntityQuery {
     private String _resourceName;
     private Predicate _wherePredicate;
@@ -25,6 +34,11 @@ public class EntityQuery {
 
     }
 
+    
+    /**
+     * Materializes the serialized json representation of an EntityQuery.
+     * @param json The serialized json version of the EntityQuery.
+     */
     public EntityQuery(String json) {
         if (json == null || json.length() == 0) {
             return;
@@ -56,6 +70,11 @@ public class EntityQuery {
         }
     }
 
+    
+    /**
+     * Copy constructor
+     * @param query
+     */
     public EntityQuery(EntityQuery query) {
         this._resourceName = query._resourceName;
         this._skipCount = query._skipCount;
@@ -69,12 +88,24 @@ public class EntityQuery {
 
     }
 
+    
+    /**
+     * Return a new query based on this query with an additional where clause added.
+     * @param json Json representation of the where clause.
+     * @return A new EntityQuery.
+     */
     public EntityQuery where(String json) {
         Map qmap = JsonGson.fromJson(json);
         Predicate pred = Predicate.predicateFromMap(qmap);
         return this.where(pred);
     }
 
+    
+    /**
+     * Return a new query based on this query with an additional where clause added.
+     * @param predicate A Predicate representing the where clause to add.
+     * @return A new EntityQuery.
+     */
     public EntityQuery where(Predicate predicate) {
         EntityQuery eq = new EntityQuery(this);
         if (eq._wherePredicate == null) {
@@ -91,10 +122,20 @@ public class EntityQuery {
         return eq;
     }
 
+    /**
+     * Return a new query based on this query with the specified orderBy clauses added.
+     * @param propertyPaths A varargs array of orderBy clauses ( each consisting of a property path and an optional sort direction).
+     * @return A new EntityQuery.
+     */
     public EntityQuery orderBy(String... propertyPaths) {
         return orderBy(Arrays.asList(propertyPaths));
     }
 
+    /**
+     * Return a new query based on this query with the specified orderBy clauses added.
+     * @param propertyPaths An List of orderBy clauses ( each consisting of a property path and an optional sort direction).
+     * @return A new EntityQuery.
+     */
     public EntityQuery orderBy(List<String> propertyPaths) {
         EntityQuery eq = new EntityQuery(this);
         if (this._orderByClause == null) {
@@ -108,10 +149,20 @@ public class EntityQuery {
         return eq;
     }
     
+    /**
+     * Return a new query based on this query with the specified expand clauses added.
+     * @param propertyPaths A varargs array of expand clauses ( each a dot delimited property path).
+     * @return A new EntityQuery.
+     */
     public EntityQuery expand(String... propertyPaths) {
         return expand(Arrays.asList(propertyPaths));
     }
 
+    /**
+     * Return a new query based on this query with the specified expand clauses added.
+     * @param propertyPaths A list of expand clauses (each a dot delimited property path).
+     * @return A new EntityQuery.
+     */
     public EntityQuery expand(List<String> propertyPaths) {
         EntityQuery eq = new EntityQuery(this);
         if (this._expandClause == null) {
@@ -126,10 +177,20 @@ public class EntityQuery {
         return eq;
     }
     
+    /**
+     * Return a new query based on this query with the specified select (projection) clauses added.
+     * @param propertyPaths A varargs array of select clauses (each a dot delimited property path).
+     * @return A new EntityQuery.
+     */
     public EntityQuery select(String... propertyPaths) {
         return select(Arrays.asList(propertyPaths));
     }
 
+    /**
+     * Return a new query based on this query with the specified select (projection) clauses added.
+     * @param propertyPaths A list of select clauses (each a dot delimited property path).
+     * @return A new EntityQuery.
+     */
     public EntityQuery select(List<String> propertyPaths) {
         EntityQuery eq = new EntityQuery(this);
         if (this._selectClause == null) {
@@ -145,17 +206,50 @@ public class EntityQuery {
     }
 
     
+    /**
+     * Return a new query based on this query that limits the results to the first n records.
+     * @param takeCount The number of records to take.
+     * @return A new EntityQuery
+     */
     public EntityQuery take(Integer takeCount) {
         EntityQuery eq = new EntityQuery(this);
         eq._takeCount = takeCount;
         return eq;
     }
     
+    /**
+     * Return a new query based on this query that skips the first n records.
+     * @param skipCount The number of records to skip.
+     * @return A new EntityQuery
+     */
     public EntityQuery skip(Integer skipCount) {
         EntityQuery eq = new EntityQuery(this);
         eq._skipCount = skipCount;
         return eq;
     }
+    
+    /**
+     * Return a new query based on this query that either adds or removes the inline count capability. 
+     * @param inlineCountEnabled Whether to enable inlineCount.
+     * @return A new EntityQuery
+     */
+    public EntityQuery enableInlineCount(boolean inlineCountEnabled) {
+        EntityQuery eq = new EntityQuery(this);
+        eq._inlineCountEnabled = inlineCountEnabled;
+        return eq;
+    }
+    
+    /**
+     * Return a new query based on this query with the specified resourceName 
+     * @param resourceName The name of the url resource.
+     * @return A new EntityQuery
+     */
+    public EntityQuery withResourceName(String resourceName) {
+        EntityQuery eq = new EntityQuery(this);
+        eq._resourceName = resourceName;
+        return eq;
+    }
+
 
     @SuppressWarnings("unchecked")
     private List<String> toStringList(Object src) {
@@ -175,6 +269,11 @@ public class EntityQuery {
         return ((Double) o).intValue();
     }
 
+    /**
+     * Validates that all of the clauses that make up this query are consistent with the 
+     * specified EntityType.
+     * @param entityType A EntityType
+     */
     public void validate(IEntityType entityType) {
         _entityType = entityType;
         if (_wherePredicate != null) {
@@ -188,14 +287,17 @@ public class EntityQuery {
         }
     }
 
-    // only available after validate is called.
+    
+    /**
+     * Returns the EntityType that this query has been validated against. Not that this property
+     * will return null until the validate method has been called.
+     * @return The EntityType that this query has been validated against.
+     */
     public IEntityType getEntityType() {
         return _entityType;
     }
 
-    public void setResourceName(String resourceName) {
-        _resourceName = resourceName;
-    }
+    
 
     public String getResourceName() {
         return _resourceName;
@@ -228,7 +330,7 @@ public class EntityQuery {
     public boolean isInlineCountEnabled() {
         return _inlineCountEnabled;
     }
-
+    
     public Map getParameters() {
         return _parameters;
     }

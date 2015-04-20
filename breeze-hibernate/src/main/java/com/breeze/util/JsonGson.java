@@ -26,8 +26,8 @@ public class JsonGson {
      * Convert the object tree to JSON, including the $id. $ref and $type
      * properties
      * 
-     * @param obj
-     * @return
+     * @param obj The obj to serialize to json
+     * @return The json string.
      */
     public static String toJson(Object obj) {
         return toJson(obj, false, false);
@@ -36,12 +36,10 @@ public class JsonGson {
     /**
      * Convert the object tree to JSON
      * 
-     * @param obj
-     *            - root object
-     * @param includesBreezeEntities
-     *            - whether to add the $id and $ref and $type properties with
-     *            each object
-     * @return
+     * @param obj The root object to be serialized to json.
+     * @param includesBreezeEntities 
+     *      Whether to add the $id and $ref and $type properties when serializing the object.
+     * @return A json string.
      */
     public static String toJson(Object obj, boolean includesBreezeEntities, boolean isHibernate) {
         try {
@@ -67,8 +65,8 @@ public class JsonGson {
     /**
      * Convert the JSON string to a Map of Lists of Maps...
      * 
-     * @param source
-     * @return
+     * @param source A json string
+     * @return A Map representing the deserialized json.
      */
     public static Map fromJson(String source) {
         try {
@@ -81,6 +79,13 @@ public class JsonGson {
         }
     }
 
+    /**
+     * 
+     * Convert a JSON string containing a json Array into an Array of Maps
+     *
+     * @param source A string containing a json array i.e. "[....]".
+     * @return An array of Maps.
+     */
     public static Map[] fromJsonArray(String source) {
         try {
             Gson gson = newGsonBuilder().create();
@@ -94,15 +99,21 @@ public class JsonGson {
     /**
      * Convert the Map into an instance of the given class
      * 
-     * @param clazz
-     * @param map
-     * @return
+     * @param clazz The class to deserialize into.
+     * @param map The data to deserialize.
+     * @return An instance of the specified class.
      */
     public static Object fromMap(Class<?> clazz, Map map) {
         String json = toJson(map);
         return fromJson(clazz, json);
     }
 
+    /**
+     * Convert a json string ito an instance of the specified class.
+     * @param clazz The class to deserialize into.
+     * @param json The data to deserialize.
+     * @return An instance of the specified class.
+     */
     public static Object fromJson(Class<?> clazz, String json) {
         try {
             Gson gson = newGsonBuilder().create();

@@ -13,11 +13,20 @@ import com.breeze.metadata.IProperty;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.util.JsonGson;
 
+/**
+ * Strongly typed metadata the describes all of the entityTypes for a single model and all of their associated data and navigation properties.
+ * @author IdeaBlade
+ *
+ */
 @SuppressWarnings("unchecked")
 public class Metadata  {
 	private HashMap<String, Object> _resourceEntityTypeMap;
 	private HashMap<String, IEntityType> _entityTypeMap = new HashMap<String, IEntityType>();
 	private RawMetadata  _rawMetadata;
+	/**
+	 * Creates strongly typed wrapper over raw breeze json metadata.  
+	 * @param rawMetadata The raw metadata in json format that is used to communicate with the breeze client. 
+	 */
 	public Metadata(RawMetadata rawMetadata) {
 		_rawMetadata = rawMetadata;
 		List<HashMap<String, Object>> structuralTypes = (List<HashMap<String, Object>>) rawMetadata.get("structuralTypes");
@@ -28,6 +37,7 @@ public class Metadata  {
 		}
 	}
 	
+	
 	public RawMetadata getRawMetadata() {
 	    return _rawMetadata;
 	}
@@ -36,6 +46,10 @@ public class Metadata  {
 	    return JsonGson.toJson(this._rawMetadata);
 	}
 	
+	/**
+	 * @param resourceName The name of the url resource.  
+	 * @return The EntityType associated with the specified resource name.
+	 */
 	public IEntityType getEntityTypeForResourceName(String resourceName) {
 		String entityTypeName = (String) _resourceEntityTypeMap.get(resourceName);
 		if (entityTypeName == null) {
@@ -44,17 +58,31 @@ public class Metadata  {
 		return getEntityType(entityTypeName);
 	}
 	
+	
+	/**
+	 * @param clazz An entity class.
+	 * @return The EntityType associated with the specified class.
+	 */
 	public IEntityType getEntityTypeForClass(Class<?> clazz) {
 		String entityTypeName = MetadataHelper.getEntityTypeName(clazz);
 		return getEntityType(entityTypeName);
 	}
 
+	/**
+	 * @param entityTypeName An EntityType name.
+	 * @return The EntityType associated with the specified name.
+	 */
 	public IEntityType getEntityType(String entityTypeName) {
 		if (entityTypeName == null) return null;
 		return _entityTypeMap.get(entityTypeName);
 	}
 	
 	
+	/**
+	 * The metadata that describes a single java entity class.
+	 * @author IdeaBlade
+	 *
+	 */
 	public class EntityType implements IEntityType {
 		private Map<String, Object> _entityMap;
 		private Metadata _metadata;
@@ -63,7 +91,7 @@ public class Metadata  {
 		private Map<String, IProperty> _propertyMap = new HashMap<String, IProperty>();
 		private List<IDataProperty> _keyProperties = new ArrayList<IDataProperty>();
 
-		public EntityType(Map<String, Object> entityMap, Metadata metadata) {
+		protected EntityType(Map<String, Object> entityMap, Metadata metadata) {
 			_entityMap = entityMap;
 			_metadata = metadata;
 			String ns = (String) _entityMap.get("namespace");
@@ -88,6 +116,9 @@ public class Metadata  {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see com.breeze.metadata.IEntityType#getName()
+		 */
 		@Override
 		public String getName() {
 			return _entityTypeName;
