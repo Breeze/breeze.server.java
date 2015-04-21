@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.hibernate.SessionFactory;
 
-import com.breeze.hib.MetadataBuilder;
+import com.breeze.hib.HibernateMetadata;
 import com.breeze.metadata.DataType;
 import com.breeze.metadata.IEntityType;
 import com.breeze.metadata.Metadata;
@@ -32,8 +32,8 @@ public class PredicateTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		SessionFactory sf = StaticConfigurator.getSessionFactory();
-		MetadataBuilder mb = new MetadataBuilder(sf);
-		_metadata = mb.buildMetadata();	
+		_metadata = new HibernateMetadata(sf);
+		_metadata.build();	
 	}
 	
 	public void testFunc1ArgPred() {

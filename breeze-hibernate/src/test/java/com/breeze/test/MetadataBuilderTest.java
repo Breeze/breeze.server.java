@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.hibernate.SessionFactory;
 
-import com.breeze.hib.MetadataBuilder;
+import com.breeze.hib.HibernateMetadata;
 import com.breeze.metadata.Metadata;
 import com.breeze.metadata.RawMetadata;
 import com.breeze.util.JsonGson;
@@ -84,9 +84,8 @@ public class MetadataBuilderTest extends TestCase {
 	public void testBuildMetadata() {
 		SessionFactory sf = StaticConfigurator.getSessionFactory();
 		
-		MetadataBuilder mb = new MetadataBuilder(sf);
-		
-		Metadata metadata = mb.buildMetadata();
+		Metadata metadata = new HibernateMetadata(sf);
+		metadata.build();
 		RawMetadata rawMetadata = metadata.getRawMetadata();
 		assertNotNull(metadata);
 		assertNotNull(rawMetadata.get("localQueryComparisonOptions"));

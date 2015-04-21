@@ -9,7 +9,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import com.breeze.metadata.Metadata;
-import com.breeze.hib.MetadataBuilder;
+import com.breeze.hib.HibernateMetadata;
 
 @WebListener
 public class AppContextListener implements ServletContextListener {
@@ -27,8 +27,8 @@ public class AppContextListener implements ServletContextListener {
 		System.out.println("AppContextListener.contextInitialized: sessionFactory=" + sessionFactory);
 		
 		// builds metadata from the  Hibernate mappings
-		MetadataBuilder metaGen = new MetadataBuilder(sessionFactory, configuration);
-		Metadata metadata = metaGen.buildMetadata();
+		Metadata metadata = new HibernateMetadata(sessionFactory, configuration);
+		metadata.build();
 		System.out.println("AppContextListener.contextInitialized: metadata=" + metadata);
 
 		// Set the values in the context so they can be used in the NorthBreeze service class

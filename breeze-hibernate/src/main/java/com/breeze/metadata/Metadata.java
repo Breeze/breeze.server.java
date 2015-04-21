@@ -19,24 +19,34 @@ import com.breeze.util.JsonGson;
  *
  */
 @SuppressWarnings("unchecked")
-public class Metadata  {
+public abstract class Metadata  {
 	private HashMap<String, Object> _resourceEntityTypeMap;
 	private HashMap<String, IEntityType> _entityTypeMap = new HashMap<String, IEntityType>();
 	private RawMetadata  _rawMetadata;
-	/**
-	 * Creates strongly typed wrapper over raw breeze json metadata.  
-	 * @param rawMetadata The raw metadata in json format that is used to communicate with the breeze client. 
-	 */
-	public Metadata(RawMetadata rawMetadata) {
-		_rawMetadata = rawMetadata;
-		List<HashMap<String, Object>> structuralTypes = (List<HashMap<String, Object>>) rawMetadata.get("structuralTypes");
-		_resourceEntityTypeMap = (HashMap<String, Object>) rawMetadata.get("resourceEntityTypeMap");
-		for (Map<String, Object> entityMap: structuralTypes) {
-			IEntityType entityType = new EntityType(entityMap, this);
-			_entityTypeMap.put(entityType.getName(), entityType);
-		}
+	
+	
+	public void build() {
+	    if (_rawMetadata == null) {
+	        _rawMetadata = buildRawMetadata();
+	        wrapRawMetadata(_rawMetadata);
+	    }
 	}
 	
+	protected abstract RawMetadata buildRawMetadata();
+	
+	/**
+     * Creates strongly typed wrapper over raw breeze json metadata.  
+     * @param rawMetadata The raw metadata in json format that is used to communicate with the breeze client. 
+     */
+    private void wrapRawMetadata(RawMetadata rawMetadata) {
+        _rawMetadata = rawMetadata;
+        List<HashMap<String, Object>> structuralTypes = (List<HashMap<String, Object>>) rawMetadata.get("structuralTypes");
+        _resourceEntityTypeMap = (HashMap<String, Object>) rawMetadata.get("resourceEntityTypeMap");
+        for (Map<String, Object> entityMap: structuralTypes) {
+            IEntityType entityType = new EntityType(entityMap, this);
+            _entityTypeMap.put(entityType.getName(), entityType);
+        }
+    }
 	
 	public RawMetadata getRawMetadata() {
 	    return _rawMetadata;

@@ -40,7 +40,7 @@ import com.breeze.metadata.RawMetadata;
  *
  */
 @SuppressWarnings("rawtypes")
-public class MetadataBuilder {
+public class HibernateMetadata extends Metadata {
 
     private SessionFactory _sessionFactory;
     private Configuration _configuration;
@@ -50,52 +50,23 @@ public class MetadataBuilder {
     private HashSet<String> _typeNames;
     private HashMap<String, String> _fkMap;
 
-    public MetadataBuilder(SessionFactory sessionFactory, Configuration configuration) {
+    public HibernateMetadata(SessionFactory sessionFactory, Configuration configuration) {
         _sessionFactory = sessionFactory;
         _configuration = configuration;
     }
 
-    public MetadataBuilder(SessionFactory sessionFactory) {
+    public HibernateMetadata(SessionFactory sessionFactory) {
         _sessionFactory = sessionFactory;
         _configuration = getConfigurationFromRegistry(sessionFactory);
     }
 
-    /**
-     * Extract the Configuration from the ServiceRegistry exposed by SessionFactoryImpl. Works in
-     * Hibernate 4.3, but will probably break in a future version as they keep trying to make the
-     * configuration harder to access (for some reason). Hopefully they will provide a interface to
-     * get the full mapping data again.
-     * 
-     * @param sessionFactory
-     */
-    Configuration getConfigurationFromRegistry(SessionFactory sessionFactory) {
-        ServiceRegistryImplementor serviceRegistry = ((SessionFactoryImplementor) _sessionFactory).getServiceRegistry();
-
-        SessionFactoryServiceRegistryImpl impl = (SessionFactoryServiceRegistryImpl) serviceRegistry;
-        Configuration cfg = null;
-
-        try {
-            Field configurationField = SessionFactoryServiceRegistryImpl.class.getDeclaredField("configuration");
-            configurationField.setAccessible(true);
-            Object configurationObject = configurationField.get(impl);
-            cfg = (Configuration) configurationObject;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (cfg == null) {
-            throw new RuntimeException(
-                    "Unable to get the Configuration from the service registry.  Please provide the Configuration in the constructor.");
-        }
-
-        return cfg;
-    }
 
     /**
-     * Build the Breeze metadata and then wrap it in a strongly typed wrapper. The internal
+     * Build the raw Breeze metadata.  This will then get wrapped with a strongly typed wrapper. The internal
      * rawMetadata can be converted to JSON and sent to the Breeze client.
      */
-    public Metadata buildMetadata() {
+    @Override
+    public RawMetadata buildRawMetadata() {
         initMap();
 
         Map<String, ClassMetadata> classMeta = _sessionFactory.getAllClassMetadata();
@@ -104,7 +75,7 @@ public class MetadataBuilder {
             addClass(meta);
         }
 
-        return new Metadata(_rawMetadata);
+        return _rawMetadata;
     }
 
     
@@ -843,5 +814,37 @@ public class MetadataBuilder {
         ValidationTypeMap.put("Time", "duration");
 
     }
+    
+    /**
+     * Extract the Configuration from the ServiceRegistry exposed by SessionFactoryImpl. Works in
+     * Hibernate 4.3, but will probably break in a future version as they keep trying to make the
+     * configuration harder to access (for some reason). Hopefully they will provide a interface to
+     * get the full mapping data again.
+     * 
+     * @param sessionFactory
+     */
+    Configuration getConfigurationFromRegistry(SessionFactory sessionFactory) {
+        ServiceRegistryImplementor serviceRegistry = ((SessionFactoryImplementor) _sessionFactory).getServiceRegistry();
+
+        SessionFactoryServiceRegistryImpl impl = (SessionFactoryServiceRegistryImpl) serviceRegistry;
+        Configuration cfg = null;
+
+        try {
+            Field configurationField = SessionFactoryServiceRegistryImpl.class.getDeclaredField("configuration");
+            configurationField.setAccessible(true);
+            Object configurationObject = configurationField.get(impl);
+            cfg = (Configuration) configurationObject;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (cfg == null) {
+            throw new RuntimeException(
+                    "Unable to get the Configuration from the service registry.  Please provide the Configuration in the constructor.");
+        }
+
+        return cfg;
+    }
+
 
 }

@@ -23,7 +23,7 @@ import northwind.model.Role;
 import northwind.model.RoleType;
 import northwind.model.Supplier;
 
-import com.breeze.hib.MetadataBuilder;
+import com.breeze.hib.HibernateMetadata;
 import com.breeze.hib.HibernateQueryProcessor;
 import com.breeze.metadata.Metadata;
 import com.breeze.query.EntityQuery;
@@ -43,8 +43,8 @@ public class QueryServiceTest extends TestCase {
         super.setUp();
         // then populate the database with test data...?
         SessionFactory sf = StaticConfigurator.getSessionFactory();
-        MetadataBuilder mb = new MetadataBuilder(sf);
-        Metadata metadata = mb.buildMetadata();
+        Metadata metadata = new HibernateMetadata(sf);
+        metadata.build();
         _qe = new HibernateQueryProcessor(metadata, sf);
     }
     
