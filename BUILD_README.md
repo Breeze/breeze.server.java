@@ -3,45 +3,37 @@
 
 The project uses [Maven](http://maven.apache.org/) as its build tool and dependency manager, so you'll need to install Maven.
 
-The dependencies are defined in the `pom.xml` file.  Maven reads this file to determine what other libraries it needs to download
-before it can start the build.  Hibernate and Jersey each have their own dependencies, so expect Maven to install many jars before 
-actually compiling.  Type 
+The dependencies are defined in `pom.xml` files in each directory discussed below.  Maven reads this file to determine what other libraries it needs to download
+before it can start the build.  Hibernate has its own dependencies, so expect Maven to install many jars before 
+actually compiling.
 
-	mvn package
+The current breeze.server.java GitHub repository consists of 4 directories containing java code.  Two of these comprise the primary breeze libraries
 
-to compile the sources and build `breezejs-hibernate-{version}.jar`.  
+- breeze-hibernate ( core breeze/hibernate functionality)
+- breeze-webserver ( additions to make it easier to build java servlet app)
 
-##### Dependency Jars
+and two of these are test directories for building and running a breeze test harness web application.
 
-When you deploy the jar, you will need to deploy all the of the 
-Hibernate and Jersey dependencies along with it.  To get all the jars in one handy directory, use
+- breeze-northwind ( hibernate test domain model)
+- breeze-webtest   ( test web application) - has dependencies on the breeze.js GitHub repo for the actual client side tests.
 
-	mvn assembly:single
+## Build and testing
+ 
+There is also a 'build' directory with a parent `pom.xml` file and a build.bat file that attempts to build the entire project including tests, and then loads the web app onto an Apache Tomcat server. Before running this batch file, please understand the dependencies listed below. 
 
-This will create the directory `breezejs-hibernate/target/breezejs-hibernate-0.1a-lib/lib` which contains all the necessary jars.  You might want to do this so that you can include the jars in the build path for your IDE.
+#### Test dependencies.
 
-##### JAR With Dependencies
+- You will need to install Apache Tomcat to run the tests.
+- You will also need to download the 'breeze.js' GitHub repo. 
+- You will need to edit the local 'setEnv.bat' file in the build.bat directory to point to your local Tomcat installation and the location of the 'breezeJs' github repo on your machine.  
+- You can then run build.bat which will build the test project and launch Tomcat in debug mode with the war file created during the build.
+- On a browser, go to [http://localhost:8080/breeze-webtest/](http://localhost:8080/breeze-webtest/) 
 
-If needed, you can create a single jar that has all of the dependencies included.  To do this, edit the pom.xml file.  **Comment out** the line
-
-	<descriptor>src/main/assembly/lib.xml</descriptor>
-	
-and **uncomment** the line
-
-	<descriptorRef>jar-with-dependencies</descriptorRef>
-	
-Then use 
-
-	mvn assembly:single
-	
-and it will create `breezejs-hibernate/target/breezejs-hibernate-0.1a-jar-with-dependencies.jar` which has all the classes from all the 
-jars discussed above.
 
 ## Using Eclipse or Other IDE
 
 In order to edit and build using an IDE, you will first need to use Maven to get the jars of all the dependencies, as described under "Dependencies" above.  Then you 
 can include the jars in the classpath of the project in your IDE.
 
-For Eclipse, the `.classpath` and `.project` files are provided in the breezejs-hibernate 
-directory.  After performing the `mvn assembly:single` command described above, you can open Eclipse and use "import project" to use the existing project definition.
+For Eclipse, the `.classpath` and `.project` files are provided in each of the directories mentioned above.  After performing the 'build' command described above, you can open Eclipse and use "import project" to use the existing project definition.
 
