@@ -187,20 +187,22 @@ The HibernateSaveProcessor is used to implement any endpoint to a breezejs SaveC
 The *SaveWorkState* object mentioned above is a wrapper over the save data that is passed in from the client saveChanges call.  In addition, the *SaveWorkState* may be subclassed to add custom handling to the save process.  The SaveWorkState has a *beforeSaveEntity*, *beforeSaveEntities* and a *beforeCommit* method that will all be called during save processing.
 These are discussed in more detail in the `breeze-webserver` library section below. 
 
-### MetadataBuilder
+### HibernateMetadata extends Metadata
 
-The Breeze client requires metadata about the domain model in order to entities manage entities.  The SaveService also requires metadata to convert foreign keys into navigation properties for related entities.  Metadata for both of these purposes is provided by the `MetadataBuilder` class.
+The Breeze client requires metadata about the domain model in order to entities manage entities.  The HibernateSaveProcessor also requires metadata to convert foreign keys into navigation properties for related entities.  Metadata for both of these purposes is provided by the `Metadata` class and in particular its specialized  HibernateMetadata subclass.
 
-The MetadataBuilder uses Hibernate's Metadata API to get information about entity mappings
+The HibernateMetadata class uses Hibernate's Metadata API to get information about entity mappings
 and relationships.  This information should be consistent whether mapping is done using .hbm.xml files, annotations, or programatically.  
 
-The MetadataBuilder requires the Hibernate SessionFactory and the Configuration.  Depending upon the Hibernate version, the Configuration may be accessible from the SessionFactory itself; then you can use the constructor
+The HibernateMetadata class requires the Hibernate SessionFactory and the Configuration.  Depending upon the Hibernate version, the Configuration may be accessible from the SessionFactory itself; then you can use the constructor
 
-	public MetadataBuilder(SessionFactory sessionFactory)
+	public HibernateMetadata(SessionFactory sessionFactory)
 
 Otherwise, you will need to provide the Configuration:
 
-	public MetadataBuilder(SessionFactory sessionFactory, Configuration configuration)
+	public HibernateMetadata(SessionFactory sessionFactory, Configuration configuration)
+
+Calling the *build* method then populates the new instance.
 
 If you're using [Spring Framework](http://projects.spring.io/spring-framework/), you may need to follow [this advice](http://stackoverflow.com/questions/2736100/how-can-i-get-the-hibernate-configuration-object-from-spring) to get the Configuration.
 
@@ -241,6 +243,12 @@ Currently, `breeze-hibernate` supports the entire spectrum breeze query and save
     > { where: { 'month(birthDate)': { gt: 3}}}
 
 2. projections of collection properties. i.e. the 'orders' property below.
-    > { where: { companyName: { startsWith: 'B'  } }, select: 'orders' } 
+    > { where: { companyName: { startsWith: 'B'  } }, select: 'orders' }
+    
 
+# breeze-webserver
+
+This project is a Java library that builds on top of breeze-hibernate by making it relatively easy to build a breeze backend webserver servlet app. 
+ 
+   **... Documentation in progess**
 
