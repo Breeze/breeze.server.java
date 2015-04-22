@@ -23,10 +23,13 @@ There is also a 'build' directory with a parent `pom.xml` file and a build.bat f
 
 #### Test dependencies.
 
+- You will need to install MySQL v 5.6 or greater.
+- You will need to import the Dump.northwindIB.sql database into your MySQL instance.
 - You will need to install Apache Tomcat to run the tests.
 - You will also need to download the 'breeze.js' GitHub repo. 
 - You will need to edit the local 'setEnv.bat' file in the build.bat directory to point to your local Tomcat installation and the location of the 'breezeJs' github repo on your machine.  
 - You can then run build.bat which will build the test project and launch Tomcat in debug mode with the war file created during the build.
+ 
 - On a browser, go to [http://localhost:8080/breeze-webtest/](http://localhost:8080/breeze-webtest/) 
 
 
