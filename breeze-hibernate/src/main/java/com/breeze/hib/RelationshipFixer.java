@@ -254,8 +254,8 @@ class RelationshipFixer {
         Object relatedEntity = getPropertyValue(meta, entity, propName);
         if (relatedEntity != null) {
             // entities are already connected - still need to add to dependency graph
-            EntityInfo relatedEntityInfo = saveWorkState.findEntityInfo(propType.getReturnedClass(), relatedEntity);
-            maybeAddToGraph(entityInfo, relatedEntityInfo, propType);
+            EntityInfo relatedEntityInfo = saveWorkState.findEntityInfo(relatedEntity);
+            maybeAddToGraph(entityInfo, relatedEntityInfo, propType); 
             return;
         }
 

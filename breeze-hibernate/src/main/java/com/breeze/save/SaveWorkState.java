@@ -15,6 +15,15 @@ import com.breeze.metadata.Metadata;
 import com.breeze.metadata.MetadataHelper;
 import com.breeze.util.JsonGson;
 
+/**
+ * This is the primary class for providing save interception logic; it it also the repository of 
+ * all of the information regarding the entities and their statuses associated with a save operation.
+ * Typically this class will be subclassed so that the subclass can defined overriden versions 
+ * of the before and after save interception methods. This class also provides a number of utility methods 
+ * to allow entities to be found, added or removed from the current save pipeline.    
+ * @author IdeaBlade
+ *
+ */
 @SuppressWarnings("unchecked")
 public class SaveWorkState {
 
@@ -31,23 +40,38 @@ public class SaveWorkState {
     private List<EntityInfo> _emptyList = Collections.emptyList();
     
 
+    /**
+     * Constructs an instance of this class with the deserialized result of 
+     * an Http save request.
+     * @param saveBundle
+     */
     public SaveWorkState(Map saveBundle) {
         this._saveOptions = new SaveOptions((Map) saveBundle.get("saveOptions"));
         this._entityMaps = (List<Map>) saveBundle.get("entities");
     }  
     
+    /**
+     * @return The SaveOptions associated with this save operation.
+     */
     public SaveOptions getSaveOptions() {
         return _saveOptions;
     }
     
-    public void setSaveProcessor(SaveProcessor saveProcessor) {
+    protected void setSaveProcessor(SaveProcessor saveProcessor) {
         _saveProcessor = saveProcessor;
     }
       
+    /**
+     * @param entity
+     * @return The id of the specified entity.
+     */
     public Object getIdentifier(Object entity) {
         return _saveProcessor.getIdentifier(entity);
     }
     
+    /**
+     * @return The complete Metadata model associated with this save.
+     */
     public Metadata getMetadata() {
         return _saveProcessor.getMetadata();
     } 
@@ -125,11 +149,19 @@ public class SaveWorkState {
         return false;
     }
     
+    /**
+     * @param clazz
+     * @return A list of all of the EntityInfo instances associated with this class for this save operation.
+     */
     public List<EntityInfo> getEntityInfos(Class clazz) {
         List<EntityInfo> entityInfos = _saveMap.get(clazz);
         return entityInfos != null ? entityInfos : _emptyList;
     }
 
+    /**
+     * @param clazz
+     * @return A list of all of the entities associated with this class for this save operation.
+     */
     public List<Object> getEntities(Class clazz) {
         List<Object> entities = new ArrayList<Object>();
         for (EntityInfo info : getEntityInfos(clazz)) {
@@ -138,6 +170,9 @@ public class SaveWorkState {
         return entities;        
     }
     
+    /**
+     * @return A list of all of the entities to be saved for this save operation.
+     */
     public List<Object> getEntities() {
         List<Object> entities = new ArrayList<Object>();
         for (List<EntityInfo> infos : _saveMap.values()) {
@@ -149,11 +184,22 @@ public class SaveWorkState {
     }
     
    
+    /**
+     * Schedule an additional entity to be saved. 
+     * @param entity The entity to be saved.
+     * @param entityState The EntityState of the newly added entity.
+     * @return The EntityInfo associated with the newly added entity.
+     */
     public EntityInfo addEntity(Object entity, EntityState entityState) {
         EntityInfo entityInfo = createEntityInfoForEntity(entity, entityState);
         return addEntityInfo(entityInfo);
     }
     
+    /**
+     * Remove an entity from being scheduled to be saved.
+     * @param entity The entity to be removed.
+     * @return Whether the entity was found.
+     */
     public boolean removeEntity(Object entity) {
         Class clazz = entity.getClass();
         List<EntityInfo> entityInfos = getEntityInfos(clazz);
@@ -167,16 +213,34 @@ public class SaveWorkState {
         }
         return false;
     }
-   
     
-    public EntityInfo findEntityInfo(Class clazz, Object entity) {
-        for (Class nextClass : findSelfAndSubclasses(clazz)) {
-            for (EntityInfo entityInfo : getEntityInfos(nextClass)) {
-                if (entityInfo.entity == entity) return entityInfo;
-            }
+    /** 
+     * Return the EntityInfo associated with a specific entity. 
+     * @param entity
+     * @return
+     */
+    public EntityInfo findEntityInfo(Object entity) {
+        for (EntityInfo entityInfo : getEntityInfos(entity.getClass())) {
+            if (entityInfo.entity == entity) return entityInfo;
         }
         return null;
     }
+   
+    
+//    /** 
+//     * Return the EntityInfo associated with a specific entity. 
+//     * @param clazz
+//     * @param entity
+//     * @return
+//     */
+//    public EntityInfo findEntityInfo(Class clazz, Object entity) {
+//        for (Class nextClass : findSelfAndSubclasses(clazz)) {
+//            for (EntityInfo entityInfo : getEntityInfos(nextClass)) {
+//                if (entityInfo.entity == entity) return entityInfo;
+//            }
+//        }
+//        return null;
+//    }
     
     public EntityInfo findEntityInfoById(Class clazz, Object id) {
         for (Class nextClass : findSelfAndSubclasses(clazz)) {
