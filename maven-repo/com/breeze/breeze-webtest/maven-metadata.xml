@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.breeze</groupId>
+  <artifactId>breeze-webtest</artifactId>
+  <versioning>
+    <versions>
+      <version>1.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20150602052050</lastUpdated>
+  </versioning>
+</metadata>

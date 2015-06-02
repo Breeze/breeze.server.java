@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-  <name>breeze-hibernate</name>
-  <comment>Tools for creating a Hibernate server for a Breeze client. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
-  <projects/>
-  <buildSpec>
-    <buildCommand>
-      <name>org.eclipse.jdt.core.javabuilder</name>
-    </buildCommand>
-  </buildSpec>
-  <natures>
-    <nature>org.eclipse.jdt.core.javanature</nature>
-  </natures>
+	<name>breeze-hibernate</name>
+	<comment>Tools for creating a Hibernate server for a Breeze client. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>java</name>
+			<type>2</type>
+			<location>C:/Java/hibernate-release-4.3.0.Final/project/hibernate-entitymanager/src/main/java</location>
+		</link>
+	</linkedResources>
 </projectDescription>

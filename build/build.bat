@@ -4,7 +4,7 @@ call setenv.bat
 set "mvnErr="
 
 ::run your Maven command and define the error flag if there was an error
-call mvn install -DskipTests || set mvnErr=1
+call mvn install -DskipTests -DcreateChecksum=true || set mvnErr=1
 
 if defined mvnErr (
 	echo Maven error - not deploying to tomcat

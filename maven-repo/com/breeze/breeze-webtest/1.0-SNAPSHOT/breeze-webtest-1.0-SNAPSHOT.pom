@@ -1,0 +1,69 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.breeze</groupId>
+  <artifactId>breeze-webtest</artifactId>
+  <packaging>war</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Breeze Integration Test Webapp</name>
+  <url>http://breezejs.com</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+
+	<dependency>
+		<groupId>javax.servlet</groupId>
+		<artifactId>javax.servlet-api</artifactId>
+		<scope>provided</scope>
+		<version>3.0.1</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.hibernate</groupId>
+		<artifactId>hibernate-core</artifactId>
+		<version>4.3.0.Final</version>
+	</dependency>
+
+	<dependency>
+		<groupId>com.breeze</groupId>
+		<artifactId>breeze-hibernate</artifactId>
+		<version>0.1a</version>
+	</dependency>
+
+ 	<dependency>
+		<groupId>com.breeze</groupId>
+		<artifactId>breeze-webserver</artifactId>
+		<version>0.1a</version>
+	</dependency>
+
+    <dependency>
+		<groupId>northwind</groupId>
+		<artifactId>breeze-northwind</artifactId>
+		<version>0.1a</version>
+	</dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+  <build>
+    <finalName>breeze-webtest</finalName>
+
+    <plugins>
+	  <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

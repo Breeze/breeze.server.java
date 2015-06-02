@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.breeze</groupId>
+  <artifactId>breeze-hibernate</artifactId>
+  <versioning>
+    <release>0.1a</release>
+    <versions>
+      <version>0.1a</version>
+    </versions>
+    <lastUpdated>20150602052048</lastUpdated>
+  </versioning>
+</metadata>
