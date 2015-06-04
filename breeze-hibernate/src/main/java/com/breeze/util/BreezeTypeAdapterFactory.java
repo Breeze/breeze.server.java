@@ -17,7 +17,12 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
-
+/**
+ * Creates $id property for each object serialized to JSON object, 
+ * and $ref when the same object is visited again, thus handling circular references. 
+ * Also adds $type to include the class of each object.
+ * @author IdeaBlade
+ */
 public class BreezeTypeAdapterFactory implements TypeAdapterFactory {
 	private Map<Object, String> _entityMap;
 	private long _nextId;

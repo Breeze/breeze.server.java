@@ -39,22 +39,13 @@ public class JsonGson {
      * @param obj The root object to be serialized to json.
      * @param includesBreezeEntities 
      *      Whether to add the $id and $ref and $type properties when serializing the object.
+     * @param isHibernate 
+     *      Whether to add Hibernate proxy handling when serializing the object.
      * @return A json string.
      */
     public static String toJson(Object obj, boolean includesBreezeEntities, boolean isHibernate) {
         try {
-            GsonBuilder gsonBuilder = newGsonBuilder();
-            if (includesBreezeEntities) {
-                gsonBuilder = gsonBuilder
-                        .registerTypeAdapterFactory(new BreezeTypeAdapterFactory());
-            }
-
-            if (isHibernate) {
-                gsonBuilder = gsonBuilder
-                        .registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY)
-                        .registerTypeAdapterFactory(HibernateCollectionTypeAdapter.FACTORY);
-
-            }
+            GsonBuilder gsonBuilder = newGsonBuilder(includesBreezeEntities, isHibernate);
             Gson gson = gsonBuilder.create();
             return gson.toJson(obj);
         } catch (Exception e) {
@@ -125,19 +116,42 @@ public class JsonGson {
         }
     }
 
-    private static GsonBuilder newGsonBuilder() {
+    /** @return newGsonBuilder(false, false) */
+    public static GsonBuilder newGsonBuilder() {
+        return newGsonBuilder(false, false);
+    }
+
+    /**
+     * @param useBreezeTypeAdapter 
+     *      Whether to add the $id and $ref and $type properties when serializing the object.
+     * @param useHibernateProxyAdapter 
+     *      Whether to add Hibernate proxy handling when serializing the object.
+     * @return a GsonBuilder with a DateTypeAdapter
+     */
+    public static GsonBuilder newGsonBuilder(boolean useBreezeTypeAdapter, boolean useHibernateProxyAdapter) {
         // setDateFormat in commented out line below works fine for
         // deserialization but doesn't handle
         // serialization properly because of need for a TimeZone setting.
         // Hence the need for the DateTypeAdapter below.
         // return new GsonBuilder().setDateFormat(ISO8601_DATEFORMAT);
 
-        GsonBuilder gson = new GsonBuilder()
+        GsonBuilder gsonBuilder = new GsonBuilder()
                 .registerTypeAdapter(Date.class, new DateTypeAdapter());
+        
+        if (useBreezeTypeAdapter) {
+            gsonBuilder = gsonBuilder
+                    .registerTypeAdapterFactory(new BreezeTypeAdapterFactory());
+        }
+        if (useHibernateProxyAdapter) {
+            gsonBuilder = gsonBuilder
+                    .registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY)
+                    .registerTypeAdapterFactory(HibernateCollectionTypeAdapter.FACTORY);
 
-        return gson;
+        }
+
+        return gsonBuilder;
     }
-
+    
     // Ugh....
     // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     // private static final String ISO8601_DATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";

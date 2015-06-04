@@ -13,6 +13,7 @@
   	<module>../breeze-hibernate</module>
   	<module>../breeze-webserver</module>
   	<module>../breeze-webtest</module>
+  	<module>../breeze-webtest-jersey</module>
   </modules>
 
 </project>
