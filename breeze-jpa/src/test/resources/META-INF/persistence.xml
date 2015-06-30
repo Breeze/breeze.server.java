@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<persistence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+  version="2.0" xmlns="http://java.sun.com/xml/ns/persistence">
+
+    <persistence-unit name="northwind">
+        <description>This unit manages orders and customers.
+            It does not rely on any vendor-specific features and can
+            therefore be deployed to any persistence provider.
+        </description>
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>		
+        
+		<properties>
+		  <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+		  <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/northwindib" />
+		  <property name="javax.persistence.jdbc.user" value="myadmin" />
+		  <property name="javax.persistence.jdbc.password" value="mysql" />
+          <property name="eclipselink.target-database" value="mysql4" />
+		
+		</properties>
+        
+    </persistence-unit>
+
+</persistence>
