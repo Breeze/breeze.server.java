@@ -145,6 +145,7 @@ public class Employee {
 	public void setPhotoPath(String photoPath) {
 		this.photoPath = photoPath;
 	}
+	@Column(insertable=false, updatable=false)
 	public Integer getReportsToEmployeeID() {
 		return reportsToEmployeeID;
 	}

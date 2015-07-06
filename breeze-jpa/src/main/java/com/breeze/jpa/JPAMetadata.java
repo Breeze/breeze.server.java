@@ -19,6 +19,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.Type.PersistenceType;
@@ -110,17 +111,9 @@ public class JPAMetadata extends Metadata {
 
             String genType = "None";
             if (idmeta.hasSingleIdAttribute()) {
-                javax.persistence.metamodel.Type<?> idType = idmeta.getIdType();
-                
                 // This throws when id is a primitive
                 //SingularAttribute<?,?> idAttr = idmeta.getId(idType.getJavaType());
-                SingularAttribute<?,?> idAttr = null;
-                for (SingularAttribute<?,?> testAttr : meta.getDeclaredSingularAttributes()) {
-                    if (testAttr.isId()) {
-                        idAttr = testAttr;
-                        break;
-                    }
-                }
+                SingularAttribute<?,?> idAttr = getSingleIdAttribute(idmeta);
                 
                 Member member = idAttr.getJavaMember();
                 GeneratedValue genValueAnn = ((AnnotatedElement)member).getAnnotation(GeneratedValue.class);
@@ -217,6 +210,19 @@ public class JPAMetadata extends Metadata {
                 // should have been handled above
             }
         }
+    }
+    
+    SingularAttribute<?,?> getSingleIdAttribute(IdentifiableType<?> type) {
+        if (type.hasSingleIdAttribute()) {
+            // This throws when id is a primitive
+            //SingularAttribute<?,?> idAttr = idmeta.getId(idType.getJavaType());
+            for (SingularAttribute<?,?> testAttr : type.getDeclaredSingularAttributes()) {
+                if (testAttr.isId()) {
+                    return testAttr;
+                }
+            }
+        }
+        return null;
     }
 
     boolean contains(int[] array, int x) {
@@ -433,7 +439,7 @@ public class JPAMetadata extends Metadata {
                 if (attr.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_ONE) {
                     nmap.put("foreignKeyNamesOnServer", fkNames);
                 } else if (attr.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE) {
-                    OneToMany otm = ((AnnotatedElement)member).getAnnotation(OneToMany.class);
+                    OneToOne otm = ((AnnotatedElement)member).getAnnotation(OneToOne.class);
                     if (otm != null && otm.mappedBy() != null) {
                         fkNames = new String[]{ otm.mappedBy().toLowerCase() };
                         nmap.put("invForeignKeyNamesOnServer", fkNames);
@@ -487,6 +493,19 @@ public class JPAMetadata extends Metadata {
         List<String> names = getAttributeColumnNames(attr);
         return unBracket(names.toArray(new String[names.size()]));
     }
+    
+    List<String> getIdAttributeColumnNames(IdentifiableType<?> type) {
+        Attribute idattr = getSingleIdAttribute(type);
+        if (idattr != null) {
+            return getAttributeColumnNames(idattr);
+        } else {
+            List<String> names = new ArrayList<String>();
+            for (Attribute id: type.getIdClassAttributes()) {
+                names.addAll(getAttributeColumnNames(id));
+            }
+            return names;
+        }
+    }
 
     /**
      * Get the column names for the given attribute.  Recurses into embedded complex types.
@@ -505,13 +524,19 @@ public class JPAMetadata extends Metadata {
             return names;
         }
         
+        if (attr.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY) {
+            Class<?> relatedEntityClass = getEntityType(attr);
+            javax.persistence.metamodel.EntityType<?> relatedEntityType = _emFactory.getMetamodel().entity(relatedEntityClass);
+            return getIdAttributeColumnNames(relatedEntityType);
+        }
+        
         Column col = ((AnnotatedElement)attr.getJavaMember()).getAnnotation(Column.class);
-        if (col != null && col.name() != null) {
+        if (col != null && !isEmpty(col.name())) {
             names.add(col.name());
             return names;
         } else {
             JoinColumn jcol = ((AnnotatedElement)attr.getJavaMember()).getAnnotation(JoinColumn.class);
-            if (jcol != null && jcol.name() != null) {
+            if (jcol != null && !isEmpty(jcol.name())) {
                 names.add(jcol.name());
                 return names;
             } else {
@@ -612,6 +637,10 @@ public class JPAMetadata extends Metadata {
             u[i] = unBracket(names[i]);
         }
         return u;
+    }
+    
+    static boolean isEmpty(String s) {
+        return s == null || s.length() == 0;
     }
 
     /**
