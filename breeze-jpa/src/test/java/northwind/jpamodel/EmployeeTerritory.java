@@ -2,9 +2,12 @@ package northwind.jpamodel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Version;
 
 @Entity
 public class EmployeeTerritory {
@@ -17,26 +20,28 @@ public class EmployeeTerritory {
     private Territory territory;
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
 	public int getId() {
 		return id;
 	}
 	public void setId(int id) {
 		this.id = id;
 	}
-    @Column(insertable=false, updatable=false)
+    @Column(insertable=false, updatable=false, nullable=false)
 	public int getEmployeeID() {
 		return employeeID;
 	}
 	public void setEmployeeID(int employeeID) {
 		this.employeeID = employeeID;
 	}
-    @Column(insertable=false, updatable=false)
+    @Column(insertable=false, updatable=false, nullable=false)
 	public int getTerritoryID() {
 		return territoryID;
 	}
 	public void setTerritoryID(int territoryID) {
 		this.territoryID = territoryID;
 	}
+    @Version
 	public int getRowVersion() {
 		return rowVersion;
 	}

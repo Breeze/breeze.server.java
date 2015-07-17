@@ -1,7 +1,10 @@
 package northwind.jpamodel;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
@@ -16,6 +19,7 @@ public class Role {
     private Set<UserRole> userRoles;
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
 	public long getId() {
 		return id;
 	}
@@ -24,6 +28,7 @@ public class Role {
 		this.id = id;
 	}
 
+    @Column(length=50, nullable=false)
 	public String getName() {
 		return name;
 	}
@@ -32,6 +37,7 @@ public class Role {
 		this.name = name;
 	}
 
+    @Column(length=2000)
 	public String getDescription() {
 		return description;
 	}
@@ -47,7 +53,6 @@ public class Role {
 	public void setTs(byte[] ts) {
 		this.ts = ts;
 	}
-
 
 	public RoleType getRoleType() {
 		return roleType;

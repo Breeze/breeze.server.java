@@ -7,11 +7,14 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Version;
 
 @Entity
 public class Order {
@@ -37,6 +40,7 @@ public class Order {
     private Set<OrderDetail> orderDetails;
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
 	public int getOrderID() {
 		return orderID;
 	}
@@ -81,42 +85,49 @@ public class Order {
 	public void setFreight(BigDecimal freight) {
 		this.freight = freight;
 	}
+    @Column(length=40)
 	public String getShipName() {
 		return shipName;
 	}
 	public void setShipName(String shipName) {
 		this.shipName = shipName;
 	}
+    @Column(length=60)
 	public String getShipAddress() {
 		return shipAddress;
 	}
 	public void setShipAddress(String shipAddress) {
 		this.shipAddress = shipAddress;
 	}
+    @Column(length=15)
 	public String getShipCity() {
 		return shipCity;
 	}
 	public void setShipCity(String shipCity) {
 		this.shipCity = shipCity;
 	}
+    @Column(length=15)
 	public String getShipRegion() {
 		return shipRegion;
 	}
 	public void setShipRegion(String shipRegion) {
 		this.shipRegion = shipRegion;
 	}
+    @Column(length=10)
 	public String getShipPostalCode() {
 		return shipPostalCode;
 	}
 	public void setShipPostalCode(String shipPostalCode) {
 		this.shipPostalCode = shipPostalCode;
 	}
+    @Column(length=15)
 	public String getShipCountry() {
 		return shipCountry;
 	}
 	public void setShipCountry(String shipCountry) {
 		this.shipCountry = shipCountry;
 	}
+	@Version
 	public int getRowVersion() {
 		return rowVersion;
 	}

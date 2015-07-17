@@ -5,9 +5,12 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Version;
 
 @Entity
 public class Product {
@@ -28,12 +31,14 @@ public class Product {
     private Supplier supplier;
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
 	public int getProductID() {
 		return productID;
 	}
 	public void setProductID(int productID) {
 		this.productID = productID;
 	}
+    @Column(length=40, nullable=false)
 	public String getProductName() {
 		return productName;
 	}
@@ -54,6 +59,7 @@ public class Product {
 	public void setCategoryID(Integer categoryID) {
 		this.categoryID = categoryID;
 	}
+    @Column(length=20)
 	public String getQuantityPerUnit() {
 		return quantityPerUnit;
 	}
@@ -97,6 +103,7 @@ public class Product {
         this.discontinuedDate = discontinuedDate;
     }
 
+    @Version
 	public int getRowVersion() {
 		return rowVersion;
 	}

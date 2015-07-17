@@ -64,6 +64,9 @@ public class JPAMetadata extends Metadata {
         initMap();
 
         Set<ManagedType<?>> classMeta = _emFactory.getMetamodel().getManagedTypes();
+        
+//        classMeta.clear(); // TODO test only
+//        classMeta.add(_emFactory.getMetamodel().entity(northwind.jpamodel.Employee.class));
 
         for (ManagedType<?> meta : classMeta) {
             addClass(meta);
@@ -111,8 +114,6 @@ public class JPAMetadata extends Metadata {
 
             String genType = "None";
             if (idmeta.hasSingleIdAttribute()) {
-                // This throws when id is a primitive
-                //SingularAttribute<?,?> idAttr = idmeta.getId(idType.getJavaType());
                 SingularAttribute<?,?> idAttr = getSingleIdAttribute(idmeta);
                 
                 Member member = idAttr.getJavaMember();
@@ -172,7 +173,7 @@ public class JPAMetadata extends Metadata {
                         } else {
                             // data property
                             SingularAttribute sbattr = (SingularAttribute) battr; 
-                            HashMap<String, Object> dmap = makeDataProperty(battr.getName(), sbattr, sbattr.isOptional(), true, false);
+                            HashMap<String, Object> dmap = makeDataProperty(battr.getName(), sbattr, true, false);
                             dataArrayList.add(0, dmap);
                         }
                     }
@@ -187,7 +188,7 @@ public class JPAMetadata extends Metadata {
                 }
             } else if (attribType == PersistentAttributeType.BASIC) {
                 // data property
-                HashMap<String, Object> dmap = makeDataProperty(propName, attr, attr.isOptional(), attr.isId(), attr.isVersion());
+                HashMap<String, Object> dmap = makeDataProperty(propName, attr, attr.isId(), attr.isVersion());
                 if (attr.isId()) 
                     dataArrayList.add(0, dmap);
                 else
@@ -288,7 +289,7 @@ public class JPAMetadata extends Metadata {
                 dataArrayList.add(compMap);
             } else {
                 // data property
-                HashMap<String, Object> dmap = makeDataProperty(cattr.getName(), cattr, cattr.isOptional(), false, false);
+                HashMap<String, Object> dmap = makeDataProperty(cattr.getName(), cattr, false, false);
                 dataArrayList.add(dmap);
             }
         }
@@ -309,7 +310,7 @@ public class JPAMetadata extends Metadata {
      * @return data property definition
      */
     private HashMap<String, Object> makeDataProperty(String propName, SingularAttribute sattr, 
-            boolean isNullable, boolean isKey, boolean isVersion) {
+            boolean isKey, boolean isVersion) {
         Class type = sattr.getJavaType();
         String newType = BreezeTypeMap.get(type.getSimpleName().toLowerCase());
         String typeName = newType != null ? newType : type.getSimpleName();
@@ -329,7 +330,7 @@ public class JPAMetadata extends Metadata {
             dmap.put("enumType", type.getSimpleName());
         }
         dmap.put("dataType", typeName);
-        dmap.put("isNullable", isNullable);
+        dmap.put("isNullable", sattr.isOptional() && !type.isPrimitive());
 
         
         if (isKey) {
@@ -341,7 +342,7 @@ public class JPAMetadata extends Metadata {
 
         ArrayList<HashMap<String, String>> validators = new ArrayList<HashMap<String, String>>();
 
-        if (!isNullable) {
+        if (!sattr.isOptional()) {
             validators.add(newMap("name", "required"));
         }
         
@@ -531,6 +532,16 @@ public class JPAMetadata extends Metadata {
                 attr.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE) {
             Class<?> relatedEntityClass = getEntityType(attr);
             javax.persistence.metamodel.EntityType<?> relatedEntityType = _emFactory.getMetamodel().entity(relatedEntityClass);
+            OneToMany otm = ((AnnotatedElement)attr.getJavaMember()).getAnnotation(OneToMany.class);
+            if (otm != null && !isEmpty(otm.mappedBy())) {
+                Attribute mappedAttr = relatedEntityType.getAttribute(otm.mappedBy());
+                return getAttributeColumnNames(mappedAttr);
+            }
+            OneToOne oto = ((AnnotatedElement)attr.getJavaMember()).getAnnotation(OneToOne.class);
+            if (oto != null && !isEmpty(oto.mappedBy())) {
+                Attribute mappedAttr = relatedEntityType.getAttribute(oto.mappedBy());
+                return getAttributeColumnNames(mappedAttr);
+            }
             return getIdAttributeColumnNames(relatedEntityType);
         }
         

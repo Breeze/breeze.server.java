@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 @Entity
 public class Employee {
@@ -49,24 +50,28 @@ public class Employee {
 	public void setEmployeeID(Integer employeeID) {
 		this.employeeID = employeeID;
 	}
+    @Column(length=30, nullable=false)
 	public String getLastName() {
 		return lastName;
 	}
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+    @Column(length=30, nullable=false)
 	public String getFirstName() {
 		return firstName;
 	}
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
+    @Column(length=30)
 	public String getTitle() {
 		return title;
 	}
 	public void setTitle(String title) {
 		this.title = title;
 	}
+    @Column(length=25)
 	public String getTitleOfCourtesy() {
 		return titleOfCourtesy;
 	}
@@ -85,42 +90,49 @@ public class Employee {
 	public void setHireDate(Date hireDate) {
 		this.hireDate = hireDate;
 	}
+    @Column(length=60)
 	public String getAddress() {
 		return address;
 	}
 	public void setAddress(String address) {
 		this.address = address;
 	}
+    @Column(length=15)
 	public String getCity() {
 		return city;
 	}
 	public void setCity(String city) {
 		this.city = city;
 	}
+    @Column(length=15)
 	public String getRegion() {
 		return region;
 	}
 	public void setRegion(String region) {
 		this.region = region;
 	}
+    @Column(length=10)
 	public String getPostalCode() {
 		return postalCode;
 	}
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;
 	}
+    @Column(length=15)
 	public String getCountry() {
 		return country;
 	}
 	public void setCountry(String country) {
 		this.country = country;
 	}
+    @Column(length=24)
 	public String getHomePhone() {
 		return homePhone;
 	}
 	public void setHomePhone(String homePhone) {
 		this.homePhone = homePhone;
 	}
+    @Column(length=4)
 	public String getExtension() {
 		return extension;
 	}
@@ -139,6 +151,7 @@ public class Employee {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
+    @Column(length=255)
 	public String getPhotoPath() {
 		return photoPath;
 	}
@@ -152,12 +165,14 @@ public class Employee {
 	public void setReportsToEmployeeID(Integer reportsToEmployeeID) {
 		this.reportsToEmployeeID = reportsToEmployeeID;
 	}
+    @Version
 	public int getRowVersion() {
 		return rowVersion;
 	}
 	public void setRowVersion(int rowVersion) {
 		this.rowVersion = rowVersion;
 	}
+    @Column(nullable=false)
 	public String getFullName() {
 		return fullName;
 	}

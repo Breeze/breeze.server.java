@@ -2,9 +2,11 @@ package northwind.jpamodel;
 
 import java.math.BigDecimal;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Version;
 
 @Entity
 public class InternationalOrder {
@@ -24,6 +26,7 @@ public class InternationalOrder {
 		this.orderID = orderID;
 	}
 
+    @Column(length=100, nullable=false)
 	public String getCustomsDescription() {
 		return customsDescription;
 	}
@@ -32,6 +35,7 @@ public class InternationalOrder {
 		this.customsDescription = customsDescription;
 	}
 
+    @Column(nullable=false)
 	public BigDecimal getExciseTax() {
 		return exciseTax;
 	}
@@ -40,6 +44,7 @@ public class InternationalOrder {
 		this.exciseTax = exciseTax;
 	}
 
+    @Version
 	public int getRowVersion() {
 		return rowVersion;
 	}
@@ -48,7 +53,7 @@ public class InternationalOrder {
 		this.rowVersion = rowVersion;
 	}
 
-	@OneToOne
+	@OneToOne(optional=false)
 	public Order getOrder() {
 		return order;
 	}

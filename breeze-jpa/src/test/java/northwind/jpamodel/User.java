@@ -3,9 +3,13 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 @Entity
 public class User {
@@ -15,7 +19,7 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
-    private BigDecimal rowVersion;
+    private Long rowVersion;
     private String createdBy;
     private long createdByUserId;
     private Date createdDate;
@@ -26,6 +30,7 @@ public class User {
     private Set<UserRole> userRoles;
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
 	public long getId() {
 		return id;
 	}
@@ -34,6 +39,7 @@ public class User {
 		this.id = id;
 	}
 
+    @Column(length=100, nullable=false)
 	public String getUserName() {
 		return userName;
 	}
@@ -42,6 +48,7 @@ public class User {
 		this.userName = userName;
 	}
 
+    @Column(length=200)
 	public String getUserPassword() {
 		return userPassword;
 	}
@@ -50,6 +57,7 @@ public class User {
 		this.userPassword = userPassword;
 	}
 
+    @Column(length=100, nullable=false)
 	public String getFirstName() {
 		return firstName;
 	}
@@ -58,6 +66,7 @@ public class User {
 		this.firstName = firstName;
 	}
 
+    @Column(length=100, nullable=false)
 	public String getLastName() {
 		return lastName;
 	}
@@ -66,6 +75,7 @@ public class User {
 		this.lastName = lastName;
 	}
 
+    @Column(length=100, nullable=false)
 	public String getEmail() {
 		return email;
 	}
@@ -74,14 +84,16 @@ public class User {
 		this.email = email;
 	}
 
-	public BigDecimal getRowVersion() {
+    @Version
+	public Long getRowVersion() {
 		return rowVersion;
 	}
 
-	public void setRowVersion(BigDecimal rowVersion) {
+	public void setRowVersion(Long rowVersion) {
 		this.rowVersion = rowVersion;
 	}
 
+    @Column(length=100, nullable=false)
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -98,6 +110,7 @@ public class User {
 		this.createdByUserId = createdByUserId;
 	}
 
+    @Column(nullable=false)
 	public Date getCreatedDate() {
 		return createdDate;
 	}
@@ -106,6 +119,7 @@ public class User {
 		this.createdDate = createdDate;
 	}
 
+    @Column(length=100, nullable=false)
 	public String getModifiedBy() {
 		return modifiedBy;
 	}
@@ -122,6 +136,7 @@ public class User {
 		this.modifiedByUserId = modifiedByUserId;
 	}
 
+    @Column(nullable=false)
 	public Date getModifiedDate() {
 		return modifiedDate;
 	}

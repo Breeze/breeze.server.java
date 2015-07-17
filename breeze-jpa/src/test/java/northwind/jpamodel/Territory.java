@@ -3,11 +3,15 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.TableGenerator;
+import javax.persistence.Version;
 
 @Entity
 public class Territory {
@@ -21,12 +25,16 @@ public class Territory {
     private Set<Employee> employees;
 
     @Id
+    @TableGenerator(name="TABLE_GEN", table="NextId", pkColumnName="Name",
+    valueColumnName="NextId", pkColumnValue="GLOBAL")
+    @GeneratedValue(strategy=GenerationType.TABLE, generator="TABLE_GEN")   
 	public int getTerritoryID() {
 		return territoryID;
 	}
 	public void setTerritoryID(int territoryID) {
 		this.territoryID = territoryID;
 	}
+    @Column(length=50, nullable=false)
 	public String getTerritoryDescription() {
 		return territoryDescription;
 	}
@@ -40,6 +48,7 @@ public class Territory {
 	public void setRegionID(int regionID) {
 		this.regionID = regionID;
 	}
+    @Version
 	public int getRowVersion() {
 		return rowVersion;
 	}

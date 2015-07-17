@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Version;
 
 @Entity
 public class OrderDetail implements Serializable {
@@ -58,6 +59,7 @@ public class OrderDetail implements Serializable {
 		this.productID = productID;
 	}
 
+    @Column(nullable=false)
 	public BigDecimal getUnitPrice() {
 		return unitPrice;
 	}
@@ -66,6 +68,7 @@ public class OrderDetail implements Serializable {
 		this.unitPrice = unitPrice;
 	}
 
+    @Column(nullable=false)
 	public short getQuantity() {
 		return quantity;
 	}
@@ -74,6 +77,7 @@ public class OrderDetail implements Serializable {
 		this.quantity = quantity;
 	}
 
+    @Column(nullable=false)
 	public float getDiscount() {
 		return discount;
 	}
@@ -82,6 +86,7 @@ public class OrderDetail implements Serializable {
 		this.discount = discount;
 	}
 
+    @Version
 	public int getRowVersion() {
 		return rowVersion;
 	}

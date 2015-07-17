@@ -1,9 +1,14 @@
 package northwind.jpamodel;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.TableGenerator;
+import javax.persistence.Version;
 
 @Entity
 public class Region {
@@ -14,14 +19,17 @@ public class Region {
     private Set<Territory> territories;
 
     @Id
-	public int getRegionID() {
+    @TableGenerator(name="TABLE_GEN", table="NextId", pkColumnName="Name",
+    valueColumnName="NextId", pkColumnValue="GLOBAL")
+    @GeneratedValue(strategy=GenerationType.TABLE, generator="TABLE_GEN")	
+    public int getRegionID() {
 		return regionID;
 	}
 
 	public void setRegionID(int regionID) {
 		this.regionID = regionID;
 	}
-
+	@Column(length=50, nullable=false)
 	public String getRegionDescription() {
 		return regionDescription;
 	}
@@ -30,6 +38,7 @@ public class Region {
 		this.regionDescription = regionDescription;
 	}
 
+    @Version
 	public int getRowVersion() {
 		return rowVersion;
 	}

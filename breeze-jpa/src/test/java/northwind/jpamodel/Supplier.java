@@ -1,10 +1,14 @@
 package northwind.jpamodel;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 @Entity
 public class Supplier {
@@ -22,6 +26,7 @@ public class Supplier {
     private Set<Product> products;
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
 	public int getSupplierID() {
 		return supplierID;
 	}
@@ -30,6 +35,7 @@ public class Supplier {
 		this.supplierID = supplierID;
 	}
 
+    @Column(length=40, nullable=false)
 	public String getCompanyName() {
 		return companyName;
 	}
@@ -38,6 +44,7 @@ public class Supplier {
 		this.companyName = companyName;
 	}
 
+    @Column(length=30)
 	public String getContactName() {
 		return contactName;
 	}
@@ -46,6 +53,7 @@ public class Supplier {
 		this.contactName = contactName;
 	}
 
+    @Column(length=30)
 	public String getContactTitle() {
 		return contactTitle;
 	}
@@ -54,6 +62,7 @@ public class Supplier {
 		this.contactTitle = contactTitle;
 	}
 
+    @Column(length=24)
 	public String getPhone() {
 		return phone;
 	}
@@ -62,6 +71,7 @@ public class Supplier {
 		this.phone = phone;
 	}
 
+    @Column(length=24)
 	public String getFax() {
 		return fax;
 	}
@@ -78,6 +88,7 @@ public class Supplier {
 		this.homePage = homePage;
 	}
 
+    @Version
 	public int getRowVersion() {
 		return rowVersion;
 	}

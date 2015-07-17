@@ -3,9 +3,13 @@ package northwind.jpamodel;
 import java.util.Collection;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 @Entity
 public class Customer {
@@ -27,6 +31,7 @@ public class Customer {
 	private Collection<Order> orders;
 
 	@Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
 	public UUID getCustomerID() {
 		return customerID;
 	}
@@ -35,6 +40,7 @@ public class Customer {
 		this.customerID = customerID;
 	}
 
+    @Column(length=5)
 	public String getCustomerID_OLD() {
 		return customerID_OLD;
 	}
@@ -43,6 +49,7 @@ public class Customer {
 		this.customerID_OLD = customerID_OLD;
 	}
 
+    @Column(length=40, nullable=false)
 	public String getCompanyName() {
 		return companyName;
 	}
@@ -51,6 +58,7 @@ public class Customer {
 		this.companyName = companyName;
 	}
 
+    @Column(length=30)
 	public String getContactName() {
 		return contactName;
 	}
@@ -59,6 +67,7 @@ public class Customer {
 		this.contactName = contactName;
 	}
 
+    @Column(length=30)
 	public String getContactTitle() {
 		return contactTitle;
 	}
@@ -67,6 +76,7 @@ public class Customer {
 		this.contactTitle = contactTitle;
 	}
 
+    @Column(length=60)
 	public String getAddress() {
 		return address;
 	}
@@ -75,6 +85,7 @@ public class Customer {
 		this.address = address;
 	}
 
+    @Column(length=15)
 	public String getCity() {
 		return city;
 	}
@@ -83,6 +94,7 @@ public class Customer {
 		this.city = city;
 	}
 
+    @Column(length=15)
 	public String getRegion() {
 		return region;
 	}
@@ -91,6 +103,7 @@ public class Customer {
 		this.region = region;
 	}
 
+    @Column(length=10)
 	public String getPostalCode() {
 		return postalCode;
 	}
@@ -99,6 +112,7 @@ public class Customer {
 		this.postalCode = postalCode;
 	}
 
+    @Column(length=15)
 	public String getCountry() {
 		return country;
 	}
@@ -107,6 +121,7 @@ public class Customer {
 		this.country = country;
 	}
 
+    @Column(length=24)
 	public String getPhone() {
 		return phone;
 	}
@@ -115,6 +130,7 @@ public class Customer {
 		this.phone = phone;
 	}
 
+    @Column(length=24)
 	public String getFax() {
 		return fax;
 	}
@@ -123,6 +139,7 @@ public class Customer {
 		this.fax = fax;
 	}
 
+    @Version
 	public Integer getRowVersion() {
 		return rowVersion;
 	}

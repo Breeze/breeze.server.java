@@ -2,8 +2,12 @@ package northwind.jpamodel;
 
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Version;
 
 @Entity
 public class Category {
@@ -16,14 +20,15 @@ public class Category {
     private Set<Product> products;
 
     @Id
-	public int getCategoryID() {
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    public int getCategoryID() {
 		return categoryID;
 	}
 
 	public void setCategoryID(int categoryID) {
 		this.categoryID = categoryID;
 	}
-
+	@Column(length=15, nullable=false)
 	public String getCategoryName() {
 		return categoryName;
 	}
@@ -48,6 +53,7 @@ public class Category {
 		this.picture = picture;
 	}
 
+    @Version
 	public int getRowVersion() {
 		return rowVersion;
 	}
