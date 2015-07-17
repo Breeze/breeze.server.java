@@ -3,8 +3,10 @@ package northwind.jpamodel;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -38,12 +40,14 @@ public class Product {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
+    @Column(insertable=false, updatable=false)
 	public Integer getSupplierID() {
 		return supplierID;
 	}
 	public void setSupplierID(Integer supplierID) {
 		this.supplierID = supplierID;
 	}
+    @Column(insertable=false, updatable=false)
 	public Integer getCategoryID() {
 		return categoryID;
 	}
@@ -100,6 +104,7 @@ public class Product {
 		this.rowVersion = rowVersion;
 	}
 	@ManyToOne
+	@JoinColumn(name="categoryID")
 	public Category getCategory() {
 		return category;
 	}
@@ -107,6 +112,7 @@ public class Product {
 		this.category = category;
 	}
 	@ManyToOne
+    @JoinColumn(name="supplierID")
 	public Supplier getSupplier() {
 		return supplier;
 	}

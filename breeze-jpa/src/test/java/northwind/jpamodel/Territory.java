@@ -1,8 +1,10 @@
 package northwind.jpamodel;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -31,6 +33,7 @@ public class Territory {
 	public void setTerritoryDescription(String territoryDescription) {
 		this.territoryDescription = territoryDescription;
 	}
+    @Column(insertable=false, updatable=false)
 	public int getRegionID() {
 		return regionID;
 	}
@@ -51,6 +54,7 @@ public class Territory {
 		this.employeeTerritories = employeeTerritories;
 	}
     @ManyToOne
+    @JoinColumn(name="regionID")
 	public Region getRegion() {
 		return region;
 	}

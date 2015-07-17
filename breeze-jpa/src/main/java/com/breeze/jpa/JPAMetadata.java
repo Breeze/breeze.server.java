@@ -439,9 +439,8 @@ public class JPAMetadata extends Metadata {
                 if (attr.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_ONE) {
                     nmap.put("foreignKeyNamesOnServer", fkNames);
                 } else if (attr.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE) {
-                    OneToOne otm = ((AnnotatedElement)member).getAnnotation(OneToOne.class);
-                    if (otm != null && otm.mappedBy() != null) {
-                        fkNames = new String[]{ otm.mappedBy().toLowerCase() };
+                    OneToOne oto = ((AnnotatedElement)member).getAnnotation(OneToOne.class);
+                    if (oto != null && !isEmpty(oto.mappedBy())) {
                         nmap.put("invForeignKeyNamesOnServer", fkNames);
                     } else {
                         nmap.put("foreignKeyNamesOnServer", fkNames);
@@ -455,7 +454,10 @@ public class JPAMetadata extends Metadata {
                 if (isKey) {
                     for (String fkName : fkNames) {
                         HashMap<String, Object> relatedDataProperty = findPropertyByName(dataProperties, fkName);
-                        if (!relatedDataProperty.containsKey("isPartOfKey")) {
+                        if (relatedDataProperty == null) {
+                            nmap.put("ERROR", "Could not find matching data property for " + entityRelationship + ", fkNames=" + fkNames);
+                            throw new IllegalArgumentException("Could not find matching data property for " + entityRelationship + ", fkNames=" + Arrays.asList(fkNames));
+                        } else if (!relatedDataProperty.containsKey("isPartOfKey")) {
                             relatedDataProperty.put("isPartOfKey", true);
                         }
                     }
@@ -494,6 +496,7 @@ public class JPAMetadata extends Metadata {
         return unBracket(names.toArray(new String[names.size()]));
     }
     
+    /** Get the column names for the ID attribute of the given type */
     List<String> getIdAttributeColumnNames(IdentifiableType<?> type) {
         Attribute idattr = getSingleIdAttribute(type);
         if (idattr != null) {
@@ -524,7 +527,8 @@ public class JPAMetadata extends Metadata {
             return names;
         }
         
-        if (attr.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY) {
+        if (attr.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY ||
+                attr.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE) {
             Class<?> relatedEntityClass = getEntityType(attr);
             javax.persistence.metamodel.EntityType<?> relatedEntityType = _emFactory.getMetamodel().entity(relatedEntityClass);
             return getIdAttributeColumnNames(relatedEntityType);
@@ -563,8 +567,11 @@ public class JPAMetadata extends Metadata {
      */
     String[] getPropertyNamesForColumns(javax.persistence.metamodel.EntityType<?> entityType, String[] columnNames) {
         for (SingularAttribute attr : entityType.getSingularAttributes()) {
-            String[] columnArray = getColumnNames(attr);
-            if (namesEqual(columnArray, columnNames)) return new String[] { attr.getName() };
+            if (attr.getPersistentAttributeType() == PersistentAttributeType.BASIC ||
+                    attr.getPersistentAttributeType() == PersistentAttributeType.EMBEDDED) {
+                String[] columnArray = getColumnNames(attr);
+                if (namesEqual(columnArray, columnNames)) return new String[] { attr.getName() };
+            }
         }
         
         if (columnNames.length > 1)

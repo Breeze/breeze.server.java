@@ -3,8 +3,10 @@ package northwind.jpamodel;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -38,6 +40,7 @@ public class OrderDetail implements Serializable {
         return (getOrderID() == x.getOrderID()) && (productID == x.getProductID());
     }
 
+    @Column(insertable=false, updatable=false)
 	public int getOrderID() {
 		return orderID;
 	}
@@ -46,6 +49,7 @@ public class OrderDetail implements Serializable {
 		this.orderID = orderID;
 	}
 
+    @Column(insertable=false, updatable=false)
 	public int getProductID() {
 		return productID;
 	}
@@ -87,6 +91,7 @@ public class OrderDetail implements Serializable {
 	}
 	@Id
 	@ManyToOne
+    @JoinColumn(name="orderID")
 	public Order getOrder() {
 		return order;
 	}
@@ -96,6 +101,7 @@ public class OrderDetail implements Serializable {
 	}
 	@Id
 	@ManyToOne
+    @JoinColumn(name="productID")
 	public Product getProduct() {
 		return product;
 	}

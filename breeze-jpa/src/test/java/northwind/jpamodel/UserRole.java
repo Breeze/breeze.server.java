@@ -1,7 +1,9 @@
 package northwind.jpamodel;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -20,12 +22,14 @@ public class UserRole {
 	public void setId(long id) {
 		this.id = id;
 	}
+    @Column(insertable=false, updatable=false)
 	public long getUserId() {
 		return userId;
 	}
 	public void setUserId(long userId) {
 		this.userId = userId;
 	}
+    @Column(insertable=false, updatable=false)
 	public long getRoleId() {
 		return roleId;
 	}
@@ -33,6 +37,7 @@ public class UserRole {
 		this.roleId = roleId;
 	}
 	@ManyToOne
+	@JoinColumn(name="userID")
 	public User getUser() {
 		return user;
 	}
@@ -40,6 +45,7 @@ public class UserRole {
 		this.user = user;
 	}
 	@ManyToOne
+    @JoinColumn(name="roleID")
 	public Role getRole() {
 		return role;
 	}

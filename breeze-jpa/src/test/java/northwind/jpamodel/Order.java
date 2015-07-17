@@ -5,8 +5,10 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -41,12 +43,14 @@ public class Order {
 	public void setOrderID(int orderID) {
 		this.orderID = orderID;
 	}
+    @Column(insertable=false, updatable=false)
 	public UUID getCustomerID() {
 		return customerID;
 	}
 	public void setCustomerID(UUID customerID) {
 		this.customerID = customerID;
 	}
+    @Column(insertable=false, updatable=false)
 	public Integer getEmployeeID() {
 		return employeeID;
 	}
@@ -120,6 +124,7 @@ public class Order {
 		this.rowVersion = rowVersion;
 	}
 	@ManyToOne
+    @JoinColumn(name="customerID")
 	public Customer getCustomer() {
 		return customer;
 	}
@@ -127,6 +132,7 @@ public class Order {
 		this.customer = customer;
 	}
 	@ManyToOne
+    @JoinColumn(name="employeeID")
 	public Employee getEmployee() {
 		return employee;
 	}
