@@ -34,8 +34,8 @@ import com.breeze.metadata.RawMetadata;
 
 /**
  * Builds a data structure containing the metadata required by Breeze.
- * 
- * @see <a href="http://www.breezejs.com/documentation/breeze-metadata-format">Breeze Metadata Doc</a>
+ *
+ * @see <a href="http://breeze.github.io/doc-js/metadata-schema.html">Breeze Metadata Doc</a>
  * @author IdeaBlade
  *
  */
