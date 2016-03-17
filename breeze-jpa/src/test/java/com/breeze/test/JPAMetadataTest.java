@@ -6,7 +6,6 @@ import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import com.breeze.hib.HibernateMetadata;
 import com.breeze.jpa.JPAMetadata;
 import com.breeze.metadata.Metadata;
 import com.breeze.metadata.RawMetadata;

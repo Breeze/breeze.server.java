@@ -14,5 +14,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/breeze-hibernate"/>
 	<classpathentry kind="lib" path="/breeze-northwind/src/main/resources"/>
 	<classpathentry kind="lib" path="C:/Java/eclipselink-jpa2.1ri-v20130425-368d603/jlib/javax.persistence_2.1.0.v201304241213.jar" sourcepath="C:/Java/eclipselink-jpa2.1ri-v20130425-368d603/src/javax.persistence.source_2.1.0.v201304241213.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.3.1/gson-2.3.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
