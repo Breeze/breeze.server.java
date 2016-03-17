@@ -2,6 +2,7 @@ package com.breeze.jpa;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -75,6 +77,7 @@ public class JPATypeAdapter<T> extends TypeAdapter<T> {
      */
     public static class Factory implements TypeAdapterFactory {
 
+        private static int MODIFIER_EXCLUDE = Modifier.ABSTRACT | Modifier.INTERFACE | Modifier.STATIC;
         private PersistenceUnitUtil puu;
         public Factory(PersistenceUnitUtil puu) {
             this.puu = puu;
@@ -97,9 +100,13 @@ public class JPATypeAdapter<T> extends TypeAdapter<T> {
             while (raw != Object.class) {
                 Field[] fields = raw.getDeclaredFields();
                 for (Field field : fields) {
+                    int mod = field.getModifiers();
+                    if ((mod & MODIFIER_EXCLUDE) != 0) continue;
+                    
                     field.setAccessible(true);
                     String fieldName = field.getName();
-                    String jsonName = FieldNamingPolicy.IDENTITY.translateName(field);
+                    SerializedName serializedName = field.getAnnotation(SerializedName.class);
+                    String jsonName = serializedName != null ? serializedName.value() : FieldNamingPolicy.IDENTITY.translateName(field);
                     boundFields.add(new BoundField(field, fieldName, jsonName, gson.getAdapter(field.getType())));
                 }
                 raw = (Class) raw.getGenericSuperclass(); // go up the hierarchy

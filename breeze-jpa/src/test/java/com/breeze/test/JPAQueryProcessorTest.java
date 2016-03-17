@@ -5,8 +5,7 @@ import java.util.Collection;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import northwind.jpamodel.Customer;
-import northwind.jpamodel.Employee;
+import northwind.jpamodel.*;
 
 import com.breeze.jpa.JPAMetadata;
 import com.breeze.jpa.JPAQueryProcessor;

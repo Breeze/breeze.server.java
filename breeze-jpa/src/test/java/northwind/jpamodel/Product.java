@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,6 +16,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Version;
 
 @Entity
+@DiscriminatorColumn(name="discontinued", discriminatorType=DiscriminatorType.INTEGER)
+@DiscriminatorValue("0")
 public class Product {
     private int productID;
     private String productName;
@@ -90,6 +95,7 @@ public class Product {
 	public void setReorderLevel(Short reorderLevel) {
 		this.reorderLevel = reorderLevel;
 	}
+	@Column(name="discontinued")
 	public boolean getIsDiscontinued() {
 	    return isDiscontinued;
 	}

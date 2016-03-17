@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
 
@@ -54,6 +55,7 @@ public class InternationalOrder {
 	}
 
 	@OneToOne(optional=false)
+	@JoinColumn(name="orderID", insertable=false, updatable=false)
 	public Order getOrder() {
 		return order;
 	}

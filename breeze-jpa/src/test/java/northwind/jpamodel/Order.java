@@ -3,7 +3,6 @@ package northwind.jpamodel;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,13 +13,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.persistence.Version;
 
 @Entity
+@Table(name="`Order`")
 public class Order {
 
     private int orderID;
-    private UUID customerID;
+    private String customerID;
     private Integer employeeID;
     private Date orderDate;
     private Date requiredDate;
@@ -48,10 +49,10 @@ public class Order {
 		this.orderID = orderID;
 	}
     @Column(insertable=false, updatable=false)
-	public UUID getCustomerID() {
+	public String getCustomerID() {
 		return customerID;
 	}
-	public void setCustomerID(UUID customerID) {
+	public void setCustomerID(String customerID) {
 		this.customerID = customerID;
 	}
     @Column(insertable=false, updatable=false)

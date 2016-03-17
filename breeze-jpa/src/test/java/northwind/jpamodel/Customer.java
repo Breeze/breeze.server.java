@@ -1,7 +1,6 @@
 package northwind.jpamodel;
 
 import java.util.Collection;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

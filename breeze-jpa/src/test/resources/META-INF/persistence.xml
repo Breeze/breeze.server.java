@@ -17,6 +17,8 @@
 		  <property name="javax.persistence.jdbc.user" value="myadmin" />
 		  <property name="javax.persistence.jdbc.password" value="mysql" />
           <property name="eclipselink.target-database" value="mysql4" />
+          <property name="eclipselink.logging.level" value="FINE"/>
+          <property name="eclipselink.logging.parameters" value="true"/>
 		
 		</properties>
         
