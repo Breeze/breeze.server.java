@@ -50,7 +50,7 @@ public class JPATypeAdapter<T> extends TypeAdapter<T> {
         out.beginObject();
         try {
             for (BoundField bf : this.boundFields) {
-                if (!puu.isLoaded(value, bf.fieldName)) {
+                if (!bf.isCore && !puu.isLoaded(value, bf.fieldName)) {
                     out.name(bf.jsonName).nullValue();
                 } else {
                     Object fieldValue = bf.field.get(value);
@@ -83,19 +83,26 @@ public class JPATypeAdapter<T> extends TypeAdapter<T> {
             this.puu = puu;
         }
         
+        public static boolean isCoreType(Class clazz, boolean langOnly) {
+            // eliminate enums
+            if (clazz.isEnum()) return true;
+            String typeName = clazz.getCanonicalName();
+            // eliminate all simple types
+            String prefix = langOnly ? "java.lang." : "java.";
+            if ((typeName.indexOf('.') == -1) || typeName.startsWith(prefix)) {
+                return true;
+            }
+            return false;
+        }
+        
         public final <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
             
             Class rawType = type.getRawType();
-            // eliminate enums
-            if (rawType.isEnum()) return null;
-            String typeName = rawType.getCanonicalName();
-            // eliminate all simple types
-            if ((typeName.indexOf('.') == -1) || typeName.startsWith("java.")) {
-                return null;
-            }
+            if (isCoreType(rawType, false)) return null;
             
             List<BoundField> boundFields = new ArrayList<BoundField>();
             
+            // populate list with all JSON-serializable fields on the type
             Class raw = type.getRawType();
             while (raw != Object.class) {
                 Field[] fields = raw.getDeclaredFields();
@@ -107,7 +114,9 @@ public class JPATypeAdapter<T> extends TypeAdapter<T> {
                     String fieldName = field.getName();
                     SerializedName serializedName = field.getAnnotation(SerializedName.class);
                     String jsonName = serializedName != null ? serializedName.value() : FieldNamingPolicy.IDENTITY.translateName(field);
-                    boundFields.add(new BoundField(field, fieldName, jsonName, gson.getAdapter(field.getType())));
+                    Class fieldType = field.getType();
+                    
+                    boundFields.add(new BoundField(field, fieldName, jsonName, gson.getAdapter(fieldType), isCoreType(fieldType, true)));
                 }
                 raw = (Class) raw.getGenericSuperclass(); // go up the hierarchy
             }
@@ -122,12 +131,13 @@ public class JPATypeAdapter<T> extends TypeAdapter<T> {
      */
     public static class BoundField
     {
-        public BoundField(Field field, String fieldName, String jsonName, TypeAdapter typeAdapter) {
+        public BoundField(Field field, String fieldName, String jsonName, TypeAdapter typeAdapter, boolean isCore) {
             super();
             this.field = field;
             this.fieldName = fieldName;
             this.jsonName = jsonName;
             this.typeAdapter = typeAdapter;
+            this.isCore = isCore;
         }
         /** Reflection field */
         Field field;
@@ -137,6 +147,8 @@ public class JPATypeAdapter<T> extends TypeAdapter<T> {
         String jsonName;
         /** TypeAdapter for serializing the field */
         TypeAdapter typeAdapter;
+        /** Field is primitive or java.lang.*  */
+        boolean isCore;
     }
     
 }
