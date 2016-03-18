@@ -40,7 +40,7 @@ public class Employee {
     private Employee manager;
     private Set<EmployeeTerritory> employeeTerritories;
     private Set<Order> orders;
-    private Set<Territory> territories;
+//    private Set<Territory> territories;
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -208,12 +208,12 @@ public class Employee {
 	public void setOrders(Set<Order> orders) {
 		this.orders = orders;
 	}
-    @ManyToMany
-	public Set<Territory> getTerritories() {
-		return territories;
-	}
-	public void setTerritories(Set<Territory> territories) {
-		this.territories = territories;
-	}
+//    @ManyToMany
+//	public Set<Territory> getTerritories() {
+//		return territories;
+//	}
+//	public void setTerritories(Set<Territory> territories) {
+//		this.territories = territories;
+//	}
 
 }

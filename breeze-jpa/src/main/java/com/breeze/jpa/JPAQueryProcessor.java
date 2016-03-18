@@ -41,6 +41,22 @@ public class JPAQueryProcessor extends QueryProcessor {
 //            pet.
 //            cq.select(pet);
             TypedQuery<?> q = em.createQuery(cq);
+            Integer takeCount = entityQuery.getTakeCount();
+            if (takeCount != null && takeCount == 0) {
+                // Hack because setMaxResults(0) returns all records instead of none.
+                // so we do then equiv of skip 'everything' instead.
+                // and then insure that we don't overwrite this with another skip.
+                q.setFirstResult(Integer.MAX_VALUE);
+            } else {
+                if (takeCount != null) {
+                    q.setMaxResults(takeCount);
+                }
+                Integer skipCount = entityQuery.getSkipCount();
+                if (skipCount != null) {
+                    q.setFirstResult(skipCount);
+                }
+            }
+            
             List<?> result = q.getResultList();       
             
             QueryResult qr;

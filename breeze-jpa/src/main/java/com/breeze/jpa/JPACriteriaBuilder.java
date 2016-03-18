@@ -51,26 +51,6 @@ public class JPACriteriaBuilder {
         _entityQuery = entityQuery;
         _cb = criteriaBuilder;
 //        _aliasBuilder = new CriteriaAliasBuilder();
-        Integer takeCount = entityQuery.getTakeCount();
-// for JPA, need to apply skip & take on a TypedQuery instance instead, after the rest of the query has been composed:
-//        TypedQuery<?> q = em.createQuery(crit);  
-//        q.setFirstResult(
-//        q.setMaxResults
-//        if (takeCount != null && takeCount == 0) {
-//            // Hack because setMaxResults(0) returns all records instead of
-//            // none.
-//            // so we do then equiv of skip 'everything' instead.
-//            // and then insure that we don't overwrite this with another skip.
-//            crit.setFirstResult(Integer.MAX_VALUE);
-//        } else {
-//            if (takeCount != null) {
-//                crit.setMaxResults(takeCount);
-//            }
-//            Integer skipCount = entityQuery.getSkipCount();
-//            if (skipCount != null) {
-//                crit.setFirstResult(skipCount);
-//            }
-//        }
 
         _root = crit.from(crit.getResultType());
         addWhere(crit, entityQuery.getWherePredicate());
@@ -109,7 +89,7 @@ public class JPACriteriaBuilder {
 
             propName = (contextAlias == null) ? propName : contextAlias + "."
                     + propName;
-            Path<Object> path = _root.get(propName);
+            Path path = _root.get(propName);
             if (expr2 instanceof LitExpression) {
                 Object value = ((LitExpression) expr2).getValue();
                 if (value == null) {
@@ -133,18 +113,14 @@ public class JPACriteriaBuilder {
                     xpred = _cb.lessThan(_root.<Comparable>get(propName), (Comparable) value);
                 } else if (op == Operator.LessThanOrEqual) {
                     xpred = _cb.lessThanOrEqualTo(_root.<Comparable>get(propName), (Comparable) value);
-//                } else if (op == Operator.In) {
-//                    xpred = _cb.in(path).in((List) value);
-//                } else if (op == Operator.StartsWith) {
-//                    xpred = _cb.like((String) value);
-//                    cr = Restrictions.like(propName, ((String) value),
-//                            MatchMode.START);
-//                } else if (op == Operator.EndsWith) {
-//                    cr = Restrictions.like(propName, (String) value,
-//                            MatchMode.END);
-//                } else if (op == Operator.Contains) {
-//                    cr = Restrictions.like(propName, ((String) value),
-//                            MatchMode.ANYWHERE);
+                } else if (op == Operator.In) {
+                    xpred = path.in((List) value);
+                } else if (op == Operator.StartsWith) {
+                    xpred = _cb.like(path, "" + value + "%");
+                } else if (op == Operator.EndsWith) {
+                    xpred = _cb.like(path, "%" + value);
+                } else if (op == Operator.Contains) {
+                    xpred = _cb.like(path, "%" + value + "%");
                 } else {
                     throw new RuntimeException("Binary Predicate with the "
                             + op.getName() + "operator is not yet supported.");
