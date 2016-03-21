@@ -67,6 +67,14 @@ public class JPACriteriaBuilder {
 //        CriteriaWrapper critWrapper = new CriteriaWrapper(crit, _entityType);
 //        Criterion cr = toCriterion(crit, wherePred, null);
 //        crit.add(cr);
+        
+        // nested path translate, ?Task???"user.name"?filedName, ???Task.user.name??
+//        String[] names = StringUtils.split(filter.fieldName, ".");
+//        Path expression = root.get(names[0]);
+//        for (int i = 1; i < names.length; i++) {
+//            expression = expression.get(names[i]);
+//        }        
+        
         BinaryPredicate breezePred = (BinaryPredicate) wherePred;
         
         Operator op = breezePred.getOperator();
@@ -87,8 +95,7 @@ public class JPACriteriaBuilder {
                 propName = propPath; //crit. _aliasBuilder.getPropertyName(crit, propPath);
             }
 
-            propName = (contextAlias == null) ? propName : contextAlias + "."
-                    + propName;
+            propName = (contextAlias == null) ? propName : contextAlias + "." + propName;
             Path path = _root.get(propName);
             if (expr2 instanceof LitExpression) {
                 Object value = ((LitExpression) expr2).getValue();
@@ -126,24 +133,30 @@ public class JPACriteriaBuilder {
                             + op.getName() + "operator is not yet supported.");
                 }
             } else {
-                String otherPropPath = ((PropExpression) expr2)
-                        .getPropertyPath();
-//                if (symbol != null) {
-//                    cr = new PropertyExpression(propName, otherPropPath, symbol);
-//                } else if (op == Operator.StartsWith) {
-//                    cr = new LikePropertyExpression(propName, otherPropPath,
-//                            MatchMode.START);
-//                } else if (op == Operator.EndsWith) {
-//                    cr = new LikePropertyExpression(propName, otherPropPath,
-//                            MatchMode.END);
-//                } else if (op == Operator.Contains) {
-//                    cr = new LikePropertyExpression(propName, otherPropPath,
-//                            MatchMode.ANYWHERE);
-//                } else {
+                String otherPropPath = ((PropExpression) expr2).getPropertyPath();
+                Path otherPath = _root.get(otherPropPath);
+                if (op == Operator.Equals) {
+                    xpred = _cb.equal(path, otherPath);
+                } else if (op == Operator.NotEquals) {
+                    xpred = _cb.notEqual(path, otherPath);
+                } else if (op == Operator.GreaterThan) {
+                    xpred = _cb.greaterThan(_root.<Comparable>get(propName), _root.<Comparable>get(otherPropPath));
+                } else if (op == Operator.GreaterThanOrEqual) {
+                    xpred = _cb.greaterThanOrEqualTo(_root.<Comparable>get(propName), _root.<Comparable>get(otherPropPath));
+                } else if (op == Operator.LessThan) {
+                    xpred = _cb.lessThan(_root.<Comparable>get(propName), _root.<Comparable>get(otherPropPath));
+                } else if (op == Operator.LessThanOrEqual) {
+                    xpred = _cb.lessThanOrEqualTo(_root.<Comparable>get(propName), _root.<Comparable>get(otherPropPath));
+                } else if (op == Operator.StartsWith) {
+                    xpred = _cb.like(path, _cb.concat(otherPath, "%"));
+                } else if (op == Operator.EndsWith) {
+                    xpred = _cb.like(path, _cb.concat("%", otherPath));
+                } else if (op == Operator.Contains) {
+                    xpred = _cb.like(path, _cb.concat(_cb.concat("%", otherPath), "%"));
+                } else {
                     throw new RuntimeException("Property comparison with the "
                             + op.getName() + "operator is not yet supported.");
-//                }
-
+                }
             }
             crit.where(xpred);
             return;

@@ -185,5 +185,82 @@ public class JPAQueryProcessorTest extends TestCase {
             assertTrue("companyName", companyName.contains("rest"));
         }
     }
+
+    // compare two properties
+
+    public void testEqualsProp() {
+        Collection results = runQuery("Products", "{ where: { supplierID: { eq: { value: 'categoryID', isProperty: true }}}}");
+        assertTrue("results.size() > 5", results.size() > 5);
+        for (Object o : results) {
+            assertEquals(((Product) o).getSupplierID(), ((Product) o).getCategoryID());
+        }
+    }
+    
+    public void testNotEqualsProp() {
+        Collection results = runQuery("Products", "{ where: { unitsOnOrder: { 'ne': { value: 'reorderLevel', isProperty: true }}}}");
+        assertTrue("results.size() > 5", results.size() > 5);
+        for (Object o : results) {
+            assertTrue("Not Equal", ((Product) o).getUnitsOnOrder() != ((Product) o).getReorderLevel());
+        }
+    }
+
+    public void testGreaterThanProp() {
+        Collection results = runQuery("Products", "{ where: { unitsOnOrder: { 'gt': { value: 'reorderLevel', isProperty: true }}}}");
+        assertTrue("results.size() > 5", results.size() > 5);
+        for (Object o : results) {
+            assertTrue("Greater", ((Product) o).getUnitsOnOrder() > ((Product) o).getReorderLevel());
+        }
+    }
+
+    public void testGreaterThanOrEqualProp() {
+        Collection results = runQuery("Products", "{ where: { unitsOnOrder: { 'ge': { value: 'reorderLevel', isProperty: true }}}}");
+        assertTrue("results.size() > 5", results.size() > 5);
+        for (Object o : results) {
+            assertTrue("Greater Or Equal", ((Product) o).getUnitsOnOrder() >= ((Product) o).getReorderLevel());
+        }
+    }
+    
+    public void testLessThanProp() {
+        Collection results = runQuery("Products", "{ where: { unitsOnOrder: { 'lt': { value: 'reorderLevel', isProperty: true }}}}");
+        assertTrue("results.size() > 5", results.size() > 5);
+        for (Object o : results) {
+            assertTrue("Less", ((Product) o).getUnitsOnOrder() < ((Product) o).getReorderLevel());
+        }
+    }
+
+    public void testLessThanOrEqualProp() {
+        Collection results = runQuery("Products", "{ where: { unitsOnOrder: { 'le': { value: 'reorderLevel', isProperty: true }}}}");
+        assertTrue("results.size() > 5", results.size() > 5);
+        for (Object o : results) {
+            assertTrue("Less Or Equal", ((Product) o).getUnitsOnOrder() <= ((Product) o).getReorderLevel());
+        }
+    }
+
+    public void testStartsWithProp() {
+        Collection results = runQuery("Users", "{ where: { userName: { 'startsWith': { value: 'lastName', isProperty: true }}}}");
+        assertEquals(17, results.size());
+        for (Object o : results) {
+            User u = ((User) o);
+            assertTrue("Username", u.getUserName().startsWith(u.getLastName().toLowerCase()));
+        }
+    }
+
+    public void testEndsWithProp() {
+        Collection results = runQuery("Users", "{ where: { userName: { 'endsWith': { value: 'firstName', isProperty: true }}}}");
+        assertEquals(2, results.size());
+        for (Object o : results) {
+            User u = ((User) o);
+            assertTrue("Username", u.getUserName().endsWith(u.getFirstName().toLowerCase()));
+        }
+    }
+
+    public void testContainsProp() {
+        Collection results = runQuery("Customers", "{ where: { companyName: { 'contains': { value: 'city', isProperty: true }}}}");
+        assertEquals(1, results.size());
+        for (Object o : results) {
+            String companyName = ((Customer) o).getCompanyName().toLowerCase();
+            assertTrue("companyName", companyName.contains(((Customer) o).getCity().toLowerCase()));
+        }
+    }
     
 }
